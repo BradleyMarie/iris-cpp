@@ -26,6 +26,25 @@ cc_test(
 )
 
 cc_library(
+    name = "ray",
+    hdrs = ["ray.h"],
+    deps = [
+        ":float",
+        ":point",
+        ":vector",
+    ],
+)
+
+cc_test(
+    name = "ray_test",
+    srcs = ["ray_test.cc"],
+    deps = [
+        ":ray",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "vector",
     hdrs = ["vector.h"],
     deps = [
