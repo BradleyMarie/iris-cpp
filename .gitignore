@@ -30,3 +30,22 @@
 *.exe
 *.out
 *.app
+
+# Build artifacts
+bazel-bin/
+bazel-genfiles/
+bazel-iris/
+bazel-iris-cpp/
+bazel-out/
+bazel-testlogs/
+
+# Build artifacts as files
+bazel-bin
+bazel-genfiles
+bazel-iris
+bazel-iris-cpp
+bazel-out
+bazel-testlogs
+
+# VS Code
+.vscode/
