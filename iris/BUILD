@@ -8,6 +8,24 @@ cc_library(
 )
 
 cc_library(
+    name = "point",
+    hdrs = ["point.h"],
+    deps = [
+        ":float",
+        ":vector",
+    ],
+)
+
+cc_test(
+    name = "point_test",
+    srcs = ["point_test.cc"],
+    deps = [
+        ":point",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "vector",
     hdrs = ["vector.h"],
     deps = [
