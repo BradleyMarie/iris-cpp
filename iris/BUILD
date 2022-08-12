@@ -8,6 +8,28 @@ cc_library(
 )
 
 cc_library(
+    name = "matrix",
+    hdrs = ["matrix.h"],
+    srcs = ["matrix.cc"],
+    deps = [
+        ":float",
+        ":point",
+        ":ray",
+        ":vector",
+        "@com_google_absl//absl/status:statusor",
+    ],
+)
+
+cc_test(
+    name = "matrix_test",
+    srcs = ["matrix_test.cc"],
+    deps = [
+        ":matrix",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "point",
     hdrs = ["point.h"],
     deps = [
