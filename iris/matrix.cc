@@ -10,14 +10,19 @@ namespace {
 
 std::optional<std::array<std::array<geometric_t, 4>, 4>> Invert(
     const std::array<std::array<geometric_t, 4>, 4>& m) {
-  std::array<std::array<geometric_t, 4>, 4> inverse = m;
+  std::array<std::array<intermediate_t, 4>, 4> inverse;
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      inverse[i][j] = static_cast<intermediate_t>(m[i][j]);
+    }
+  }
 
   size_t column_index[] = {0, 0, 0, 0};
   size_t row_index[] = {0, 0, 0, 0};
   size_t pivot[] = {0, 0, 0, 0};
 
   for (size_t i = 0; i < 4; i++) {
-    float_t best_candidate = (float_t)0.0;
+    intermediate_t best_candidate = 0.0;
     size_t best_column = 0;
     size_t best_row = 0;
 
@@ -35,7 +40,7 @@ std::optional<std::array<std::array<geometric_t, 4>, 4>> Invert(
           return std::nullopt;
         }
 
-        float_t new_candidate = fabs(inverse[j][k]);
+        intermediate_t new_candidate = std::abs(inverse[j][k]);
         if (new_candidate >= best_candidate) {
           best_candidate = new_candidate;
           best_row = j;
@@ -48,7 +53,7 @@ std::optional<std::array<std::array<geometric_t, 4>, 4>> Invert(
 
     if (best_row != best_column) {
       for (size_t k = 0; k < 4; k++) {
-        float_t tmp = inverse[best_row][k];
+        intermediate_t tmp = inverse[best_row][k];
         inverse[best_row][k] = inverse[best_column][k];
         inverse[best_column][k] = tmp;
       }
@@ -61,7 +66,7 @@ std::optional<std::array<std::array<geometric_t, 4>, 4>> Invert(
     column_index[i] = best_column;
     row_index[i] = best_row;
 
-    float_t divisor = inverse[best_column][best_column];
+    intermediate_t divisor = inverse[best_column][best_column];
     inverse[best_column][best_column] = (float_t)1.0;
     for (size_t j = 0; j < 4; j++) {
       inverse[best_column][j] /= divisor;
@@ -72,8 +77,8 @@ std::optional<std::array<std::array<geometric_t, 4>, 4>> Invert(
         continue;
       }
 
-      float_t scalar = -inverse[j][best_column];
-      inverse[j][best_column] = (float_t)0.0;
+      intermediate_t scalar = -inverse[j][best_column];
+      inverse[j][best_column] = 0.0;
       for (size_t k = 0; k < 4; k++) {
         inverse[j][k] += scalar * inverse[best_column][k];
       }
@@ -87,13 +92,20 @@ std::optional<std::array<std::array<geometric_t, 4>, 4>> Invert(
     }
 
     for (size_t k = 0; k < 4; k++) {
-      float_t tmp = inverse[k][row_index[j]];
+      intermediate_t tmp = inverse[k][row_index[j]];
       inverse[k][row_index[j]] = inverse[k][column_index[j]];
       inverse[k][column_index[j]] = tmp;
     }
   }
 
-  return inverse;
+  std::array<std::array<geometric_t, 4>, 4> result;
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      result[i][j] = static_cast<geometric_t>(inverse[i][j]);
+    }
+  }
+
+  return result;
 }
 
 std::array<std::array<geometric_t, 4>, 4> Multiply4x4(
@@ -102,10 +114,19 @@ std::array<std::array<geometric_t, 4>, 4> Multiply4x4(
   std::array<std::array<geometric_t, 4>, 4> result;
   for (size_t i = 0; i < 4; i++) {
     for (size_t j = 0; j < 4; j++) {
-      result[i][j] = left[i][0] * right[0][j] + left[i][1] * right[1][j] +
-                     left[i][2] * right[2][j] + left[i][3] * right[3][j];
+      intermediate_t intermediate =
+          static_cast<intermediate_t>(left[i][0]) *
+              static_cast<intermediate_t>(right[0][j]) +
+          static_cast<intermediate_t>(left[i][1]) *
+              static_cast<intermediate_t>(right[1][j]) +
+          static_cast<intermediate_t>(left[i][2]) *
+              static_cast<intermediate_t>(right[2][j]) +
+          static_cast<intermediate_t>(left[i][3]) *
+              static_cast<intermediate_t>(right[3][j]);
+      result[i][j] = static_cast<geometric_t>(intermediate);
     }
   }
+
   return result;
 }
 
@@ -251,23 +272,40 @@ absl::StatusOr<Matrix> Matrix::Rotation(geometric_t theta, geometric_t x,
     return absl::InvalidArgumentError("One of x, y, or z must be non-zero");
   }
 
-  Vector axis = Normalize(Vector(x, y, z));
+  intermediate_t theta_intermediate = static_cast<intermediate_t>(theta);
+  intermediate_t x_intermediate = static_cast<intermediate_t>(x);
+  intermediate_t y_intermediate = static_cast<intermediate_t>(y);
+  intermediate_t z_intermediate = static_cast<intermediate_t>(z);
 
-  geometric_t sin_theta = std::sin(theta);
-  geometric_t cos_theta = std::cos(theta);
-  geometric_t ic = 1.0 - cos_theta;
+  intermediate_t magnitude = std::sqrt(x * x + y * y + z * z);
+  x_intermediate /= magnitude;
+  y_intermediate /= magnitude;
+  z_intermediate /= magnitude;
 
-  geometric_t m00 = axis.x * axis.x * ic + cos_theta;
-  geometric_t m01 = axis.x * axis.y * ic - axis.z * sin_theta;
-  geometric_t m02 = axis.x * axis.z * ic + axis.y * sin_theta;
+  intermediate_t sin_theta = std::sin(theta_intermediate);
+  intermediate_t cos_theta = std::cos(theta_intermediate);
+  intermediate_t ic = static_cast<intermediate_t>(1.0) - cos_theta;
 
-  geometric_t a0 = axis.y * axis.x * ic + axis.z * sin_theta;
-  geometric_t a1 = axis.y * axis.y * ic + cos_theta;
-  geometric_t a2 = axis.y * axis.z * ic - axis.x * sin_theta;
+  geometric_t m00 = static_cast<geometric_t>(
+      x_intermediate * x_intermediate * ic + cos_theta);
+  geometric_t m01 = static_cast<geometric_t>(
+      x_intermediate * y_intermediate * ic - z_intermediate * sin_theta);
+  geometric_t m02 = static_cast<geometric_t>(
+      x_intermediate * z_intermediate * ic + y_intermediate * sin_theta);
 
-  geometric_t b0 = axis.z * axis.x * ic - axis.y * sin_theta;
-  geometric_t b1 = axis.z * axis.y * ic + axis.x * sin_theta;
-  geometric_t b2 = axis.z * axis.z * ic + cos_theta;
+  geometric_t a0 = static_cast<geometric_t>(
+      y_intermediate * x_intermediate * ic + z_intermediate * sin_theta);
+  geometric_t a1 = static_cast<geometric_t>(
+      y_intermediate * y_intermediate * ic + cos_theta);
+  geometric_t a2 = static_cast<geometric_t>(
+      y_intermediate * z_intermediate * ic - x_intermediate * sin_theta);
+
+  geometric_t b0 = static_cast<geometric_t>(
+      z_intermediate * x_intermediate * ic - y_intermediate * sin_theta);
+  geometric_t b1 = static_cast<geometric_t>(
+      z_intermediate * y_intermediate * ic + x_intermediate * sin_theta);
+  geometric_t b2 = static_cast<geometric_t>(
+      z_intermediate * z_intermediate * ic + cos_theta);
 
   std::array<std::array<geometric_t, 4>, 4> matrix = {{{m00, m01, m02, 0.0},
                                                        {a0, a1, a2, 0.0},
@@ -320,13 +358,32 @@ absl::StatusOr<Matrix> Matrix::Orthographic(geometric_t left, geometric_t right,
     return absl::InvalidArgumentError("near cannot equal far");
   }
 
-  geometric_t tx = -(right + left) / (right - left);
-  geometric_t ty = -(top + bottom) / (top - bottom);
-  geometric_t tz = -(far + near) / (far - near);
+  intermediate_t left_intermediate = left;
+  intermediate_t right_intermediate = right;
+  intermediate_t bottom_intermediate = bottom;
+  intermediate_t top_intermediate = top;
+  intermediate_t near_intermediate = near;
+  intermediate_t far_intermediate = far;
 
-  geometric_t sx = static_cast<geometric_t>(2.0) / (right - left);
-  geometric_t sy = static_cast<geometric_t>(2.0) / (top - bottom);
-  geometric_t sz = static_cast<geometric_t>(-2.0) / (far - near);
+  geometric_t tx =
+      -static_cast<geometric_t>((right_intermediate + left_intermediate) /
+                                (right_intermediate - left_intermediate));
+  geometric_t ty =
+      -static_cast<geometric_t>((top_intermediate + bottom_intermediate) /
+                                (top_intermediate - bottom_intermediate));
+  geometric_t tz =
+      -static_cast<geometric_t>((far_intermediate + near_intermediate) /
+                                (far_intermediate - near_intermediate));
+
+  geometric_t sx =
+      static_cast<geometric_t>(static_cast<intermediate_t>(2.0) /
+                               (right_intermediate - left_intermediate));
+  geometric_t sy =
+      static_cast<geometric_t>(static_cast<intermediate_t>(2.0) /
+                               (top_intermediate - bottom_intermediate));
+  geometric_t sz =
+      static_cast<geometric_t>(static_cast<intermediate_t>(-2.0) /
+                               (far_intermediate - near_intermediate));
 
   std::array<std::array<geometric_t, 4>, 4> matrix = {{{sx, 0.0, 0.0, tx},
                                                        {0.0, sy, 0.0, ty},
