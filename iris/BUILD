@@ -67,6 +67,22 @@ cc_test(
 )
 
 cc_library(
+    name = "reflector",
+    hdrs = ["reflector.h"],
+    deps = [
+        ":float",
+    ],
+)
+
+cc_library(
+    name = "spectrum",
+    hdrs = ["spectrum.h"],
+    deps = [
+        ":float",
+    ],
+)
+
+cc_library(
     name = "vector",
     hdrs = ["vector.h"],
     deps = [
