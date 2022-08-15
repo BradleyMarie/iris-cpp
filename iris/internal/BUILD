@@ -24,9 +24,7 @@ cc_library(
     name = "hit",
     hdrs = ["hit.h"],
     deps = [
-        "//iris:geometry",
         "//iris:hit",
         "//iris:integer",
-        "//iris:matrix",
     ],
 )

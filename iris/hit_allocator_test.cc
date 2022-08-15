@@ -6,8 +6,10 @@
 #include "iris/internal/hit_arena.h"
 
 TEST(HitArena, Allocate) {
+  auto ray = iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0));
+
   auto arena = iris::internal::HitArena();
-  iris::HitAllocator allocator(arena);
+  iris::HitAllocator allocator(ray, arena);
 
   auto& hit0 = allocator.Allocate(nullptr, 1.0, 1, 2);
   EXPECT_EQ(nullptr, hit0.next);

@@ -1,12 +1,13 @@
 #ifndef _IRIS_INTERNAL_HIT_
 #define _IRIS_INTERNAL_HIT_
 
-#include "iris/geometry.h"
 #include "iris/hit.h"
 #include "iris/integer.h"
-#include "iris/matrix.h"
 
-namespace iris::internal {
+namespace iris {
+class Geometry;
+class Matrix;
+namespace internal {
 
 struct Hit : public iris::Hit {
   Hit() : Hit(nullptr, 0.0, 0, 0, nullptr) {}
@@ -27,6 +28,7 @@ struct Hit : public iris::Hit {
   const void* additional_data;
 };
 
-}  // namespace iris::internal
+}  // namespace internal
+}  // namespace iris
 
 #endif  // _IRIS_INTERNAL_HIT_

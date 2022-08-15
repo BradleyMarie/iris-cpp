@@ -7,6 +7,7 @@
 #include "iris/float.h"
 #include "iris/hit.h"
 #include "iris/integer.h"
+#include "iris/ray.h"
 
 namespace iris {
 namespace internal {
@@ -15,7 +16,8 @@ class HitArena;
 
 class HitAllocator {
  public:
-  HitAllocator(internal::HitArena& arena) : arena_(arena) {}
+  HitAllocator(const Ray& ray, internal::HitArena& arena)
+      : ray_(ray), arena_(arena) {}
 
   Hit& Allocate(Hit* next, geometric_t distance, face_t front, face_t back) {
     return Allocate(next, distance, front, back, nullptr, 0);
@@ -32,7 +34,10 @@ class HitAllocator {
   Hit& Allocate(Hit* next, geometric_t distance, face_t front, face_t back,
                 const void* additional_data, size_t additional_data_size);
 
+  const Ray& ray_;
   internal::HitArena& arena_;
+
+  friend class Geometry;
 };
 
 }  // namespace iris
