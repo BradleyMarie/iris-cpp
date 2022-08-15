@@ -10,12 +10,14 @@ cc_library(
 
 cc_library(
     name = "geometry",
+    srcs = ["geometry.cc"],
     hdrs = ["geometry.h"],
     visibility = ["//visibility:public"],
     deps = [
         ":float",
         ":hit_allocator",
         ":ray",
+        "//iris/internal:hit_arena",
     ],
 )
 
