@@ -5,12 +5,59 @@ package(default_visibility = ["//visibility:private"])
 cc_library(
     name = "float",
     hdrs = ["float.h"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "geometry",
+    hdrs = ["geometry.h"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "hit",
+    hdrs = ["hit.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":float",
+    ],
+)
+
+cc_library(
+    name = "hit_allocator",
+    srcs = ["hit_allocator.cc"],
+    hdrs = ["hit_allocator.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":float",
+        ":hit",
+        ":integer",
+        "//iris/internal:hit_arena",
+    ],
+)
+
+cc_test(
+    name = "hit_allocator_test",
+    srcs = ["hit_allocator_test.cc"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":hit_allocator",
+        "//iris/internal:hit_arena",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "integer",
+    hdrs = ["integer.h"],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "matrix",
-    hdrs = ["matrix.h"],
     srcs = ["matrix.cc"],
+    hdrs = ["matrix.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":float",
         ":point",
@@ -32,6 +79,7 @@ cc_test(
 cc_library(
     name = "point",
     hdrs = ["point.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":float",
         ":vector",
@@ -50,6 +98,7 @@ cc_test(
 cc_library(
     name = "ray",
     hdrs = ["ray.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":float",
         ":point",
@@ -69,6 +118,7 @@ cc_test(
 cc_library(
     name = "reflector",
     hdrs = ["reflector.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":float",
     ],
@@ -77,6 +127,7 @@ cc_library(
 cc_library(
     name = "spectrum",
     hdrs = ["spectrum.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":float",
     ],
@@ -85,6 +136,7 @@ cc_library(
 cc_library(
     name = "vector",
     hdrs = ["vector.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":float",
     ],
