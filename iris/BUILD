@@ -72,6 +72,29 @@ cc_library(
 )
 
 cc_library(
+    name = "intersector",
+    srcs = ["intersector.cc"],
+    hdrs = ["intersector.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":geometry",
+        ":hit_allocator",
+        ":matrix",
+        "//iris/internal:hit",
+    ],
+)
+
+cc_test(
+    name = "intersector_test",
+    srcs = ["intersector_test.cc"],
+    deps = [
+        ":intersector",
+        "//iris/internal:hit_arena",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "matrix",
     srcs = ["matrix.cc"],
     hdrs = ["matrix.h"],

@@ -36,15 +36,15 @@ TEST(GeometryTest, Trace) {
 
   auto* full_hit = static_cast<iris::internal::Hit*>(hit);
   EXPECT_EQ(1.0, hit->distance);
-  EXPECT_EQ(2, full_hit->front);
-  EXPECT_EQ(3, full_hit->back);
+  EXPECT_EQ(2u, full_hit->front);
+  EXPECT_EQ(3u, full_hit->back);
   EXPECT_EQ(base_geom, full_hit->geometry);
 
   ASSERT_NE(nullptr, hit->next);
   auto* next_hit = hit->next;
   auto* next_full_hit = static_cast<iris::internal::Hit*>(next_hit);
   EXPECT_EQ(2.0, next_hit->distance);
-  EXPECT_EQ(3, next_full_hit->front);
-  EXPECT_EQ(4, next_full_hit->back);
+  EXPECT_EQ(3u, next_full_hit->front);
+  EXPECT_EQ(4u, next_full_hit->back);
   EXPECT_EQ(&nested_geom, next_full_hit->geometry);
 };
