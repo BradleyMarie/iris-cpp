@@ -5,7 +5,7 @@
 #include "googletest/include/gtest/gtest.h"
 #include "iris/internal/hit_arena.h"
 
-TEST(HitArena, Allocate) {
+TEST(HitAllocator, Allocate) {
   auto ray = iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0));
 
   auto arena = iris::internal::HitArena();

@@ -21,6 +21,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "geometry_test",
+    srcs = ["geometry_test.cc"],
+    deps = [
+        ":geometry",
+        "//iris/internal:hit_arena",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "hit",
     hdrs = ["hit.h"],

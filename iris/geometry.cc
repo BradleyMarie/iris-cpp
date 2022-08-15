@@ -4,11 +4,8 @@
 
 namespace iris {
 
-Hit* Geometry::Trace(HitAllocator& hit_allocator,
-                     std::optional<geometric_t> minimum_distance,
-                     std::optional<geometric_t> maximum_distance) const {
-  auto* result = Trace(hit_allocator.ray_, hit_allocator, minimum_distance,
-                       maximum_distance);
+Hit* Geometry::Trace(HitAllocator& hit_allocator) const {
+  auto* result = Trace(hit_allocator.ray_, hit_allocator);
 
   auto* hit_list = result;
   while (hit_list) {
