@@ -166,6 +166,16 @@ cc_library(
 )
 
 cc_library(
+    name = "scene",
+    hdrs = ["scene.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":intersector",
+        ":ray",
+    ],
+)
+
+cc_library(
     name = "spectrum",
     hdrs = ["spectrum.h"],
     visibility = ["//visibility:public"],
