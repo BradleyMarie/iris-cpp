@@ -1,2 +1,2 @@
-# iris-cpp
-A simple ray tracer written in C++
+# Iris
+A ray tracer written in C++
