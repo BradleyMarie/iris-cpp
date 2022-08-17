@@ -201,3 +201,26 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "visibility_tester",
+    srcs = ["visibility_tester.cc"],
+    hdrs = ["visibility_tester.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":float",
+        ":ray",
+        ":scene",
+        "//iris/internal:ray_tracer",
+    ],
+)
+
+cc_test(
+    name = "visibility_tester_test",
+    srcs = ["visibility_tester_test.cc"],
+    deps = [
+        ":visibility_tester",
+        "//iris/internal:ray_tracer",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
