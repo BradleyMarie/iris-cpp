@@ -14,6 +14,13 @@ class TestGeometry : public iris::Geometry {
     return &hit_allocator.Allocate(nullptr, 1.0, 2, 3);
   }
 
+  virtual iris::Vector ComputeSurfaceNormal(const iris::Point& hit_point,
+                                            iris::face_t face,
+                                            const void* additional_data) const {
+    EXPECT_FALSE(true);
+    return iris::Vector(1.0, 0.0, 0.0);
+  }
+
   iris::Ray expected_ray_;
 };
 
@@ -25,6 +32,13 @@ class TestScene : public iris::Scene {
     if (geometry_) {
       intersector.Intersect(*geometry_);
     }
+  }
+
+  virtual iris::Vector ComputeSurfaceNormal(const iris::Point& hit_point,
+                                            iris::face_t face,
+                                            const void* additional_data) const {
+    EXPECT_FALSE(true);
+    return iris::Vector(1.0, 0.0, 0.0);
   }
 
  private:

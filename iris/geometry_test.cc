@@ -19,6 +19,13 @@ class TestGeometry final : public iris::Geometry {
     return &hit_allocator.Allocate(nullptr, 2.0, 3, 4);
   }
 
+  virtual iris::Vector ComputeSurfaceNormal(const iris::Point& hit_point,
+                                            iris::face_t face,
+                                            const void* additional_data) const {
+    EXPECT_FALSE(true);
+    return iris::Vector(1.0, 0.0, 0.0);
+  }
+
   iris::Ray expected_ray_;
   const iris::Geometry* nested_;
 };

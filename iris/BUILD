@@ -16,7 +16,10 @@ cc_library(
     deps = [
         ":float",
         ":hit_allocator",
+        ":integer",
+        ":point",
         ":ray",
+        ":vector",
         "//iris/internal:hit_arena",
     ],
 )
