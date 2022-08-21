@@ -3,6 +3,21 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 package(default_visibility = ["//iris:__pkg__"])
 
 cc_library(
+    name = "arena",
+    srcs = ["arena.cc"],
+    hdrs = ["arena.h"],
+)
+
+cc_test(
+    name = "arena_test",
+    srcs = ["arena_test.cc"],
+    deps = [
+        ":arena",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "hit_arena",
     srcs = ["hit_arena.cc"],
     hdrs = ["hit_arena.h"],
