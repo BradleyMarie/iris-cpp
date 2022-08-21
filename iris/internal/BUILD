@@ -22,6 +22,7 @@ cc_library(
     srcs = ["hit_arena.cc"],
     hdrs = ["hit_arena.h"],
     deps = [
+        ":arena",
         ":hit",
     ],
 )

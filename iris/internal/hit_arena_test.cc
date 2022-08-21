@@ -32,13 +32,12 @@ TEST(HitArena, AllocateAndClear) {
 
   uint64_t maxval = 0xFFFFFFFFu;
   auto& hit2 = arena.Allocate(nullptr, 5.0, 6, 7, &maxval, sizeof(maxval));
-  EXPECT_EQ(&hit0, &hit2);
   EXPECT_EQ(nullptr, hit2.next);
   EXPECT_EQ(5.0, hit2.distance);
   EXPECT_EQ(nullptr, hit2.geometry);
   EXPECT_EQ(nullptr, hit2.model_to_world);
   EXPECT_EQ(6u, hit2.front);
   EXPECT_EQ(7u, hit2.back);
-  EXPECT_EQ(copy, hit0.additional_data);
-  EXPECT_EQ(0xFFFFFFFFu, copy[0]);
+  const auto* copy2 = static_cast<const uint64_t*>(hit2.additional_data);
+  EXPECT_EQ(0xFFFFFFFFu, copy2[0]);
 }

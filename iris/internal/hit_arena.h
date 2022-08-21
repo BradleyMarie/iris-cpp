@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 
+#include "iris/internal/arena.h"
 #include "iris/internal/hit.h"
 
 namespace iris::internal {
@@ -16,11 +17,7 @@ class HitArena {
   void Clear();
 
  private:
-  std::vector<std::unique_ptr<Hit>> hits_;
-  size_t hit_index_ = 0;
-
-  std::vector<std::vector<char>> additional_data_;
-  size_t additional_data_index_ = 0;
+  Arena arena_;
 };
 
 }  // namespace iris::internal
