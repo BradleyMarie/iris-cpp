@@ -55,3 +55,21 @@ TEST(GeometryTest, Trace) {
   EXPECT_EQ(4u, next_full_hit->back);
   EXPECT_EQ(&nested_geom, next_full_hit->geometry);
 };
+
+TEST(GeometryTrace, ComputeTextureCoordinates) {
+  TestGeometry geom(
+      iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)),
+      nullptr);
+  EXPECT_FALSE(
+      geom.ComputeTextureCoordinates(iris::Point(0.0, 0.0, 0.0), 0, nullptr)
+          .has_value());
+}
+
+TEST(GeometryTrace, ComputeShadingNormal) {
+  TestGeometry geom(
+      iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)),
+      nullptr);
+  auto normal = geom.ComputeShadingNormal(0, nullptr);
+  ASSERT_TRUE(std::holds_alternative<iris::NormalMap*>(normal));
+  EXPECT_EQ(nullptr, std::get<iris::NormalMap*>(normal));
+}
