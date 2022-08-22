@@ -26,6 +26,12 @@ class TestGeometry final : public iris::Geometry {
     return iris::Vector(1.0, 0.0, 0.0);
   }
 
+  virtual std::span<const iris::face_t> GetFaces() const {
+    static const iris::face_t faces[] = {1};
+    EXPECT_FALSE(true);
+    return faces;
+  }
+
   iris::Ray expected_ray_;
   const iris::Geometry* nested_;
 };

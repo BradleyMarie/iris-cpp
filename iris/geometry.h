@@ -2,6 +2,7 @@
 #define _IRIS_GEOMETRY_
 
 #include <optional>
+#include <span>
 #include <variant>
 
 #include "iris/emissive_material.h"
@@ -34,6 +35,8 @@ class Geometry {
 
   virtual const EmissiveMaterial* GetEmissiveMaterial(
       face_t face, const void* additional_data) const;
+
+  virtual std::span<const face_t> GetFaces() const = 0;
 
  private:
   virtual Hit* Trace(const Ray& ray, HitAllocator& hit_allocator) const = 0;
