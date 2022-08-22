@@ -29,4 +29,9 @@ std::variant<Vector, NormalMap*> Geometry::ComputeShadingNormal(
   return nullptr;
 }
 
+Material* Geometry::GetMaterial(face_t face,
+                                const void* additional_data) const {
+  return nullptr;
+}
+
 }  // namespace iris

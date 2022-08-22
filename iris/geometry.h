@@ -6,6 +6,7 @@
 
 #include "iris/hit_allocator.h"
 #include "iris/integer.h"
+#include "iris/material.h"
 #include "iris/normal_map.h"
 #include "iris/point.h"
 #include "iris/ray.h"
@@ -26,6 +27,8 @@ class Geometry {
 
   virtual std::variant<Vector, NormalMap*> ComputeShadingNormal(
       face_t face, const void* additional_data) const;
+
+  virtual Material* GetMaterial(face_t face, const void* additional_data) const;
 
  private:
   virtual Hit* Trace(const Ray& ray, HitAllocator& hit_allocator) const = 0;

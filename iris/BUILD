@@ -3,6 +3,15 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 package(default_visibility = ["//visibility:private"])
 
 cc_library(
+    name = "bsdf",
+    hdrs = ["bsdf.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":reflector",
+    ],
+)
+
+cc_library(
     name = "float",
     hdrs = ["float.h"],
     visibility = ["//visibility:public"],
@@ -17,6 +26,7 @@ cc_library(
         ":float",
         ":hit_allocator",
         ":integer",
+        ":material",
         ":normal_map",
         ":point",
         ":ray",
@@ -96,6 +106,16 @@ cc_test(
         ":intersector",
         "//iris/internal:hit_arena",
         "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "material",
+    hdrs = ["material.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":bsdf",
+        ":texture_coordinates",
     ],
 )
 

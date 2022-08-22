@@ -73,3 +73,10 @@ TEST(GeometryTrace, ComputeShadingNormal) {
   ASSERT_TRUE(std::holds_alternative<iris::NormalMap*>(normal));
   EXPECT_EQ(nullptr, std::get<iris::NormalMap*>(normal));
 }
+
+TEST(GeometryTrace, GetMaterial) {
+  TestGeometry geom(
+      iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)),
+      nullptr);
+  EXPECT_EQ(nullptr, geom.GetMaterial(0, nullptr));
+}
