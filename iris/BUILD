@@ -17,6 +17,7 @@ cc_library(
         ":float",
         ":hit_allocator",
         ":integer",
+        ":normal_map",
         ":point",
         ":ray",
         ":texture_coordinates",
@@ -118,6 +119,17 @@ cc_test(
     deps = [
         ":matrix",
         "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "normal_map",
+    hdrs = ["normal_map.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":float",
+        ":texture_coordinates",
+        ":vector",
     ],
 )
 

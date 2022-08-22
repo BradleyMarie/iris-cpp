@@ -24,4 +24,9 @@ std::optional<TextureCoordinates> Geometry::ComputeTextureCoordinates(
   return std::nullopt;
 }
 
+std::variant<Vector, NormalMap*> Geometry::ComputeShadingNormal(
+    face_t face, const void* additional_data) const {
+  return nullptr;
+}
+
 }  // namespace iris
