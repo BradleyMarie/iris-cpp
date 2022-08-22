@@ -19,6 +19,7 @@ cc_library(
         ":integer",
         ":point",
         ":ray",
+        ":texture_coordinates",
         ":vector",
         "//iris/internal:hit_arena",
     ],
@@ -184,6 +185,16 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":float",
+    ],
+)
+
+cc_library(
+    name = "texture_coordinates",
+    hdrs = ["texture_coordinates.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":float",
+        ":vector",
     ],
 )
 

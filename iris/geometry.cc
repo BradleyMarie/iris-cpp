@@ -19,4 +19,9 @@ Hit* Geometry::Trace(HitAllocator& hit_allocator) const {
   return result;
 }
 
+std::optional<TextureCoordinates> Geometry::ComputeTextureCoordinates(
+    const Point& hit_point, face_t face, const void* additional_data) const {
+  return std::nullopt;
+}
+
 }  // namespace iris
