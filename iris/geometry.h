@@ -4,6 +4,7 @@
 #include <optional>
 #include <variant>
 
+#include "iris/emissive_material.h"
 #include "iris/hit_allocator.h"
 #include "iris/integer.h"
 #include "iris/material.h"
@@ -25,10 +26,14 @@ class Geometry {
   virtual std::optional<TextureCoordinates> ComputeTextureCoordinates(
       const Point& hit_point, face_t face, const void* additional_data) const;
 
-  virtual std::variant<Vector, NormalMap*> ComputeShadingNormal(
+  virtual std::variant<Vector, const NormalMap*> ComputeShadingNormal(
       face_t face, const void* additional_data) const;
 
-  virtual Material* GetMaterial(face_t face, const void* additional_data) const;
+  virtual const Material* GetMaterial(face_t face,
+                                      const void* additional_data) const;
+
+  virtual const EmissiveMaterial* GetEmissiveMaterial(
+      face_t face, const void* additional_data) const;
 
  private:
   virtual Hit* Trace(const Ray& ray, HitAllocator& hit_allocator) const = 0;

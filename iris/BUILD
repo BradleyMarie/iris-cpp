@@ -12,6 +12,16 @@ cc_library(
 )
 
 cc_library(
+    name = "emissive_material",
+    hdrs = ["emissive_material.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":spectrum",
+        ":texture_coordinates",
+    ],
+)
+
+cc_library(
     name = "float",
     hdrs = ["float.h"],
     visibility = ["//visibility:public"],
@@ -23,6 +33,7 @@ cc_library(
     hdrs = ["geometry.h"],
     visibility = ["//visibility:public"],
     deps = [
+        ":emissive_material",
         ":float",
         ":hit_allocator",
         ":integer",

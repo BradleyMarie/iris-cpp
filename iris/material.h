@@ -8,7 +8,7 @@ namespace iris {
 
 class Material {
  public:
-  virtual Bsdf* Compute(
+  virtual const Bsdf* Compute(
       const TextureCoordinates& texture_coordinates) const = 0;
   virtual ~Material() {}
 };

@@ -24,13 +24,18 @@ std::optional<TextureCoordinates> Geometry::ComputeTextureCoordinates(
   return std::nullopt;
 }
 
-std::variant<Vector, NormalMap*> Geometry::ComputeShadingNormal(
+std::variant<Vector, const NormalMap*> Geometry::ComputeShadingNormal(
     face_t face, const void* additional_data) const {
   return nullptr;
 }
 
-Material* Geometry::GetMaterial(face_t face,
-                                const void* additional_data) const {
+const Material* Geometry::GetMaterial(face_t face,
+                                      const void* additional_data) const {
+  return nullptr;
+}
+
+const EmissiveMaterial* Geometry::GetEmissiveMaterial(
+    face_t face, const void* additional_data) const {
   return nullptr;
 }
 
