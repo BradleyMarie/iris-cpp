@@ -204,6 +204,31 @@ cc_test(
 )
 
 cc_library(
+    name = "ray_tracer",
+    srcs = ["ray_tracer.cc"],
+    hdrs = ["ray_tracer.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":bsdf",
+        ":float",
+        ":ray",
+        ":scene",
+        ":spectrum",
+        "//iris/internal:ray_tracer",
+    ],
+)
+
+cc_test(
+    name = "ray_tracer_test",
+    srcs = ["ray_tracer_test.cc"],
+    deps = [
+        ":ray_tracer",
+        "//iris/internal:ray_tracer",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "reflector",
     hdrs = ["reflector.h"],
     visibility = ["//visibility:public"],

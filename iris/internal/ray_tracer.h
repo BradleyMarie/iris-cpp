@@ -1,5 +1,5 @@
-#ifndef _IRIS_RAY_TRACER_
-#define _IRIS_RAY_TRACER_
+#ifndef _IRIS_INTERNAL_RAY_TRACER_
+#define _IRIS_INTERNAL_RAY_TRACER_
 
 #include "iris/float.h"
 #include "iris/internal/hit.h"

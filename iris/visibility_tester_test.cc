@@ -57,7 +57,7 @@ class TestScene : public iris::Scene {
   iris::Geometry* geometry_;
 };
 
-TEST(RayTracerTest, NoGeometry) {
+TEST(VisibilityTesterTest, NoGeometry) {
   iris::internal::RayTracer ray_tracer;
   TestScene scene(nullptr);
   iris::VisibilityTester visibility_tester(scene, 0.0, ray_tracer);
@@ -68,7 +68,7 @@ TEST(RayTracerTest, NoGeometry) {
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)), 1.0));
 }
 
-TEST(RayTracerTest, WithGeometry) {
+TEST(VisibilityTesterTest, WithGeometry) {
   iris::Ray ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0));
   TestGeometry geometry(ray);
 
