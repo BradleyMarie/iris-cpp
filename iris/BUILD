@@ -257,6 +257,28 @@ cc_library(
 )
 
 cc_library(
+    name = "spectral_allocator",
+    srcs = ["spectral_allocator.cc"],
+    hdrs = ["spectral_allocator.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":reflector",
+        ":spectrum",
+        "//iris/internal:arena",
+    ],
+)
+
+cc_test(
+    name = "spectral_allocator_test",
+    srcs = ["spectral_allocator_test.cc"],
+    deps = [
+        ":spectral_allocator",
+        "//iris/internal:arena",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "texture_coordinates",
     hdrs = ["texture_coordinates.h"],
     visibility = ["//visibility:public"],

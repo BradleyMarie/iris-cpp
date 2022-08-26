@@ -12,25 +12,22 @@ TEST(Arena, AllocateZero) {
 TEST(Arena, Allocate) {
   auto arena = iris::internal::Arena();
 
-  auto* alloc0 = arena.Allocate(1);
-  EXPECT_NE(nullptr, alloc0);
-
-  auto* alloc1 = arena.Allocate(1);
-  EXPECT_NE(nullptr, alloc1);
-
-  EXPECT_NE(alloc0, alloc1);
+  auto& alloc0 = arena.Allocate<char>('c');
+  auto& alloc1 = arena.Allocate<char>('b');
+  EXPECT_EQ('c', alloc0);
+  EXPECT_EQ('b', alloc1);
 }
 
 TEST(Arena, AllocateAndClear) {
   auto arena = iris::internal::Arena();
 
-  auto* alloc0 = arena.Allocate(1);
-  EXPECT_NE(nullptr, alloc0);
+  auto& alloc0 = arena.Allocate<char>('c');
+  EXPECT_EQ('c', alloc0);
 
   arena.Clear();
 
-  auto* alloc1 = arena.Allocate(1);
-  EXPECT_NE(nullptr, alloc1);
+  auto& alloc1 = arena.Allocate<char>('b');
+  EXPECT_EQ('b', alloc1);
 
-  EXPECT_EQ(alloc0, alloc1);
+  EXPECT_EQ(&alloc0, &alloc1);
 }

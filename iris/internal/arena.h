@@ -2,6 +2,7 @@
 #define _IRIS_INTERNAL_ARENA_
 
 #include <cstddef>
+#include <type_traits>
 #include <vector>
 
 namespace iris::internal {
@@ -9,6 +10,13 @@ namespace iris::internal {
 class Arena final {
  public:
   void* Allocate(size_t size);
+
+  template <typename T, typename... Args>
+  T& Allocate(Args&&... args) {
+    auto* result = new (Allocate(sizeof(T))) T(std::forward<Args>(args)...);
+    return *result;
+  }
+
   void Clear();
 
  private:
