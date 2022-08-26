@@ -184,6 +184,12 @@ cc_test(
 )
 
 cc_library(
+    name = "random",
+    hdrs = ["random.h"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
     name = "ray",
     hdrs = ["ray.h"],
     visibility = ["//visibility:public"],
