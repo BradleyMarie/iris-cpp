@@ -12,7 +12,7 @@ namespace internal {
 class RayTracer;
 }  // namespace internal
 
-class VisibilityTester {
+class VisibilityTester final {
  public:
   VisibilityTester(const Scene& scene, geometric_t minimum_distance,
                    internal::RayTracer& ray_tracer)

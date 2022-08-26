@@ -14,7 +14,7 @@ namespace internal {
 class HitArena;
 }  // namespace internal
 
-class HitAllocator {
+class HitAllocator final {
  public:
   HitAllocator(const Ray& ray, internal::HitArena& arena)
       : ray_(ray), arena_(arena) {}

@@ -6,7 +6,7 @@
 
 namespace iris::internal {
 
-class Arena {
+class Arena final {
  public:
   void* Allocate(size_t size);
   void Clear();

@@ -14,7 +14,7 @@ namespace internal {
 class RayTracer;
 }  // namespace internal
 
-class RayTracer {
+class RayTracer final {
  public:
   struct Result {
     const Bsdf* bsdf;

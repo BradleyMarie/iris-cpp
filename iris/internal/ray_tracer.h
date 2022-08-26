@@ -10,7 +10,7 @@
 namespace iris {
 namespace internal {
 
-struct RayTracer {
+struct RayTracer final {
  public:
   Hit* Trace(const Ray& ray, geometric_t minimum_distance,
              geometric_t maximum_distance, const Scene& scene);

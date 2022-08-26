@@ -9,7 +9,7 @@
 
 namespace iris {
 
-struct TextureCoordinates {
+struct TextureCoordinates final {
   struct Derivatives {
     geometric_t du_dx;
     geometric_t du_dy;

@@ -9,7 +9,7 @@
 
 namespace iris::internal {
 
-class HitArena {
+class HitArena final {
  public:
   Hit& Allocate(iris::Hit* next, geometric_t distance, face_t front,
                 face_t back, const void* additional_data,

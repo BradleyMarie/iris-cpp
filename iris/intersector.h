@@ -10,7 +10,7 @@ namespace internal {
 class HitArena;
 }  // namespace internal
 
-class Intersector {
+class Intersector final {
  public:
   Intersector(const Ray& ray, geometric_t minimum_distance,
               geometric_t maximum_distance, internal::HitArena& hit_arena,
