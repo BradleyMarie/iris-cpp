@@ -14,7 +14,7 @@ struct Hit : public iris::Hit {
 
   Hit(iris::Hit* next, geometric_t distance, face_t front, face_t back,
       const void* additional_data)
-      : iris::Hit(next, distance),
+      : iris::Hit{next, distance},
         geometry(nullptr),
         model_to_world(nullptr),
         front(front),

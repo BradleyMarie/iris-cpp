@@ -4,18 +4,10 @@
 #include "iris/float.h"
 
 namespace iris {
-namespace internal {
-class Hit;
-}  // namespace internal
 
 struct Hit {
   Hit* next;
   const geometric_t distance;
-
- private:
-  Hit(Hit* next, geometric_t distance) : next(next), distance(distance) {}
-
-  friend internal::Hit;
 };
 
 }  // namespace iris
