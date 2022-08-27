@@ -39,10 +39,9 @@ class TestScene : public iris::Scene {
     }
   }
 
-  virtual std::span<const iris::face_t> GetFaces() const {
-    static const iris::face_t faces[] = {1};
+  virtual iris::Scene::const_iterator begin() const {
     EXPECT_FALSE(true);
-    return faces;
+    return end();
   }
 
  private:

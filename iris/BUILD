@@ -261,11 +261,21 @@ cc_library(
 
 cc_library(
     name = "scene",
+    srcs = ["scene.cc"],
     hdrs = ["scene.h"],
     visibility = ["//visibility:public"],
     deps = [
         ":intersector",
         ":ray",
+    ],
+)
+
+cc_test(
+    name = "scene_test",
+    srcs = ["scene_test.cc"],
+    deps = [
+        ":scene",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

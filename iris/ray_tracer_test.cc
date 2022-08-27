@@ -139,6 +139,11 @@ class TestScene : public iris::Scene {
     }
   }
 
+  virtual iris::Scene::const_iterator begin() const {
+    EXPECT_FALSE(true);
+    return end();
+  }
+
  private:
   iris::Geometry* geometry_;
 };
@@ -153,6 +158,11 @@ class TestSceneWithTransform : public iris::Scene {
     if (geometry_) {
       intersector.Intersect(*geometry_, matrix_);
     }
+  }
+
+  virtual iris::Scene::const_iterator begin() const {
+    EXPECT_FALSE(true);
+    return end();
   }
 
  private:

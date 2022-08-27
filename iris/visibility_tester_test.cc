@@ -40,17 +40,9 @@ class TestScene : public iris::Scene {
     }
   }
 
-  virtual iris::Vector ComputeSurfaceNormal(const iris::Point& hit_point,
-                                            iris::face_t face,
-                                            const void* additional_data) const {
+  virtual iris::Scene::const_iterator begin() const {
     EXPECT_FALSE(true);
-    return iris::Vector(1.0, 0.0, 0.0);
-  }
-
-  virtual std::span<const iris::face_t> GetFaces() const {
-    static const iris::face_t faces[] = {1};
-    EXPECT_FALSE(true);
-    return faces;
+    return end();
   }
 
  private:
