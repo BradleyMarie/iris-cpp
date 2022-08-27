@@ -121,6 +121,22 @@ cc_test(
 )
 
 cc_library(
+    name = "light",
+    hdrs = ["light.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":float",
+        ":point",
+        ":random",
+        ":ray",
+        ":spectral_allocator",
+        ":spectrum",
+        ":vector",
+        ":visibility_tester",
+    ],
+)
+
+cc_library(
     name = "material",
     hdrs = ["material.h"],
     visibility = ["//visibility:public"],
