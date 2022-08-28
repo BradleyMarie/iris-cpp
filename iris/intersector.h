@@ -24,6 +24,7 @@ class Intersector final {
   }
 
   void Intersect(const Geometry& geometry);
+  void Intersect(const Geometry& geometry, const Matrix* model_to_world);
   void Intersect(const Geometry& geometry, const Matrix& model_to_world);
 
   geometric_t MinimumDistance() const { return minimum_distance_; }

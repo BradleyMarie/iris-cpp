@@ -15,19 +15,19 @@ class TestGeometry final : public iris::Geometry {
 
  private:
   iris::Hit* Trace(const iris::Ray& trace_ray,
-                   iris::HitAllocator& hit_allocator) const {
+                   iris::HitAllocator& hit_allocator) const override {
     EXPECT_EQ(ray, trace_ray);
     return &hit_allocator.Allocate(nullptr, distance_, 2, 3);
   }
 
-  virtual iris::Vector ComputeSurfaceNormal(const iris::Point& hit_point,
-                                            iris::face_t face,
-                                            const void* additional_data) const {
+  iris::Vector ComputeSurfaceNormal(
+      const iris::Point& hit_point, iris::face_t face,
+      const void* additional_data) const override {
     EXPECT_FALSE(true);
     return iris::Vector(1.0, 0.0, 0.0);
   }
 
-  virtual std::span<const iris::face_t> GetFaces() const {
+  std::span<const iris::face_t> GetFaces() const override {
     static const iris::face_t faces[] = {1};
     EXPECT_FALSE(true);
     return faces;
@@ -234,6 +234,200 @@ TEST(IntersectorTest, TransformedKeepsCloser) {
 
   TestGeometry geometry1(1.0);
   intersector.Intersect(geometry1, model_to_world);
+
+  EXPECT_EQ(0.0, intersector.MinimumDistance());
+  EXPECT_EQ(1.0, intersector.MaximumDistance());
+
+  auto* full_hit = static_cast<iris::internal::Hit*>(closest_hit);
+  EXPECT_EQ(1.0, closest_hit->distance);
+  EXPECT_EQ(2u, full_hit->front);
+  EXPECT_EQ(3u, full_hit->back);
+  EXPECT_EQ(&geometry1, full_hit->geometry);
+  EXPECT_EQ(&model_to_world, full_hit->model_to_world);
+};
+
+TEST(IntersectorTest, MatrixPointerTooClose) {
+  auto arena = iris::internal::HitArena();
+
+  iris::Hit* closest_hit;
+  iris::Intersector intersector(ray, 1.0, 2.0, arena, &closest_hit);
+
+  TestGeometry geometry(0.0);
+  intersector.Intersect(geometry, nullptr);
+
+  EXPECT_EQ(nullptr, closest_hit);
+  EXPECT_EQ(1.0, intersector.MinimumDistance());
+  EXPECT_EQ(2.0, intersector.MaximumDistance());
+};
+
+TEST(IntersectorTest, MatrixPointerTooFar) {
+  auto arena = iris::internal::HitArena();
+
+  iris::Hit* closest_hit;
+  iris::Intersector intersector(ray, 1.0, 2.0, arena, &closest_hit);
+
+  TestGeometry geometry(3.0);
+  intersector.Intersect(geometry, nullptr);
+
+  EXPECT_EQ(nullptr, closest_hit);
+  EXPECT_EQ(1.0, intersector.MinimumDistance());
+  EXPECT_EQ(2.0, intersector.MaximumDistance());
+};
+
+TEST(IntersectorTest, MatrixPointerHits) {
+  auto arena = iris::internal::HitArena();
+
+  iris::Hit* closest_hit;
+  iris::Intersector intersector(ray, 0.0, 2.0, arena, &closest_hit);
+
+  TestGeometry geometry(1.0);
+  intersector.Intersect(geometry, nullptr);
+
+  EXPECT_EQ(0.0, intersector.MinimumDistance());
+  EXPECT_EQ(1.0, intersector.MaximumDistance());
+
+  auto* full_hit = static_cast<iris::internal::Hit*>(closest_hit);
+  EXPECT_EQ(1.0, closest_hit->distance);
+  EXPECT_EQ(2u, full_hit->front);
+  EXPECT_EQ(3u, full_hit->back);
+  EXPECT_EQ(&geometry, full_hit->geometry);
+  EXPECT_EQ(nullptr, full_hit->model_to_world);
+};
+
+TEST(IntersectorTest, MatrixPointerHitsIgnoreFarther) {
+  auto arena = iris::internal::HitArena();
+
+  iris::Hit* closest_hit;
+  iris::Intersector intersector(ray, 0.0, 2.0, arena, &closest_hit);
+
+  TestGeometry geometry0(1.0);
+  intersector.Intersect(geometry0, nullptr);
+
+  TestGeometry geometry1(2.0);
+  intersector.Intersect(geometry1, nullptr);
+
+  EXPECT_EQ(0.0, intersector.MinimumDistance());
+  EXPECT_EQ(1.0, intersector.MaximumDistance());
+
+  auto* full_hit = static_cast<iris::internal::Hit*>(closest_hit);
+  EXPECT_EQ(1.0, closest_hit->distance);
+  EXPECT_EQ(2u, full_hit->front);
+  EXPECT_EQ(3u, full_hit->back);
+  EXPECT_EQ(&geometry0, full_hit->geometry);
+  EXPECT_EQ(nullptr, full_hit->model_to_world);
+};
+
+TEST(IntersectorTest, MatrixPointerKeepsCloser) {
+  auto arena = iris::internal::HitArena();
+
+  iris::Hit* closest_hit;
+  iris::Intersector intersector(ray, 0.0, 3.0, arena, &closest_hit);
+
+  TestGeometry geometry0(2.0);
+  intersector.Intersect(geometry0);
+
+  EXPECT_EQ(0.0, intersector.MinimumDistance());
+  EXPECT_EQ(2.0, intersector.MaximumDistance());
+
+  TestGeometry geometry1(1.0);
+  intersector.Intersect(geometry1, nullptr);
+
+  EXPECT_EQ(0.0, intersector.MinimumDistance());
+  EXPECT_EQ(1.0, intersector.MaximumDistance());
+
+  auto* full_hit = static_cast<iris::internal::Hit*>(closest_hit);
+  EXPECT_EQ(1.0, closest_hit->distance);
+  EXPECT_EQ(2u, full_hit->front);
+  EXPECT_EQ(3u, full_hit->back);
+  EXPECT_EQ(&geometry1, full_hit->geometry);
+  EXPECT_EQ(nullptr, full_hit->model_to_world);
+};
+
+TEST(IntersectorTest, MatrixPointerTransformedTooClose) {
+  auto arena = iris::internal::HitArena();
+
+  iris::Hit* closest_hit;
+  iris::Intersector intersector(transformed_ray, 1.0, 2.0, arena, &closest_hit);
+
+  TestGeometry geometry(0.0);
+  intersector.Intersect(geometry, &model_to_world);
+
+  EXPECT_EQ(nullptr, closest_hit);
+  EXPECT_EQ(1.0, intersector.MinimumDistance());
+  EXPECT_EQ(2.0, intersector.MaximumDistance());
+};
+
+TEST(IntersectorTest, MatrixPointerTransformedTooFar) {
+  auto arena = iris::internal::HitArena();
+
+  iris::Hit* closest_hit;
+  iris::Intersector intersector(transformed_ray, 1.0, 2.0, arena, &closest_hit);
+
+  TestGeometry geometry(3.0);
+  intersector.Intersect(geometry, &model_to_world);
+
+  EXPECT_EQ(nullptr, closest_hit);
+  EXPECT_EQ(1.0, intersector.MinimumDistance());
+  EXPECT_EQ(2.0, intersector.MaximumDistance());
+};
+
+TEST(IntersectorTest, MatrixPointerTransformedHits) {
+  auto arena = iris::internal::HitArena();
+
+  iris::Hit* closest_hit;
+  iris::Intersector intersector(transformed_ray, 0.0, 2.0, arena, &closest_hit);
+
+  TestGeometry geometry(1.0);
+  intersector.Intersect(geometry, &model_to_world);
+
+  EXPECT_EQ(0.0, intersector.MinimumDistance());
+  EXPECT_EQ(1.0, intersector.MaximumDistance());
+
+  auto* full_hit = static_cast<iris::internal::Hit*>(closest_hit);
+  EXPECT_EQ(1.0, closest_hit->distance);
+  EXPECT_EQ(2u, full_hit->front);
+  EXPECT_EQ(3u, full_hit->back);
+  EXPECT_EQ(&geometry, full_hit->geometry);
+  EXPECT_EQ(&model_to_world, full_hit->model_to_world);
+};
+
+TEST(IntersectorTest, MatrixPointerTransformedHitsIgnoreFarther) {
+  auto arena = iris::internal::HitArena();
+
+  iris::Hit* closest_hit;
+  iris::Intersector intersector(transformed_ray, 0.0, 2.0, arena, &closest_hit);
+
+  TestGeometry geometry0(1.0);
+  intersector.Intersect(geometry0, &model_to_world);
+
+  TestGeometry geometry1(2.0);
+  intersector.Intersect(geometry1, &model_to_world);
+
+  EXPECT_EQ(0.0, intersector.MinimumDistance());
+  EXPECT_EQ(1.0, intersector.MaximumDistance());
+
+  auto* full_hit = static_cast<iris::internal::Hit*>(closest_hit);
+  EXPECT_EQ(1.0, closest_hit->distance);
+  EXPECT_EQ(2u, full_hit->front);
+  EXPECT_EQ(3u, full_hit->back);
+  EXPECT_EQ(&geometry0, full_hit->geometry);
+  EXPECT_EQ(&model_to_world, full_hit->model_to_world);
+};
+
+TEST(IntersectorTest, MatrixPointerTransformedKeepsCloser) {
+  auto arena = iris::internal::HitArena();
+
+  iris::Hit* closest_hit;
+  iris::Intersector intersector(transformed_ray, 0.0, 3.0, arena, &closest_hit);
+
+  TestGeometry geometry0(2.0);
+  intersector.Intersect(geometry0, &model_to_world);
+
+  EXPECT_EQ(0.0, intersector.MinimumDistance());
+  EXPECT_EQ(2.0, intersector.MaximumDistance());
+
+  TestGeometry geometry1(1.0);
+  intersector.Intersect(geometry1, &model_to_world);
 
   EXPECT_EQ(0.0, intersector.MinimumDistance());
   EXPECT_EQ(1.0, intersector.MaximumDistance());
