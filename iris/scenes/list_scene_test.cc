@@ -61,7 +61,7 @@ TEST(ListSceneTest, Iterators) {
       EXPECT_EQ(matrix0, *entry.second);
     } else if (current == 1u) {
       EXPECT_EQ(geom1_ptr, &entry.first);
-      EXPECT_EQ(matrix1, *entry.second);
+      EXPECT_EQ(nullptr, entry.second);
     } else {
       EXPECT_TRUE(false);
     }

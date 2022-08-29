@@ -29,7 +29,7 @@ class ListScene final : public Scene {
   };
 
   ListScene(std::vector<std::shared_ptr<Geometry>> geometry,
-            std::vector<Matrix> matrices)
+            std::vector<std::shared_ptr<Matrix>> matrices)
       : geometry_(std::move(geometry)), matrices_(std::move(matrices)) {
     assert(geometry_.size() == matrices_.size());
   }
@@ -40,7 +40,7 @@ class ListScene final : public Scene {
 
  private:
   std::vector<std::shared_ptr<Geometry>> geometry_;
-  std::vector<Matrix> matrices_;
+  std::vector<std::shared_ptr<Matrix>> matrices_;
 };
 
 }  // namespace scenes

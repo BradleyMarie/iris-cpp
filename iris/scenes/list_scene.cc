@@ -13,10 +13,13 @@ std::unique_ptr<Scene> ListScene::Builder::Build(
   }
 
   std::vector<std::shared_ptr<Geometry>> scene_geometry;
-  std::vector<Matrix> scene_matrices;
+  std::vector<std::shared_ptr<Matrix>> scene_matrices;
   for (const auto& entry : geometry_and_matrix) {
     scene_geometry.push_back(shared_geometry[entry.first]);
-    scene_matrices.push_back(matrices[entry.second]);
+    auto matrix = entry.second
+                      ? std::make_shared<Matrix>(matrices[entry.second])
+                      : nullptr;
+    scene_matrices.push_back(std::move(matrix));
   }
 
   return std::make_unique<ListScene>(std::move(scene_geometry),
@@ -34,13 +37,13 @@ Scene::const_iterator ListScene::begin() const {
 
         size_t current = index++;
         return std::make_pair(std::cref(*geometry_[current]),
-                              &matrices_[current]);
+                              matrices_[current].get());
       });
 }
 
 void ListScene::Trace(const Ray& ray, Intersector& intersector) const {
   for (size_t i = 0u; i < geometry_.size(); i++) {
-    intersector.Intersect(*geometry_[i], matrices_[i]);
+    intersector.Intersect(*geometry_[i], matrices_[i].get());
   }
 }
 
