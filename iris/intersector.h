@@ -31,6 +31,9 @@ class Intersector final {
   geometric_t MaximumDistance() const { return maximum_distance_; }
 
  private:
+  Intersector(const Intersector&) = delete;
+  Intersector& operator=(const Intersector&) = delete;
+
   const Ray& ray_;
   geometric_t minimum_distance_;
   geometric_t maximum_distance_;

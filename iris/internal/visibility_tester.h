@@ -28,6 +28,10 @@ class VisibilityTester : public iris::VisibilityTester {
                                        const Matrix* model_to_world,
                                        face_t face, visual_t geometry_area,
                                        visual_t* pdf);
+
+ private:
+  VisibilityTester(const VisibilityTester&) = delete;
+  VisibilityTester& operator=(const VisibilityTester&) = delete;
 };
 
 }  // namespace internal

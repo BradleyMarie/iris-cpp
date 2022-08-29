@@ -33,6 +33,9 @@ class RayTracer final {
   std::optional<Result> Trace(const Ray& ray);
 
  private:
+  RayTracer(const RayTracer&) = delete;
+  RayTracer& operator=(const RayTracer&) = delete;
+
   const Scene& scene_;
   geometric_t minimum_distance_;
   internal::RayTracer& ray_tracer_;

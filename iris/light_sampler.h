@@ -17,6 +17,9 @@ class LightSampler final {
   LightSample* Sample(const Point& hit_point);
 
  private:
+  LightSampler(const LightSampler&) = delete;
+  LightSampler& operator=(const LightSampler&) = delete;
+
   const LightScene& scene_;
   Random& rng_;
   LightSampleAllocator& allocator_;

@@ -31,6 +31,9 @@ class HitAllocator final {
   }
 
  private:
+  HitAllocator(const HitAllocator&) = delete;
+  HitAllocator& operator=(const HitAllocator&) = delete;
+
   Hit& Allocate(Hit* next, geometric_t distance, face_t front, face_t back,
                 const void* additional_data, size_t additional_data_size);
 

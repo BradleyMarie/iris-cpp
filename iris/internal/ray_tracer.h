@@ -12,10 +12,15 @@ namespace internal {
 
 struct RayTracer final {
  public:
+  RayTracer() = default;
+
   Hit* Trace(const Ray& ray, geometric_t minimum_distance,
              geometric_t maximum_distance, const Scene& scene);
 
  private:
+  RayTracer(const RayTracer&) = delete;
+  RayTracer& operator=(const RayTracer&) = delete;
+
   HitArena hit_arena_;
 };
 

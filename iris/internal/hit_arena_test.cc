@@ -3,7 +3,7 @@
 #include "googletest/include/gtest/gtest.h"
 
 TEST(HitArena, AllocateAndClear) {
-  auto arena = iris::internal::HitArena();
+  iris::internal::HitArena arena;
 
   auto& hit0 = arena.Allocate(nullptr, 1.0, 1, 2, nullptr, 0);
   EXPECT_EQ(nullptr, hit0.next);

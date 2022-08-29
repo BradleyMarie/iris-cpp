@@ -21,6 +21,9 @@ class SpectralAllocator {
   const Reflector* Scale(const Reflector* reflector, visual_t attenuation);
 
  private:
+  SpectralAllocator(const SpectralAllocator&) = delete;
+  SpectralAllocator& operator=(const SpectralAllocator&) = delete;
+
   internal::Arena& arena_;
 };
 

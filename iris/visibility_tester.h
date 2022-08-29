@@ -26,6 +26,9 @@ class VisibilityTester {
                    std::numeric_limits<geometric_t>::infinity());
 
  private:
+  VisibilityTester(const VisibilityTester&) = delete;
+  VisibilityTester& operator=(const VisibilityTester&) = delete;
+
   const Scene& scene_;
   geometric_t minimum_distance_;
   internal::RayTracer& ray_tracer_;

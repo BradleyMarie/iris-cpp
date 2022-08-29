@@ -11,12 +11,17 @@ namespace iris::internal {
 
 class HitArena final {
  public:
+  HitArena() = default;
+
   Hit& Allocate(iris::Hit* next, geometric_t distance, face_t front,
                 face_t back, const void* additional_data,
                 size_t additional_data_size);
   void Clear();
 
  private:
+  HitArena(const HitArena&) = delete;
+  HitArena& operator=(const HitArena&) = delete;
+
   Arena arena_;
 };
 

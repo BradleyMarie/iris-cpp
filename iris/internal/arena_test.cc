@@ -3,14 +3,14 @@
 #include "googletest/include/gtest/gtest.h"
 
 TEST(Arena, AllocateZero) {
-  auto arena = iris::internal::Arena();
+  iris::internal::Arena arena;
 
   auto* alloc0 = arena.Allocate(0);
   EXPECT_EQ(nullptr, alloc0);
 }
 
 TEST(Arena, Allocate) {
-  auto arena = iris::internal::Arena();
+  iris::internal::Arena arena;
 
   auto& alloc0 = arena.Allocate<char>('c');
   auto& alloc1 = arena.Allocate<char>('b');
@@ -19,7 +19,7 @@ TEST(Arena, Allocate) {
 }
 
 TEST(Arena, AllocateAndClear) {
-  auto arena = iris::internal::Arena();
+  iris::internal::Arena arena;
 
   auto& alloc0 = arena.Allocate<char>('c');
   EXPECT_EQ('c', alloc0);

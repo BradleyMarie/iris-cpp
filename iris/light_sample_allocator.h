@@ -18,6 +18,9 @@ class LightSampleAllocator final {
                         LightSample* next = nullptr);
 
  private:
+  LightSampleAllocator(const LightSampleAllocator&) = delete;
+  LightSampleAllocator& operator=(const LightSampleAllocator&) = delete;
+
   internal::Arena& arena_;
 };
 
