@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "googletest/include/gtest/gtest.h"
+#include "iris/lights/point_light.h"
 #include "iris/scenes/list_scene.h"
 
 class TestLightSceneBuilder final : public iris::LightScene::Builder {
@@ -35,25 +36,6 @@ std::unique_ptr<iris::LightScene> TestLightSceneBuilder::Build(
   return nullptr;
 }
 
-class TestLight final : public iris::Light {
- public:
-  std::optional<SampleResult> Sample(
-      const iris::Point& hit_point, iris::Random& rng,
-      iris::VisibilityTester& tester,
-      iris::SpectralAllocator& allocator) const override {
-    EXPECT_TRUE(false);
-    return std::nullopt;
-  }
-
-  const iris::Spectrum* Emission(const iris::Ray& to_light,
-                                 iris::VisibilityTester& tester,
-                                 iris::SpectralAllocator& allocator,
-                                 iris::visual_t* pdf) const override {
-    EXPECT_TRUE(false);
-    return nullptr;
-  }
-};
-
 TEST(ListSceneTest, BuilderEmpty) {
   auto scene = iris::scenes::ListScene::Builder::Create()->Build();
   std::unique_ptr<iris::LightScene::Builder> builder =
@@ -62,7 +44,8 @@ TEST(ListSceneTest, BuilderEmpty) {
 }
 
 TEST(ListSceneTest, BuilderOneLight) {
-  auto test_light = std::make_unique<TestLight>();
+  auto test_light = std::make_unique<iris::lights::PointLight>(
+      nullptr, iris::Point(1.0, 1.0, 1.0));
   auto scene = iris::scenes::ListScene::Builder::Create()->Build();
   std::unique_ptr<iris::LightScene::Builder> builder =
       std::make_unique<TestLightSceneBuilder>(
