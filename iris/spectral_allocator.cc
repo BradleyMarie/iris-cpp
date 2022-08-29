@@ -60,7 +60,7 @@ class SumReflector final : public Reflector {
   visual_t Reflectance(visual_t wavelength) const {
     visual_t sum =
         addend0_.Reflectance(wavelength) + addend1_.Reflectance(wavelength);
-    return std::min(sum, static_cast<visual_t>(1.0));
+    return std::min(static_cast<visual_t>(1.0), sum);
   }
 
  private:

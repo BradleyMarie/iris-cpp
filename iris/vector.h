@@ -1,6 +1,7 @@
 #ifndef _IRIS_VECTOR_
 #define _IRIS_VECTOR_
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 
@@ -66,6 +67,11 @@ Vector operator/(const Vector& dividend, geometric_t divisor) {
 geometric_t DotProduct(const Vector& operand0, const Vector& operand1) {
   return operand0.x * operand1.x + operand0.y * operand1.y +
          operand0.z * operand1.z;
+}
+
+geometric_t PositiveDotProduct(const Vector& operand0, const Vector& operand1) {
+  return std::max(static_cast<geometric_t>(0.0),
+                  DotProduct(operand0, operand1));
 }
 
 Vector CrossProduct(const Vector& operand0, const Vector& operand1) {

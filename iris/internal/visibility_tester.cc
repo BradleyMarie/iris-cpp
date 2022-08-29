@@ -96,9 +96,8 @@ std::optional<VisibilityTester::VisibleResult> VisibilityTester::Visible(
     Vector world_to_light = world_hit_point - ray.origin;
     auto distance_to_light_squared = DotProduct(world_to_light, world_to_light);
 
-    // TODO: Implement make this a bounded dot product
     *pdf = distance_to_light_squared /
-           (std::abs(DotProduct(world_surface_normal, -ray.direction)) *
+           (PositiveDotProduct(world_surface_normal, -ray.direction) *
             geometry_area);
   }
 
