@@ -12,9 +12,9 @@ class Random {
   virtual result_type min() const = 0;
   virtual result_type max() const = 0;
   virtual result_type operator()() = 0;
-  virtual void discard(unsigned long long z);
+  virtual void discard(unsigned long long z) = 0;
 
-  virtual std::unique_ptr<Random> Replicate();
+  virtual std::unique_ptr<Random> Replicate() = 0;
 
   virtual ~Random() {}
 };

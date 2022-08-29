@@ -23,8 +23,8 @@ class Light {
   };
 
   virtual std::optional<SampleResult> Sample(
-      const Point& hit_point, const Vector& surface_normal, Random& rng,
-      VisibilityTester& tester, SpectralAllocator& allocator) const = 0;
+      const Point& hit_point, Random& rng, VisibilityTester& tester,
+      SpectralAllocator& allocator) const = 0;
 
   virtual const Spectrum* Emission(const Ray& to_light,
                                    VisibilityTester& tester,

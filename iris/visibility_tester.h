@@ -10,9 +10,10 @@
 namespace iris {
 namespace internal {
 class RayTracer;
+class VisibilityTester;
 }  // namespace internal
 
-class VisibilityTester final {
+class VisibilityTester {
  public:
   VisibilityTester(const Scene& scene, geometric_t minimum_distance,
                    internal::RayTracer& ray_tracer)
@@ -28,6 +29,8 @@ class VisibilityTester final {
   const Scene& scene_;
   geometric_t minimum_distance_;
   internal::RayTracer& ray_tracer_;
+
+  friend class internal::VisibilityTester;
 };
 
 }  // namespace iris

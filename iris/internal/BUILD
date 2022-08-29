@@ -63,6 +63,32 @@ cc_test(
     srcs = ["ray_tracer_test.cc"],
     deps = [
         ":ray_tracer",
+        "//iris/scenes:list_scene",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "visibility_tester",
+    srcs = ["visibility_tester.cc"],
+    hdrs = ["visibility_tester.h"],
+    deps = [
+        ":ray_tracer",
+        "//iris:float",
+        "//iris:geometry",
+        "//iris:integer",
+        "//iris:matrix",
+        "//iris:spectrum",
+        "//iris:visibility_tester",
+    ],
+)
+
+cc_test(
+    name = "visibility_tester_test",
+    srcs = ["visibility_tester_test.cc"],
+    deps = [
+        ":visibility_tester",
+        "//iris/scenes:list_scene",
         "@com_google_googletest//:gtest_main",
     ],
 )

@@ -16,7 +16,8 @@ class Scene {
  public:
   class Builder {
    public:
-    void Add(std::unique_ptr<Geometry> geometry, const Matrix& matrix);
+    void Add(std::unique_ptr<Geometry> geometry,
+             const Matrix& matrix = Matrix::Identity());
     std::unique_ptr<Scene> Build();
 
    private:

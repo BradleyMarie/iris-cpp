@@ -39,4 +39,14 @@ const EmissiveMaterial* Geometry::GetEmissiveMaterial(
   return nullptr;
 }
 
+bool Geometry::IsEmissive(face_t face) const { return false; }
+
+std::optional<Point> Geometry::SampleFace(face_t face, Random& rng) const {
+  return std::nullopt;
+}
+
+std::optional<visual_t> Geometry::ComputeArea(face_t face) const {
+  return std::nullopt;
+}
+
 }  // namespace iris

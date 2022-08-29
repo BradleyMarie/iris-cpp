@@ -40,6 +40,7 @@ cc_library(
         ":material",
         ":normal_map",
         ":point",
+        ":random",
         ":ray",
         ":texture_coordinates",
         ":vector",
@@ -133,6 +134,87 @@ cc_library(
         ":spectrum",
         ":vector",
         ":visibility_tester",
+    ],
+)
+
+cc_library(
+    name = "light_sample_allocator",
+    srcs = ["light_sample_allocator.cc"],
+    hdrs = ["light_sample_allocator.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":float",
+        ":light",
+        ":light_sample",
+        "//iris/internal:arena",
+    ],
+)
+
+cc_test(
+    name = "light_sample_allocator_test",
+    srcs = ["light_sample_allocator_test.cc"],
+    deps = [
+        ":light_sample_allocator",
+        "//iris/internal:arena",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "light_sample",
+    hdrs = ["light_sample.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":float",
+        ":light",
+    ],
+)
+
+cc_library(
+    name = "light_sampler",
+    srcs = ["light_sampler.cc"],
+    hdrs = ["light_sampler.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":light_sample",
+        ":light_sample_allocator",
+        ":light_scene",
+        ":random",
+    ],
+)
+
+cc_test(
+    name = "light_sampler_test",
+    srcs = ["light_sampler_test.cc"],
+    deps = [
+        ":light_sampler",
+        "//iris/internal:arena",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "light_scene",
+    srcs = ["light_scene.cc"],
+    hdrs = ["light_scene.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":light",
+        ":light_sample",
+        ":light_sample_allocator",
+        ":point",
+        ":random",
+        "//iris/internal:visibility_tester",
+    ],
+)
+
+cc_test(
+    name = "light_scene_test",
+    srcs = ["light_scene_test.cc"],
+    deps = [
+        ":light_scene",
+        "//iris/scenes:list_scene",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -246,6 +328,7 @@ cc_test(
     deps = [
         ":ray_tracer",
         "//iris/internal:ray_tracer",
+        "//iris/scenes:list_scene",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -357,6 +440,7 @@ cc_test(
     deps = [
         ":visibility_tester",
         "//iris/internal:ray_tracer",
+        "//iris/scenes:list_scene",
         "@com_google_googletest//:gtest_main",
     ],
 )

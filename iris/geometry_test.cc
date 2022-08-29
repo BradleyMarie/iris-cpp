@@ -10,7 +10,7 @@ class TestGeometry final : public iris::Geometry {
 
  private:
   iris::Hit* Trace(const iris::Ray& ray,
-                   iris::HitAllocator& hit_allocator) const {
+                   iris::HitAllocator& hit_allocator) const override {
     EXPECT_EQ(expected_ray_, ray);
     if (nested_) {
       auto* nested_hit = nested_->Trace(hit_allocator);
@@ -19,14 +19,14 @@ class TestGeometry final : public iris::Geometry {
     return &hit_allocator.Allocate(nullptr, 2.0, 3, 4);
   }
 
-  virtual iris::Vector ComputeSurfaceNormal(const iris::Point& hit_point,
-                                            iris::face_t face,
-                                            const void* additional_data) const {
+  iris::Vector ComputeSurfaceNormal(
+      const iris::Point& hit_point, iris::face_t face,
+      const void* additional_data) const override {
     EXPECT_FALSE(true);
     return iris::Vector(1.0, 0.0, 0.0);
   }
 
-  virtual std::span<const iris::face_t> GetFaces() const {
+  std::span<const iris::face_t> GetFaces() const override {
     static const iris::face_t faces[] = {1};
     EXPECT_FALSE(true);
     return faces;
@@ -34,6 +34,30 @@ class TestGeometry final : public iris::Geometry {
 
   iris::Ray expected_ray_;
   const iris::Geometry* nested_;
+};
+
+class TestRandom final : public iris::Random {
+  result_type min() const override {
+    EXPECT_FALSE(true);
+    return 0u;
+  }
+
+  result_type max() const override {
+    EXPECT_FALSE(true);
+    return 0u;
+  }
+
+  result_type operator()() override {
+    EXPECT_FALSE(true);
+    return 0u;
+  }
+
+  void discard(unsigned long long z) override { EXPECT_FALSE(true); }
+
+  std::unique_ptr<Random> Replicate() override {
+    EXPECT_FALSE(true);
+    return nullptr;
+  }
 };
 
 TEST(GeometryTest, Trace) {
@@ -62,7 +86,7 @@ TEST(GeometryTest, Trace) {
   EXPECT_EQ(&nested_geom, next_full_hit->geometry);
 };
 
-TEST(GeometryTrace, ComputeTextureCoordinates) {
+TEST(GeometryTest, ComputeTextureCoordinates) {
   TestGeometry geom(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)),
       nullptr);
@@ -71,7 +95,7 @@ TEST(GeometryTrace, ComputeTextureCoordinates) {
           .has_value());
 }
 
-TEST(GeometryTrace, ComputeShadingNormal) {
+TEST(GeometryTest, ComputeShadingNormal) {
   TestGeometry geom(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)),
       nullptr);
@@ -80,16 +104,39 @@ TEST(GeometryTrace, ComputeShadingNormal) {
   EXPECT_EQ(nullptr, std::get<const iris::NormalMap*>(normal));
 }
 
-TEST(GeometryTrace, GetMaterial) {
+TEST(GeometryTest, GetMaterial) {
   TestGeometry geom(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)),
       nullptr);
   EXPECT_EQ(nullptr, geom.GetMaterial(0, nullptr));
 }
 
-TEST(GeometryTrace, GetEmissiveMaterial) {
+TEST(GeometryTest, IsEmissive) {
+  TestGeometry geom(
+      iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)),
+      nullptr);
+  EXPECT_FALSE(geom.IsEmissive(0));
+}
+
+TEST(GeometryTest, GetEmissiveMaterial) {
   TestGeometry geom(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)),
       nullptr);
   EXPECT_EQ(nullptr, geom.GetEmissiveMaterial(0, nullptr));
+}
+
+TEST(GeometryTest, SampleFace) {
+  TestGeometry geom(
+      iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)),
+      nullptr);
+  TestRandom rng;
+  EXPECT_FALSE(geom.SampleFace(0, rng));
+}
+
+TEST(GeometryTest, ComputeArea) {
+  TestGeometry geom(
+      iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)),
+      nullptr);
+  TestRandom rng;
+  EXPECT_FALSE(geom.ComputeArea(0));
 }

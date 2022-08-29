@@ -8,7 +8,7 @@ class TestSpectrum : public iris::Spectrum {
   TestSpectrum(iris::visual_t wavelength, iris::visual_t intensity)
       : wavelength_(wavelength), intensity_(intensity) {}
 
-  iris::visual_t Intensity(iris::visual_t wavelength) const {
+  iris::visual_t Intensity(iris::visual_t wavelength) const override {
     EXPECT_EQ(wavelength_, wavelength);
     return intensity_;
   }
@@ -23,7 +23,7 @@ class TestReflector : public iris::Reflector {
   TestReflector(iris::visual_t wavelength, iris::visual_t reflectance)
       : wavelength_(wavelength), reflectance_(reflectance) {}
 
-  iris::visual_t Reflectance(iris::visual_t wavelength) const {
+  iris::visual_t Reflectance(iris::visual_t wavelength) const override {
     EXPECT_EQ(wavelength_, wavelength);
     return reflectance_;
   }
