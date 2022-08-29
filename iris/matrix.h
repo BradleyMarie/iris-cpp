@@ -60,6 +60,8 @@ struct Matrix final {
   const std::array<std::array<geometric_t, 4>, 4> i;
 };
 
+bool operator<(const Matrix& left, const Matrix& right);
+
 inline Point Matrix::Multiply(const Point& point) const {
   return Point(
       m[0][0] * point.x + m[0][1] * point.y + m[0][2] * point.z + m[0][3],

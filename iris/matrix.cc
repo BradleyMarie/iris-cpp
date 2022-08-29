@@ -416,4 +416,32 @@ Matrix Matrix::Multiply(const Matrix& matrix) const {
   return Matrix(Multiply4x4(m, matrix.m), Multiply4x4(matrix.i, i));
 }
 
+bool operator<(const Matrix& left, const Matrix& right) {
+  for (size_t i = 0; i < 4; i++) {
+    for (size_t j = 0; j < 4; j++) {
+      if (left.m[i][j] > right.m[i][j]) {
+        return false;
+      }
+
+      if (left.m[i][j] < right.m[i][j]) {
+        return true;
+      }
+    }
+  }
+
+  for (size_t i = 0; i < 4; i++) {
+    for (size_t j = 0; j < 4; j++) {
+      if (left.i[i][j] > right.i[i][j]) {
+        return false;
+      }
+
+      if (left.i[i][j] < right.i[i][j]) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 }  // namespace iris

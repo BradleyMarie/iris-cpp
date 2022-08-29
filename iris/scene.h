@@ -2,15 +2,34 @@
 #define _IRIS_SCENE_
 
 #include <functional>
+#include <map>
 #include <utility>
 
+#include "iris/geometry.h"
 #include "iris/intersector.h"
+#include "iris/matrix.h"
 #include "iris/ray.h"
 
 namespace iris {
 
 class Scene {
  public:
+  class Builder {
+   public:
+    void Add(std::unique_ptr<Geometry> geometry, const Matrix& matrix);
+    std::unique_ptr<Scene> Build();
+
+   private:
+    virtual std::unique_ptr<Scene> Build(
+        std::vector<std::pair<size_t, size_t>> geometry_and_matrix,
+        std::vector<std::unique_ptr<Geometry>> geometry,
+        std::vector<Matrix> matrices) = 0;
+
+    std::vector<std::pair<size_t, size_t>> indices_;
+    std::vector<std::unique_ptr<Geometry>> geometry_;
+    std::map<Matrix, size_t> numbered_matrices_ = {{Matrix::Identity(), 0}};
+  };
+
   class const_iterator {
    public:
     typedef std::pair<const Geometry&, const Matrix*> value_type;

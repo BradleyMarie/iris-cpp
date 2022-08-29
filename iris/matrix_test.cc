@@ -542,3 +542,12 @@ TEST(MatrixTest, InverseTransposeMultiplyVector) {
   EXPECT_NEAR(1.0, rotate_z.y, static_cast<iris::geometric_t>(0.0001));
   EXPECT_NEAR(1.0, rotate_z.z, static_cast<iris::geometric_t>(0.0001));
 }
+
+TEST(MatrixTest, LessThan) {
+  auto left = iris::Matrix::Scalar(1.0, 1.0, 1.0).value();
+  EXPECT_FALSE(left < left);
+
+  auto right = iris::Matrix::Scalar(2.0, 1.0, 1.0).value();
+  EXPECT_FALSE(right < left);
+  EXPECT_TRUE(left < right);
+}
