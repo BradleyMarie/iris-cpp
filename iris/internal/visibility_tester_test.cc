@@ -9,6 +9,7 @@
 static bool g_override_face = false;
 static iris::face_t g_front_face = 1;
 static const uint32_t g_data = 0xDEADBEEF;
+static bool g_second_hit = false;
 
 class TestEmissiveMaterial final : public iris::EmissiveMaterial {
  public:
@@ -51,7 +52,12 @@ class TestGeometry final : public iris::Geometry {
       return &hit_allocator.Allocate(nullptr, 1.0, g_front_face++, 2, g_data);
     }
 
-    return &hit_allocator.Allocate(nullptr, 1.0, 1, 2, g_data);
+    auto* good_hit = &hit_allocator.Allocate(nullptr, 1.0, 1, 2, g_data);
+    if (!g_second_hit) {
+      return good_hit;
+    }
+
+    return &hit_allocator.Allocate(good_hit, 0.5, 100, 200, g_data);
   }
 
   iris::Vector ComputeSurfaceNormal(
@@ -119,6 +125,31 @@ TEST(VisibilityTesterTest, WrongFace) {
 
   EXPECT_FALSE(visibility_tester.Visible(world_ray, *geometry, nullptr, 2, 1.0,
                                          nullptr));
+}
+
+TEST(VisibilityTesterTest, SucceedsSecondHit) {
+  iris::Ray world_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0));
+  iris::Ray model_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0));
+
+  const iris::Spectrum* spectrum = reinterpret_cast<iris::Spectrum*>(2);
+  TestEmissiveMaterial emissive_material({0.0, 0.0}, spectrum);
+
+  auto builder = iris::scenes::ListScene::Builder::Create();
+
+  auto geometry = std::make_unique<TestGeometry>(
+      model_ray, iris::Point(1.0, 0.0, 0.0), &emissive_material);
+  auto geometry_ptr = geometry.get();
+  builder->Add(std::move(geometry));
+
+  auto scene = builder->Build();
+
+  iris::internal::RayTracer ray_tracer;
+  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
+
+  g_second_hit = true;
+  EXPECT_FALSE(visibility_tester.Visible(world_ray, *geometry_ptr, nullptr, 1,
+                                         1.0, nullptr));
+  g_second_hit = false;
 }
 
 TEST(VisibilityTesterTest, SceneTraceMisses) {

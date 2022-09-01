@@ -36,6 +36,22 @@ void SingleGeometryScene::Trace(const Ray& ray,
 
 }  // namespace
 
+bool VisibilityTester::Intersects(const Ray& ray, const Geometry& geometry,
+                                  const Matrix* model_to_world, face_t face) {
+  SingleGeometryScene geometry_scene(geometry, model_to_world);
+  for (auto* geometry_hit = ray_tracer_.Trace(
+           ray, minimum_distance_, std::numeric_limits<geometric_t>::infinity(),
+           geometry_scene);
+       geometry_hit;
+       geometry_hit = static_cast<internal::Hit*>(geometry_hit->next)) {
+    if (geometry_hit->front == face) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 std::optional<VisibilityTester::VisibleResult> VisibilityTester::Visible(
     const Ray& ray, const Geometry& geometry, const Matrix* model_to_world,
     face_t face, visual_t geometry_area, visual_t* pdf) {
@@ -43,16 +59,13 @@ std::optional<VisibilityTester::VisibleResult> VisibilityTester::Visible(
 
   // Optimization: Check that the face is visible along the ray before tracing
   // the entire scene
-  SingleGeometryScene geometry_scene(geometry, model_to_world);
-  auto* geometry_hit = ray_tracer_.Trace(
-      ray, minimum_distance_, std::numeric_limits<geometric_t>::infinity(),
-      geometry_scene);
-  if (!geometry_hit || geometry_hit->front != face) {
+  if (!Intersects(ray, geometry, model_to_world, face)) {
     return std::nullopt;
   }
 
-  // The distance from the previous intersection cannot be used as a bound since
-  // it may be be discarded in a full scene intersection if part of CSG
+  // The distance from the previous intersection cannot be used as a bound
+  // since it may be be discarded in a full scene intersection if part of
+  // CSG
   auto* scene_hit =
       ray_tracer_.Trace(ray, minimum_distance_,
                         std::numeric_limits<geometric_t>::infinity(), scene_);
