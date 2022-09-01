@@ -20,6 +20,7 @@ cc_test(
     srcs = ["list_scene_test.cc"],
     deps = [
         ":list_scene",
+        "//iris/testing:scene",
         "@com_google_googletest//:gtest_main",
     ],
 )

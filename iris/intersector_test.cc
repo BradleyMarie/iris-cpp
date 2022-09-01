@@ -40,7 +40,7 @@ TEST(InspectorTest, Initialize) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(ray, 1.0, 2.0, arena, &closest_hit);
+  iris::Intersector intersector(ray, 1.0, 2.0, arena, closest_hit);
 
   EXPECT_EQ(nullptr, closest_hit);
   EXPECT_EQ(1.0, intersector.MinimumDistance());
@@ -51,7 +51,7 @@ TEST(IntersectorTest, TooClose) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(ray, 1.0, 2.0, arena, &closest_hit);
+  iris::Intersector intersector(ray, 1.0, 2.0, arena, closest_hit);
 
   TestGeometry geometry(0.0);
   intersector.Intersect(geometry);
@@ -65,7 +65,7 @@ TEST(IntersectorTest, TooFar) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(ray, 1.0, 2.0, arena, &closest_hit);
+  iris::Intersector intersector(ray, 1.0, 2.0, arena, closest_hit);
 
   TestGeometry geometry(3.0);
   intersector.Intersect(geometry);
@@ -79,7 +79,7 @@ TEST(IntersectorTest, Hits) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(ray, 0.0, 2.0, arena, &closest_hit);
+  iris::Intersector intersector(ray, 0.0, 2.0, arena, closest_hit);
 
   TestGeometry geometry(1.0);
   intersector.Intersect(geometry);
@@ -99,7 +99,7 @@ TEST(IntersectorTest, HitsIgnoreFarther) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(ray, 0.0, 2.0, arena, &closest_hit);
+  iris::Intersector intersector(ray, 0.0, 2.0, arena, closest_hit);
 
   TestGeometry geometry0(1.0);
   intersector.Intersect(geometry0);
@@ -122,7 +122,7 @@ TEST(IntersectorTest, KeepsCloser) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(ray, 0.0, 3.0, arena, &closest_hit);
+  iris::Intersector intersector(ray, 0.0, 3.0, arena, closest_hit);
 
   TestGeometry geometry0(2.0);
   intersector.Intersect(geometry0);
@@ -153,7 +153,7 @@ TEST(IntersectorTest, TransformedTooClose) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(transformed_ray, 1.0, 2.0, arena, &closest_hit);
+  iris::Intersector intersector(transformed_ray, 1.0, 2.0, arena, closest_hit);
 
   TestGeometry geometry(0.0);
   intersector.Intersect(geometry, model_to_world);
@@ -167,7 +167,7 @@ TEST(IntersectorTest, TransformedTooFar) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(transformed_ray, 1.0, 2.0, arena, &closest_hit);
+  iris::Intersector intersector(transformed_ray, 1.0, 2.0, arena, closest_hit);
 
   TestGeometry geometry(3.0);
   intersector.Intersect(geometry, model_to_world);
@@ -181,7 +181,7 @@ TEST(IntersectorTest, TransformedHits) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(transformed_ray, 0.0, 2.0, arena, &closest_hit);
+  iris::Intersector intersector(transformed_ray, 0.0, 2.0, arena, closest_hit);
 
   TestGeometry geometry(1.0);
   intersector.Intersect(geometry, model_to_world);
@@ -201,7 +201,7 @@ TEST(IntersectorTest, TransformedHitsIgnoreFarther) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(transformed_ray, 0.0, 2.0, arena, &closest_hit);
+  iris::Intersector intersector(transformed_ray, 0.0, 2.0, arena, closest_hit);
 
   TestGeometry geometry0(1.0);
   intersector.Intersect(geometry0, model_to_world);
@@ -224,7 +224,7 @@ TEST(IntersectorTest, TransformedKeepsCloser) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(transformed_ray, 0.0, 3.0, arena, &closest_hit);
+  iris::Intersector intersector(transformed_ray, 0.0, 3.0, arena, closest_hit);
 
   TestGeometry geometry0(2.0);
   intersector.Intersect(geometry0, model_to_world);
@@ -250,7 +250,7 @@ TEST(IntersectorTest, MatrixPointerTooClose) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(ray, 1.0, 2.0, arena, &closest_hit);
+  iris::Intersector intersector(ray, 1.0, 2.0, arena, closest_hit);
 
   TestGeometry geometry(0.0);
   intersector.Intersect(geometry, nullptr);
@@ -264,7 +264,7 @@ TEST(IntersectorTest, MatrixPointerTooFar) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(ray, 1.0, 2.0, arena, &closest_hit);
+  iris::Intersector intersector(ray, 1.0, 2.0, arena, closest_hit);
 
   TestGeometry geometry(3.0);
   intersector.Intersect(geometry, nullptr);
@@ -278,7 +278,7 @@ TEST(IntersectorTest, MatrixPointerHits) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(ray, 0.0, 2.0, arena, &closest_hit);
+  iris::Intersector intersector(ray, 0.0, 2.0, arena, closest_hit);
 
   TestGeometry geometry(1.0);
   intersector.Intersect(geometry, nullptr);
@@ -298,7 +298,7 @@ TEST(IntersectorTest, MatrixPointerHitsIgnoreFarther) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(ray, 0.0, 2.0, arena, &closest_hit);
+  iris::Intersector intersector(ray, 0.0, 2.0, arena, closest_hit);
 
   TestGeometry geometry0(1.0);
   intersector.Intersect(geometry0, nullptr);
@@ -321,7 +321,7 @@ TEST(IntersectorTest, MatrixPointerKeepsCloser) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(ray, 0.0, 3.0, arena, &closest_hit);
+  iris::Intersector intersector(ray, 0.0, 3.0, arena, closest_hit);
 
   TestGeometry geometry0(2.0);
   intersector.Intersect(geometry0);
@@ -347,7 +347,7 @@ TEST(IntersectorTest, MatrixPointerTransformedTooClose) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(transformed_ray, 1.0, 2.0, arena, &closest_hit);
+  iris::Intersector intersector(transformed_ray, 1.0, 2.0, arena, closest_hit);
 
   TestGeometry geometry(0.0);
   intersector.Intersect(geometry, &model_to_world);
@@ -361,7 +361,7 @@ TEST(IntersectorTest, MatrixPointerTransformedTooFar) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(transformed_ray, 1.0, 2.0, arena, &closest_hit);
+  iris::Intersector intersector(transformed_ray, 1.0, 2.0, arena, closest_hit);
 
   TestGeometry geometry(3.0);
   intersector.Intersect(geometry, &model_to_world);
@@ -375,7 +375,7 @@ TEST(IntersectorTest, MatrixPointerTransformedHits) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(transformed_ray, 0.0, 2.0, arena, &closest_hit);
+  iris::Intersector intersector(transformed_ray, 0.0, 2.0, arena, closest_hit);
 
   TestGeometry geometry(1.0);
   intersector.Intersect(geometry, &model_to_world);
@@ -395,7 +395,7 @@ TEST(IntersectorTest, MatrixPointerTransformedHitsIgnoreFarther) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(transformed_ray, 0.0, 2.0, arena, &closest_hit);
+  iris::Intersector intersector(transformed_ray, 0.0, 2.0, arena, closest_hit);
 
   TestGeometry geometry0(1.0);
   intersector.Intersect(geometry0, &model_to_world);
@@ -418,7 +418,7 @@ TEST(IntersectorTest, MatrixPointerTransformedKeepsCloser) {
   auto arena = iris::internal::HitArena();
 
   iris::Hit* closest_hit;
-  iris::Intersector intersector(transformed_ray, 0.0, 3.0, arena, &closest_hit);
+  iris::Intersector intersector(transformed_ray, 0.0, 3.0, arena, closest_hit);
 
   TestGeometry geometry0(2.0);
   intersector.Intersect(geometry0, &model_to_world);

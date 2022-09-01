@@ -1,6 +1,9 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
-package(default_visibility = ["//iris:__pkg__"])
+package(default_visibility = [
+    "//iris:__pkg__",
+    "//iris/testing:__pkg__",
+])
 
 cc_library(
     name = "arena",

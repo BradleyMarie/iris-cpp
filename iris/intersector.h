@@ -14,13 +14,13 @@ class Intersector final {
  public:
   Intersector(const Ray& ray, geometric_t minimum_distance,
               geometric_t maximum_distance, internal::HitArena& hit_arena,
-              Hit** closest_hit)
+              Hit*& closest_hit)
       : ray_(ray),
         minimum_distance_(minimum_distance),
         maximum_distance_(maximum_distance),
         hit_arena_(hit_arena),
         closest_hit_(closest_hit) {
-    *closest_hit_ = nullptr;
+    closest_hit_ = nullptr;
   }
 
   void Intersect(const Geometry& geometry);
@@ -38,7 +38,7 @@ class Intersector final {
   geometric_t minimum_distance_;
   geometric_t maximum_distance_;
   internal::HitArena& hit_arena_;
-  Hit** closest_hit_;
+  Hit*& closest_hit_;
 };
 
 }  // namespace iris

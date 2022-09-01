@@ -1,6 +1,7 @@
 #include "iris/scenes/list_scene.h"
 
 #include "googletest/include/gtest/gtest.h"
+#include "iris/testing/scene.h"
 
 class TestGeometry final : public iris::Geometry {
  public:
@@ -68,26 +69,7 @@ TEST(ListSceneTest, Iterators) {
   }
 }
 
-TEST(ListSceneTest, Trace) {
+TEST(ListSceneTest, SceneTestSuite) {
   auto builder = iris::scenes::ListScene::Builder::Create();
-
-  auto matrix0 = iris::Matrix::Translation(1.0, 0.0, 0.0).value();
-  auto matrix1 = iris::Matrix::Identity();
-
-  iris::Ray world_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0));
-
-  bool intersected0;
-  auto geom0 = std::make_unique<TestGeometry>(
-      iris::Ray(iris::Point(-1.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)),
-      &intersected0);
-
-  bool intersected1;
-  auto geom1 = std::make_unique<TestGeometry>(world_ray, &intersected1);
-
-  builder->Add(std::move(geom0), matrix0);
-  builder->Add(std::move(geom1), matrix1);
-  auto result = builder->Build();
-
-  // TODO: Call Trace
-  // TODO: Check Intersected
+  iris::testing::SceneTestSuite(*builder);
 }
