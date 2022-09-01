@@ -7,13 +7,11 @@ namespace iris {
 Hit* Geometry::Trace(HitAllocator& hit_allocator) const {
   auto* result = Trace(hit_allocator.ray_, hit_allocator);
 
-  auto* hit_list = result;
-  while (hit_list) {
+  for (auto* hit_list = result; hit_list; hit_list = hit_list->next) {
     auto* full_hit = static_cast<internal::Hit*>(hit_list);
     if (!full_hit->geometry) {
       full_hit->geometry = this;
     }
-    hit_list = hit_list->next;
   }
 
   return result;

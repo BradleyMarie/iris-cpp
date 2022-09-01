@@ -27,16 +27,14 @@ std::optional<RayTracer::Result> RayTracer::Trace(const Ray& ray) {
           .value_or(TextureCoordinates{0.0, 0.0});
 
   const Bsdf* bsdf = nullptr;
-  const Material* material =
-      hit->geometry->GetMaterial(hit->front, hit->additional_data);
-  if (material) {
+  if (auto material =
+          hit->geometry->GetMaterial(hit->front, hit->additional_data)) {
     bsdf = material->Compute(texture_coordinates);
   }
 
   const Spectrum* spectrum = nullptr;
-  const EmissiveMaterial* emissive_material =
-      hit->geometry->GetEmissiveMaterial(hit->front, hit->additional_data);
-  if (emissive_material) {
+  if (auto* emissive_material = hit->geometry->GetEmissiveMaterial(
+          hit->front, hit->additional_data)) {
     spectrum = emissive_material->Compute(texture_coordinates);
   }
 

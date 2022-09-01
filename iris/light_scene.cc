@@ -72,18 +72,18 @@ void LightScene::Builder::Add(std::unique_ptr<Light> light) {
 }
 
 std::unique_ptr<LightScene> LightScene::Builder::Build(const Scene& scene) {
-  for (const auto& entry : scene) {
-    for (face_t face : entry.first.GetFaces()) {
-      if (!entry.first.IsEmissive(face)) {
+  for (const auto& [geometry, model_to_world] : scene) {
+    for (face_t face : geometry.GetFaces()) {
+      if (!geometry.IsEmissive(face)) {
         continue;
       }
 
-      auto surface_area = entry.first.ComputeArea(face);
+      auto surface_area = geometry.ComputeArea(face);
       if (!surface_area) {
         continue;
       }
 
-      lights_.push_back(std::make_unique<AreaLight>(entry.first, entry.second,
+      lights_.push_back(std::make_unique<AreaLight>(geometry, model_to_world,
                                                     face, *surface_area));
     }
   }

@@ -44,8 +44,7 @@ Scene::const_iterator::value_type Scene::const_iterator::operator*() noexcept {
 }
 
 Scene::const_iterator& Scene::const_iterator::operator++() noexcept {
-  auto next = generator_();
-  if (next) {
+  if (auto next = generator_()) {
     geometry_ = &next->first;
     matrix_ = next->second;
   } else {

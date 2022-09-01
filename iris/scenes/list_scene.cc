@@ -14,10 +14,10 @@ std::unique_ptr<Scene> ListScene::Builder::Build(
 
   std::vector<std::shared_ptr<Geometry>> scene_geometry;
   std::vector<std::shared_ptr<Matrix>> scene_matrices;
-  for (const auto& entry : geometry_and_matrix) {
-    scene_geometry.push_back(shared_geometry[entry.first]);
-    auto matrix = entry.second
-                      ? std::make_shared<Matrix>(matrices[entry.second])
+  for (const auto& [geometry_index, matrix_index] : geometry_and_matrix) {
+    scene_geometry.push_back(shared_geometry[geometry_index]);
+    auto matrix = (matrix_index != 0u)
+                      ? std::make_shared<Matrix>(matrices[matrix_index])
                       : nullptr;
     scene_matrices.push_back(std::move(matrix));
   }

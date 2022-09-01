@@ -54,14 +54,14 @@ TEST(ListSceneTest, Iterators) {
   auto result = builder->Build();
 
   size_t index = 0u;
-  for (const auto& entry : *result) {
+  for (const auto& [geometry, matrix] : *result) {
     size_t current = index++;
     if (current == 0u) {
-      EXPECT_EQ(geom0_ptr, &entry.first);
-      EXPECT_EQ(matrix0, *entry.second);
+      EXPECT_EQ(geom0_ptr, &geometry);
+      EXPECT_EQ(matrix0, *matrix);
     } else if (current == 1u) {
-      EXPECT_EQ(geom1_ptr, &entry.first);
-      EXPECT_EQ(nullptr, entry.second);
+      EXPECT_EQ(geom1_ptr, &geometry);
+      EXPECT_EQ(nullptr, matrix);
     } else {
       EXPECT_TRUE(false);
     }
