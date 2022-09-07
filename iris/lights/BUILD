@@ -23,6 +23,9 @@ cc_test(
     srcs = ["point_light_test.cc"],
     deps = [
         ":point_light",
+        "//iris/random:mock_random",
+        "//iris/spectra:mock_spectrum",
+        "//iris/testing:light_tester",
         "@com_google_googletest//:gtest_main",
     ],
 )
