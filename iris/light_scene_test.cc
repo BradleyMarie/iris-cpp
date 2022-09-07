@@ -1,9 +1,11 @@
 #include "iris/light_scene.h"
 
+#include <memory>
 #include <optional>
 #include <vector>
 
 #include "googletest/include/gtest/gtest.h"
+#include "iris/emissive/mock_emissive_material.h"
 #include "iris/lights/point_light.h"
 #include "iris/scenes/list_scene.h"
 
@@ -36,6 +38,52 @@ std::unique_ptr<iris::LightScene> TestLightSceneBuilder::Build(
   return nullptr;
 }
 
+class TestGeometry : public iris::Geometry {
+ public:
+  TestGeometry(iris::Point location, iris::geometric_t distance,
+               std::unique_ptr<iris::EmissiveMaterial> emissive_material)
+      : location_(location),
+        distance_(distance),
+        emissive_material_(std::move(emissive_material)) {}
+
+  iris::Hit* Trace(const iris::Ray& ray,
+                   iris::HitAllocator& hit_allocator) const override {
+    return &hit_allocator.Allocate(nullptr, distance_, 1u, 2u);
+  }
+
+  bool IsEmissive(iris::face_t face) const override { return true; }
+
+  const iris::EmissiveMaterial* GetEmissiveMaterial(
+      iris::face_t face, const void* additional_data) const override {
+    return emissive_material_.get();
+  }
+
+  std::optional<iris::Point> SampleFace(iris::face_t face,
+                                        iris::Random& rng) const override {
+    return location_;
+  }
+
+  iris::Vector ComputeSurfaceNormal(
+      const iris::Point& hit_point, iris::face_t face,
+      const void* additional_data) const override {
+    return iris::Vector(1.0, 0.0, 0.0);
+  }
+
+  std::optional<iris::visual_t> ComputeArea(iris::face_t face) const override {
+    return 1.0;
+  }
+
+  std::span<const iris::face_t> GetFaces() const override {
+    static const iris::face_t faces[] = {1u, 2u};
+    return faces;
+  }
+
+  iris::Point location_;
+  iris::geometric_t distance_;
+  std::unique_ptr<iris::EmissiveMaterial> emissive_material_;
+  bool has_area_;
+};
+
 TEST(ListSceneTest, BuilderEmpty) {
   auto scene = iris::scenes::ListScene::Builder::Create()->Build();
   std::unique_ptr<iris::LightScene::Builder> builder =
@@ -54,5 +102,15 @@ TEST(ListSceneTest, BuilderOneLight) {
   ASSERT_EQ(nullptr, builder->Build(*scene).get());
 }
 
-// TODO: Test AreaLight Creation
+TEST(ListSceneTest, BuilderOneAreaLight) {
+  auto scene_builder = iris::scenes::ListScene::Builder::Create();
+  scene_builder->Add(
+      std::make_unique<TestGeometry>(iris::Point(0.0, 0.0, 0.0), 1.0, nullptr));
+  auto scene = scene_builder->Build();
+
+  std::unique_ptr<iris::LightScene::Builder> builder =
+      std::make_unique<TestLightSceneBuilder>(2);
+  ASSERT_EQ(nullptr, builder->Build(*scene).get());
+}
+
 // TODO: Test AreaLight Logic

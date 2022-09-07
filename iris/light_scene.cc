@@ -1,5 +1,7 @@
 #include "iris/light_scene.h"
 
+#include <cassert>
+
 #include "iris/internal/visibility_tester.h"
 
 namespace iris {
@@ -37,7 +39,11 @@ std::optional<Light::SampleResult> AreaLight::Sample(
     return std::nullopt;
   }
 
-  auto to_light = Normalize(*sampled_point - hit_point);
+  auto world_sample_point = model_to_world_
+                                ? model_to_world_->Multiply(*sampled_point)
+                                : *sampled_point;
+
+  auto to_light = Normalize(world_sample_point - hit_point);
 
   visual_t pdf;
   auto* emission = Emission(Ray(hit_point, to_light), tester, allocator, &pdf);
@@ -78,13 +84,8 @@ std::unique_ptr<LightScene> LightScene::Builder::Build(const Scene& scene) {
         continue;
       }
 
-      auto surface_area = geometry.ComputeArea(face);
-      if (!surface_area) {
-        continue;
-      }
-
-      lights_.push_back(std::make_unique<AreaLight>(geometry, model_to_world,
-                                                    face, *surface_area));
+      lights_.push_back(std::make_unique<AreaLight>(
+          geometry, model_to_world, face, geometry.ComputeArea(face).value()));
     }
   }
 

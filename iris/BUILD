@@ -213,6 +213,7 @@ cc_test(
     srcs = ["light_scene_test.cc"],
     deps = [
         ":light_scene",
+        "//iris/emissive:mock_emissive_material",
         "//iris/lights:point_light",
         "//iris/scenes:list_scene",
         "@com_google_googletest//:gtest_main",
