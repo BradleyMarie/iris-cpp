@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <type_traits>
 
 #include "iris/float.h"
 
@@ -27,7 +28,7 @@ struct Vector final {
     return as_array[index];
   }
 
-  geometric_t Length() const;
+  geometric_intermediate_t Length() const;
 
   const geometric_t x;
   const geometric_t y;
@@ -48,29 +49,37 @@ Vector operator+(const Vector& addend0, const Vector& addend1) {
                 addend0.z + addend1.z);
 }
 
-Vector operator*(const Vector& vector, geometric_t scalar) {
+template <typename T>
+Vector operator*(const Vector& vector,
+                 T scalar) requires std::is_floating_point<T>::value {
   assert(std::isfinite(scalar));
   return Vector(vector.x * scalar, vector.y * scalar, vector.z * scalar);
 }
 
-Vector operator*(geometric_t scalar, const Vector& vector) {
+template <typename T>
+Vector operator*(
+    T scalar, const Vector& vector) requires std::is_floating_point<T>::value {
   assert(std::isfinite(scalar));
   return vector * scalar;
 }
 
-Vector operator/(const Vector& dividend, geometric_t divisor) {
-  assert(!std::isnan(divisor) && divisor != static_cast<geometric_t>(0.0));
+template <typename T>
+Vector operator/(const Vector& dividend,
+                 T divisor) requires std::is_floating_point<T>::value {
+  assert(!std::isnan(divisor) && divisor != 0.0);
   return Vector(dividend.x / divisor, dividend.y / divisor,
                 dividend.z / divisor);
 }
 
-geometric_t DotProduct(const Vector& operand0, const Vector& operand1) {
+geometric_intermediate_t DotProduct(const Vector& operand0,
+                                    const Vector& operand1) {
   return operand0.x * operand1.x + operand0.y * operand1.y +
          operand0.z * operand1.z;
 }
 
-geometric_t PositiveDotProduct(const Vector& operand0, const Vector& operand1) {
-  return std::max(static_cast<geometric_t>(0.0),
+geometric_intermediate_t PositiveDotProduct(const Vector& operand0,
+                                            const Vector& operand1) {
+  return std::max(static_cast<geometric_intermediate_t>(0.0),
                   DotProduct(operand0, operand1));
 }
 
@@ -80,14 +89,15 @@ Vector CrossProduct(const Vector& operand0, const Vector& operand1) {
                 operand0.x * operand1.y - operand0.y * operand1.x);
 }
 
-Vector Normalize(const Vector& vector, geometric_t* length_squared = nullptr,
-                 geometric_t* length = nullptr) {
-  geometric_t old_length_squared = DotProduct(vector, vector);
+Vector Normalize(const Vector& vector,
+                 geometric_intermediate_t* length_squared = nullptr,
+                 geometric_intermediate_t* length = nullptr) {
+  geometric_intermediate_t old_length_squared = DotProduct(vector, vector);
   if (length_squared) {
     *length_squared = old_length_squared;
   }
 
-  geometric_t old_length = std::sqrt(old_length_squared);
+  geometric_intermediate_t old_length = std::sqrt(old_length_squared);
   if (length) {
     *length = old_length;
   }
@@ -95,7 +105,7 @@ Vector Normalize(const Vector& vector, geometric_t* length_squared = nullptr,
   return vector / old_length;
 }
 
-geometric_t Vector::Length() const {
+geometric_intermediate_t Vector::Length() const {
   return std::sqrt(DotProduct(*this, *this));
 }
 

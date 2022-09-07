@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <type_traits>
 
 #include "iris/float.h"
 #include "iris/point.h"
@@ -18,7 +19,8 @@ struct Ray final {
 
   bool operator==(const Ray&) const = default;
 
-  Point Endpoint(geometric_t distance) const {
+  template <typename T>
+  Point Endpoint(T distance) const requires std::is_floating_point<T>::value {
     assert(std::isfinite(distance));
     return origin + direction * distance;
   }
