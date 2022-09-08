@@ -8,9 +8,9 @@
 #include "iris/light.h"
 #include "iris/point.h"
 #include "iris/random.h"
+#include "iris/scene.h"
 #include "iris/spectral_allocator.h"
 #include "iris/spectrum.h"
-#include "iris/testing/mock_visibility_tester.h"
 #include "iris/visibility_tester.h"
 
 namespace iris {
@@ -18,16 +18,16 @@ namespace testing {
 
 class LightTester {
  public:
-  std::optional<iris::Light::SampleResult> Sample(
-      const Light& light, const Point& hit_point, Random& rng,
-      MockVisibilityTester& visibility_tester) const;
+  std::optional<iris::Light::SampleResult> Sample(const Light& light,
+                                                  const Point& hit_point,
+                                                  Random& rng,
+                                                  const Scene& scene);
 
   const Spectrum* Emission(const Light& light, const Ray& to_light,
-                           MockVisibilityTester& visibility_tester,
-                           visual_t* pdf = nullptr) const;
+                           const Scene& scene, visual_t* pdf = nullptr);
 
  private:
-  mutable internal::Arena arena_;
+  internal::Arena arena_;
 };
 
 }  // namespace testing

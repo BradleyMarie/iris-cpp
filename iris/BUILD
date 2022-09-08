@@ -215,7 +215,10 @@ cc_test(
         ":light_scene",
         "//iris/emissive:mock_emissive_material",
         "//iris/lights:point_light",
+        "//iris/random:mock_random",
         "//iris/scenes:list_scene",
+        "//iris/spectra:mock_spectrum",
+        "//iris/testing:light_tester",
         "@com_google_googletest//:gtest_main",
     ],
 )

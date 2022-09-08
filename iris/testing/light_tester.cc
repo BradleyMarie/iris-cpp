@@ -9,7 +9,7 @@ namespace testing {
 
 std::optional<iris::Light::SampleResult> LightTester::Sample(
     const Light& light, const Point& hit_point, Random& rng,
-    MockVisibilityTester& visibility_tester) const {
+    const Scene& visibility_tester) {
   internal::RayTracer ray_tracer;
   internal::VisibilityTester real_visibility_tester(
       visibility_tester, static_cast<geometric_t>(0.0), ray_tracer);
@@ -18,8 +18,8 @@ std::optional<iris::Light::SampleResult> LightTester::Sample(
 }
 
 const Spectrum* LightTester::Emission(const Light& light, const Ray& to_light,
-                                      MockVisibilityTester& visibility_tester,
-                                      visual_t* pdf) const {
+                                      const Scene& visibility_tester,
+                                      visual_t* pdf) {
   internal::RayTracer ray_tracer;
   internal::VisibilityTester real_visibility_tester(
       visibility_tester, static_cast<geometric_t>(0.0), ray_tracer);

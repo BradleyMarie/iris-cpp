@@ -9,8 +9,8 @@ cc_library(
     testonly = True,
     hdrs = ["mock_emissive_material.h"],
     deps = [
-        "//iris:float",
-        "//iris:spectrum",
+        "//iris:emissive_material",
+        "//iris:texture_coordinates",
         "@com_google_googletest//:gtest",
     ],
 )

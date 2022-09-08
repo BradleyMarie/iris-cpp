@@ -5,16 +5,31 @@ package(default_visibility = [
 ])
 
 cc_library(
+    name = "light_scene_tester",
+    testonly = True,
+    srcs = ["light_scene_tester.cc"],
+    hdrs = ["light_scene_tester.h"],
+    deps = [
+        "//iris:light_sample",
+        "//iris:light_sample_allocator",
+        "//iris:light_scene",
+        "//iris:point",
+        "//iris:random",
+        "//iris/internal:arena",
+    ],
+)
+
+cc_library(
     name = "light_tester",
     testonly = True,
     srcs = ["light_tester.cc"],
     hdrs = ["light_tester.h"],
     deps = [
-        ":mock_visibility_tester",
         "//iris:float",
         "//iris:light",
         "//iris:point",
         "//iris:random",
+        "//iris:scene",
         "//iris:spectral_allocator",
         "//iris:spectrum",
         "//iris:visibility_tester",
