@@ -10,7 +10,7 @@ class Matrix;
 namespace internal {
 
 struct Hit : public iris::Hit {
-  Hit(iris::Hit* next, geometric distance, face_t front, face_t back,
+  Hit(iris::Hit* next, geometric_t distance, face_t front, face_t back,
       const void* additional_data)
       : iris::Hit{next, distance},
         geometry(nullptr),

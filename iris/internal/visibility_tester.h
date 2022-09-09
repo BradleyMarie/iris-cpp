@@ -15,7 +15,7 @@ namespace internal {
 
 class VisibilityTester : public iris::VisibilityTester {
  public:
-  VisibilityTester(const Scene& scene, geometric minimum_distance,
+  VisibilityTester(const Scene& scene, geometric_t minimum_distance,
                    internal::RayTracer& ray_tracer)
       : iris::VisibilityTester(scene, minimum_distance, ray_tracer) {}
 

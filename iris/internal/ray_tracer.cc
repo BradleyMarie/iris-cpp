@@ -3,8 +3,8 @@
 namespace iris {
 namespace internal {
 
-Hit* RayTracer::Trace(const Ray& ray, geometric minimum_distance,
-                      geometric maximum_distance, const Scene& scene) {
+Hit* RayTracer::Trace(const Ray& ray, geometric_t minimum_distance,
+                      geometric_t maximum_distance, const Scene& scene) {
   hit_arena_.Clear();
 
   iris::Hit* closest_hit;

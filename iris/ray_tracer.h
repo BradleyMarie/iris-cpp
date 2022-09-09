@@ -24,7 +24,7 @@ class RayTracer final {
     const Vector shading_normal;
   };
 
-  RayTracer(const Scene& scene, geometric minimum_distance,
+  RayTracer(const Scene& scene, geometric_t minimum_distance,
             internal::RayTracer& ray_tracer)
       : scene_(scene),
         minimum_distance_(minimum_distance),
@@ -37,7 +37,7 @@ class RayTracer final {
   RayTracer& operator=(const RayTracer&) = delete;
 
   const Scene& scene_;
-  geometric minimum_distance_;
+  geometric_t minimum_distance_;
   internal::RayTracer& ray_tracer_;
 };
 

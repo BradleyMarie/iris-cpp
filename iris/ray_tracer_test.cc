@@ -10,7 +10,7 @@ static const uint32_t g_data = 0xDEADBEEF;
 
 class TestEmissiveMaterial : public iris::EmissiveMaterial {
  public:
-  TestEmissiveMaterial(std::array<iris::geometric, 2> expected)
+  TestEmissiveMaterial(std::array<iris::geometric_t, 2> expected)
       : expected_(expected) {}
 
   const iris::Spectrum* Compute(
@@ -21,12 +21,13 @@ class TestEmissiveMaterial : public iris::EmissiveMaterial {
   }
 
  private:
-  std::array<iris::geometric, 2> expected_;
+  std::array<iris::geometric_t, 2> expected_;
 };
 
 class TestMaterial : public iris::Material {
  public:
-  TestMaterial(std::array<iris::geometric, 2> expected) : expected_(expected) {}
+  TestMaterial(std::array<iris::geometric_t, 2> expected)
+      : expected_(expected) {}
 
   const iris::Bsdf* Compute(
       const iris::TextureCoordinates& texture_coordinates) const override {
@@ -36,12 +37,12 @@ class TestMaterial : public iris::Material {
   }
 
  private:
-  std::array<iris::geometric, 2> expected_;
+  std::array<iris::geometric_t, 2> expected_;
 };
 
 class TestNormalMap : public iris::NormalMap {
  public:
-  TestNormalMap(std::array<iris::geometric, 2> expected)
+  TestNormalMap(std::array<iris::geometric_t, 2> expected)
       : expected_(expected) {}
 
   iris::Vector Compute(const iris::TextureCoordinates& texture_coordinates,
@@ -53,7 +54,7 @@ class TestNormalMap : public iris::NormalMap {
   }
 
  private:
-  std::array<iris::geometric, 2> expected_;
+  std::array<iris::geometric_t, 2> expected_;
 };
 
 class TestGeometry : public iris::Geometry {
