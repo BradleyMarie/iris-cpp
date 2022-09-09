@@ -99,6 +99,21 @@ cc_library(
 )
 
 cc_library(
+    name = "integrator",
+    hdrs = ["integrator.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":light_sampler",
+        ":random",
+        ":ray",
+        ":ray_tracer",
+        ":spectral_allocator",
+        ":spectrum",
+        ":visibility_tester",
+    ],
+)
+
+cc_library(
     name = "intersector",
     srcs = ["intersector.cc"],
     hdrs = ["intersector.h"],
