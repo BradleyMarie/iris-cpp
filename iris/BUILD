@@ -12,6 +12,24 @@ cc_library(
 )
 
 cc_library(
+    name = "color",
+    hdrs = ["color.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":float",
+    ],
+)
+
+cc_test(
+    name = "color_test",
+    srcs = ["color_test.cc"],
+    deps = [
+        ":color",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "emissive_material",
     hdrs = ["emissive_material.h"],
     visibility = ["//visibility:public"],
