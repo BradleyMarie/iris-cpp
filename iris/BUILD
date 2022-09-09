@@ -12,6 +12,16 @@ cc_library(
 )
 
 cc_library(
+    name = "color_matcher",
+    hdrs = ["color_matcher.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":color",
+        ":spectrum",
+    ],
+)
+
+cc_library(
     name = "color",
     hdrs = ["color.h"],
     visibility = ["//visibility:public"],
