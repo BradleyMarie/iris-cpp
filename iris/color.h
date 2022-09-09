@@ -22,8 +22,6 @@ struct Color final {
 
   Color(const Color&) = default;
 
-  bool operator==(const Color&) const = default;
-
   const visual_t& operator[](size_t index) const {
     assert(index < 3);
     const visual_t* as_array = &x;
@@ -45,6 +43,11 @@ struct Color final {
 
   Space space;
 };
+
+bool operator==(const Color& lhs, const Color& rhs) {
+  return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z &&
+         lhs.space == rhs.space;
+}
 
 }  // namespace iris
 

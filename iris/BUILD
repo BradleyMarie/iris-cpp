@@ -56,6 +56,25 @@ cc_library(
 )
 
 cc_library(
+    name = "framebuffer",
+    hdrs = ["framebuffer.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":color",
+        ":float",
+    ],
+)
+
+cc_test(
+    name = "framebuffer_test",
+    srcs = ["framebuffer_test.cc"],
+    deps = [
+        ":framebuffer",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "geometry",
     srcs = ["geometry.cc"],
     hdrs = ["geometry.h"],
