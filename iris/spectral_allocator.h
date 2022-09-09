@@ -14,11 +14,11 @@ class SpectralAllocator {
   SpectralAllocator(internal::Arena& arena) : arena_(arena) {}
 
   const Spectrum* Add(const Spectrum* addend0, const Spectrum* addend1);
-  const Spectrum* Scale(const Spectrum* spectrum, visual attenuation);
+  const Spectrum* Scale(const Spectrum* spectrum, visual_t attenuation);
   const Spectrum* Reflect(const Spectrum* spectrum, const Reflector* reflector);
 
   const Reflector* Add(const Reflector* addend0, const Reflector* addend1);
-  const Reflector* Scale(const Reflector* reflector, visual attenuation);
+  const Reflector* Scale(const Reflector* reflector, visual_t attenuation);
 
  private:
   SpectralAllocator(const SpectralAllocator&) = delete;

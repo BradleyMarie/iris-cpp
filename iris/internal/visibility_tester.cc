@@ -54,7 +54,7 @@ bool VisibilityTester::Intersects(const Ray& ray, const Geometry& geometry,
 
 std::optional<VisibilityTester::VisibleResult> VisibilityTester::Visible(
     const Ray& ray, const Geometry& geometry, const Matrix* model_to_world,
-    face_t face, visual geometry_area, visual* pdf) {
+    face_t face, visual_t geometry_area, visual_t* pdf) {
   assert(std::isfinite(geometry_area) && geometry_area > 0.0);
 
   // Optimization: Check that the face is visible along the ray before tracing

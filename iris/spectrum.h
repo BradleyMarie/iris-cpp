@@ -7,7 +7,7 @@ namespace iris {
 
 class Spectrum {
  public:
-  virtual visual Intensity(visual wavelength) const = 0;
+  virtual visual_t Intensity(visual_t wavelength) const = 0;
   virtual ~Spectrum() {}
 };
 

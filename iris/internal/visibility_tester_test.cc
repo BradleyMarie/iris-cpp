@@ -312,7 +312,7 @@ TEST(VisibilityTesterTest, SucceedsWithPdf) {
   iris::internal::RayTracer ray_tracer;
   iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
 
-  iris::visual pdf;
+  iris::visual_t pdf;
   auto result = visibility_tester.Visible(world_ray, *geometry_ptr, nullptr, 1,
                                           0.5, &pdf);
   ASSERT_TRUE(result);
@@ -341,7 +341,7 @@ TEST(VisibilityTesterTest, SucceedsWithTransformWithPdf) {
   iris::internal::RayTracer ray_tracer;
   iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
 
-  iris::visual pdf;
+  iris::visual_t pdf;
   auto result = visibility_tester.Visible(
       world_ray, *geometry_ptr, (*scene->begin()).second, 1, 0.5, &pdf);
   ASSERT_TRUE(result);

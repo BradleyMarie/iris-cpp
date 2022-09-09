@@ -24,7 +24,7 @@ class LightTester {
                                                   const Scene& scene);
 
   const Spectrum* Emission(const Light& light, const Ray& to_light,
-                           const Scene& scene, visual* pdf = nullptr);
+                           const Scene& scene, visual_t* pdf = nullptr);
 
  private:
   internal::Arena arena_;

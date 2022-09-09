@@ -14,7 +14,7 @@ class LightSampleAllocator final {
  public:
   LightSampleAllocator(internal::Arena& arena) noexcept : arena_(arena) {}
 
-  LightSample& Allocate(const Light& light, visual pdf,
+  LightSample& Allocate(const Light& light, visual_t pdf,
                         LightSample* next = nullptr);
 
  private:

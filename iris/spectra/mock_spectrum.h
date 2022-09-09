@@ -10,7 +10,7 @@ namespace spectra {
 
 class MockSpectrum : public Spectrum {
  public:
-  MOCK_METHOD(visual, Intensity, (visual), (const));
+  MOCK_METHOD(visual_t, Intensity, (visual_t), (const));
 };
 
 }  // namespace spectra

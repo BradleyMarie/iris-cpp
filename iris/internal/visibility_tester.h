@@ -26,8 +26,8 @@ class VisibilityTester : public iris::VisibilityTester {
 
   std::optional<VisibleResult> Visible(const Ray& ray, const Geometry& geometry,
                                        const Matrix* model_to_world,
-                                       face_t face, visual geometry_area,
-                                       visual* pdf);
+                                       face_t face, visual_t geometry_area,
+                                       visual_t* pdf);
 
  private:
   VisibilityTester(const VisibilityTester&) = delete;

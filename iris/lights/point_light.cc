@@ -14,13 +14,13 @@ std::optional<Light::SampleResult> PointLight::Sample(
   }
 
   return Light::SampleResult{*spectrum_, Normalize(to_light),
-                             std::numeric_limits<visual>::infinity()};
+                             std::numeric_limits<visual_t>::infinity()};
 }
 
 const Spectrum* PointLight::Emission(const Ray& to_light,
                                      VisibilityTester& tester,
                                      SpectralAllocator& allocator,
-                                     visual* pdf) const {
+                                     visual_t* pdf) const {
   return nullptr;
 }
 

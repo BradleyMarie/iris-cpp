@@ -4,7 +4,7 @@
 
 namespace iris {
 
-LightSample& LightSampleAllocator::Allocate(const Light& light, visual pdf,
+LightSample& LightSampleAllocator::Allocate(const Light& light, visual_t pdf,
                                             LightSample* next) {
   return arena_.Allocate<LightSample>(next, light, pdf);
 }

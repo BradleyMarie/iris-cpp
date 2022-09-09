@@ -83,7 +83,7 @@ class TestGeometry : public iris::Geometry {
     return iris::Vector(0.0, 0.0, std::copysign(1.0, -location_.z));
   }
 
-  std::optional<iris::visual> ComputeArea(iris::face_t face) const override {
+  std::optional<iris::visual_t> ComputeArea(iris::face_t face) const override {
     return 1.0;
   }
 

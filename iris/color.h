@@ -13,7 +13,7 @@ struct Color final {
     LINEAR_SRGB,
   };
 
-  explicit Color(geometric c0, geometric c1, geometric c2, Space space)
+  explicit Color(visual_t c0, visual_t c1, visual_t c2, Space space)
       : x(c0), y(c1), z(c2), space(space) {
     assert(x >= 0.0);
     assert(y >= 0.0);
@@ -24,22 +24,22 @@ struct Color final {
 
   bool operator==(const Color&) const = default;
 
-  const geometric& operator[](size_t index) const {
+  const visual_t& operator[](size_t index) const {
     assert(index < 3);
-    const geometric* as_array = &x;
+    const visual_t* as_array = &x;
     return as_array[index];
   }
 
   union {
     struct {
-      const visual x;
-      const visual y;
-      const visual z;
+      const visual_t x;
+      const visual_t y;
+      const visual_t z;
     };
     struct {
-      const visual r;
-      const visual g;
-      const visual b;
+      const visual_t r;
+      const visual_t g;
+      const visual_t b;
     };
   };
 

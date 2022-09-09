@@ -9,7 +9,7 @@ namespace iris {
 struct LightSample final {
   LightSample* next;
   const Light& light;
-  const visual pdf;
+  const visual_t pdf;
 };
 
 }  // namespace iris

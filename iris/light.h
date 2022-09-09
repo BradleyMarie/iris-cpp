@@ -19,7 +19,7 @@ class Light {
   struct SampleResult {
     const Spectrum& emission;
     Vector to_light;
-    visual pdf;
+    visual_t pdf;
   };
 
   virtual std::optional<SampleResult> Sample(
@@ -29,7 +29,7 @@ class Light {
   virtual const Spectrum* Emission(const Ray& to_light,
                                    VisibilityTester& tester,
                                    SpectralAllocator& allocator,
-                                   visual* pdf = nullptr) const = 0;
+                                   visual_t* pdf = nullptr) const = 0;
 
   virtual ~Light() {}
 };

@@ -26,7 +26,7 @@ class PointLight final : public Light {
 
   const Spectrum* Emission(const Ray& to_light, VisibilityTester& tester,
                            SpectralAllocator& allocator,
-                           visual* pdf) const override;
+                           visual_t* pdf) const override;
 
  private:
   std::shared_ptr<Spectrum> spectrum_;
