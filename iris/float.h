@@ -5,10 +5,13 @@
 
 namespace iris {
 
-typedef float geometric_t;
-typedef float_t geometric_intermediate_t;
+typedef float geometric;
+typedef float_t geometric_t;
+
 typedef double intermediate_t;
-typedef float visual_t;
+
+typedef float visual;
+typedef float_t visual_t;
 
 }  // namespace iris
 

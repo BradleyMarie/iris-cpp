@@ -13,7 +13,7 @@ class SumSpectrum final : public Spectrum {
   SumSpectrum(const Spectrum& addend0, const Spectrum& addend1)
       : addend0_(addend0), addend1_(addend1) {}
 
-  visual_t Intensity(visual_t wavelength) const {
+  visual Intensity(visual wavelength) const {
     return addend0_.Intensity(wavelength) + addend1_.Intensity(wavelength);
   }
 
@@ -24,18 +24,18 @@ class SumSpectrum final : public Spectrum {
 
 class ScaledSpectrum final : public Spectrum {
  public:
-  ScaledSpectrum(const Spectrum& spectrum, visual_t scalar)
+  ScaledSpectrum(const Spectrum& spectrum, visual scalar)
       : spectrum_(spectrum), scalar_(scalar) {
     assert(scalar > 0.0);
   }
 
-  visual_t Intensity(visual_t wavelength) const {
+  visual Intensity(visual wavelength) const {
     return spectrum_.Intensity(wavelength) * scalar_;
   }
 
  private:
   const Spectrum& spectrum_;
-  const visual_t scalar_;
+  const visual scalar_;
 };
 
 class ReflectedSpectrum final : public Spectrum {
@@ -43,7 +43,7 @@ class ReflectedSpectrum final : public Spectrum {
   ReflectedSpectrum(const Spectrum& spectrum, const Reflector& reflector)
       : spectrum_(spectrum), reflector_(reflector) {}
 
-  visual_t Intensity(visual_t wavelength) const {
+  visual Intensity(visual wavelength) const {
     return spectrum_.Intensity(wavelength) * reflector_.Reflectance(wavelength);
   }
 
@@ -57,10 +57,10 @@ class SumReflector final : public Reflector {
   SumReflector(const Reflector& addend0, const Reflector& addend1)
       : addend0_(addend0), addend1_(addend1) {}
 
-  visual_t Reflectance(visual_t wavelength) const {
-    visual_t sum =
+  visual Reflectance(visual wavelength) const {
+    visual sum =
         addend0_.Reflectance(wavelength) + addend1_.Reflectance(wavelength);
-    return std::min(static_cast<visual_t>(1.0), sum);
+    return std::min(static_cast<visual>(1.0), sum);
   }
 
  private:
@@ -70,18 +70,18 @@ class SumReflector final : public Reflector {
 
 class ScaledReflector final : public Reflector {
  public:
-  ScaledReflector(const Reflector& spectrum, visual_t scalar)
+  ScaledReflector(const Reflector& spectrum, visual scalar)
       : spectrum_(spectrum), scalar_(scalar) {
     assert(scalar > 0.0 && scalar < 1.0);
   }
 
-  visual_t Reflectance(visual_t wavelength) const {
+  visual Reflectance(visual wavelength) const {
     return spectrum_.Reflectance(wavelength) * scalar_;
   }
 
  private:
   const Reflector& spectrum_;
-  const visual_t scalar_;
+  const visual scalar_;
 };
 
 }  // namespace
@@ -100,7 +100,7 @@ const Spectrum* SpectralAllocator::Add(const Spectrum* addend0,
 }
 
 const Spectrum* SpectralAllocator::Scale(const Spectrum* spectrum,
-                                         visual_t attenuation) {
+                                         visual attenuation) {
   if (!spectrum) {
     return nullptr;
   }
@@ -139,7 +139,7 @@ const Reflector* SpectralAllocator::Add(const Reflector* addend0,
 }
 
 const Reflector* SpectralAllocator::Scale(const Reflector* reflector,
-                                          visual_t attenuation) {
+                                          visual attenuation) {
   assert(attenuation >= 0.0 && attenuation <= 1.0);
 
   if (!reflector || attenuation <= 0.0) {

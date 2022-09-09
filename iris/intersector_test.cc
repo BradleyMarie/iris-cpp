@@ -11,7 +11,7 @@ static const iris::Ray ray(iris::Point(0.0, 0.0, 0.0),
 
 class TestGeometry final : public iris::Geometry {
  public:
-  TestGeometry(iris::geometric_t distance) : distance_(distance) {}
+  TestGeometry(iris::geometric distance) : distance_(distance) {}
 
  private:
   iris::Hit* Trace(const iris::Ray& trace_ray,
@@ -33,7 +33,7 @@ class TestGeometry final : public iris::Geometry {
     return faces;
   }
 
-  iris::geometric_t distance_;
+  iris::geometric distance_;
 };
 
 TEST(InspectorTest, Initialize) {

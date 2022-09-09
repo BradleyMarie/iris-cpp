@@ -8,8 +8,8 @@
 namespace iris {
 namespace {
 
-std::optional<std::array<std::array<geometric_t, 4>, 4>> Invert(
-    const std::array<std::array<geometric_t, 4>, 4>& m) {
+std::optional<std::array<std::array<geometric, 4>, 4>> Invert(
+    const std::array<std::array<geometric, 4>, 4>& m) {
   std::array<std::array<intermediate_t, 4>, 4> inverse;
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
@@ -98,20 +98,20 @@ std::optional<std::array<std::array<geometric_t, 4>, 4>> Invert(
     }
   }
 
-  std::array<std::array<geometric_t, 4>, 4> result;
+  std::array<std::array<geometric, 4>, 4> result;
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
-      result[i][j] = static_cast<geometric_t>(inverse[i][j]);
+      result[i][j] = static_cast<geometric>(inverse[i][j]);
     }
   }
 
   return result;
 }
 
-std::array<std::array<geometric_t, 4>, 4> Multiply4x4(
-    const std::array<std::array<geometric_t, 4>, 4>& left,
-    const std::array<std::array<geometric_t, 4>, 4>& right) {
-  std::array<std::array<geometric_t, 4>, 4> result;
+std::array<std::array<geometric, 4>, 4> Multiply4x4(
+    const std::array<std::array<geometric, 4>, 4>& left,
+    const std::array<std::array<geometric, 4>, 4>& right) {
+  std::array<std::array<geometric, 4>, 4> result;
   for (size_t i = 0; i < 4; i++) {
     for (size_t j = 0; j < 4; j++) {
       intermediate_t intermediate =
@@ -123,7 +123,7 @@ std::array<std::array<geometric_t, 4>, 4> Multiply4x4(
               static_cast<intermediate_t>(right[2][j]) +
           static_cast<intermediate_t>(left[i][3]) *
               static_cast<intermediate_t>(right[3][j]);
-      result[i][j] = static_cast<geometric_t>(intermediate);
+      result[i][j] = static_cast<geometric>(intermediate);
     }
   }
 
@@ -132,8 +132,8 @@ std::array<std::array<geometric_t, 4>, 4> Multiply4x4(
 
 }  // namespace
 
-Matrix::Matrix(const std::array<std::array<geometric_t, 4>, 4>& m,
-               const std::array<std::array<geometric_t, 4>, 4>& i)
+Matrix::Matrix(const std::array<std::array<geometric, 4>, 4>& m,
+               const std::array<std::array<geometric, 4>, 4>& i)
     : m{m}, i{i} {
   assert(std::isfinite(m[0][0]));
   assert(std::isfinite(m[0][1]));
@@ -179,7 +179,7 @@ Matrix::Matrix(const std::array<std::array<geometric_t, 4>, 4>& m,
 }
 
 absl::StatusOr<Matrix> Matrix::Create(
-    const std::array<std::array<geometric_t, 4>, 4>& m) {
+    const std::array<std::array<geometric, 4>, 4>& m) {
   for (size_t i = 0; i < m.size(); i++) {
     for (size_t j = 0; j < m[i].size(); j++) {
       if (!std::isfinite(m[i][j])) {
@@ -197,8 +197,8 @@ absl::StatusOr<Matrix> Matrix::Create(
   return Matrix(m, inverse.value());
 }
 
-absl::StatusOr<Matrix> Matrix::Translation(geometric_t x, geometric_t y,
-                                           geometric_t z) {
+absl::StatusOr<Matrix> Matrix::Translation(geometric x, geometric y,
+                                           geometric z) {
   if (!std::isfinite(x)) {
     return absl::InvalidArgumentError("x");
   }
@@ -211,11 +211,11 @@ absl::StatusOr<Matrix> Matrix::Translation(geometric_t x, geometric_t y,
     return absl::InvalidArgumentError("z");
   }
 
-  std::array<std::array<geometric_t, 4>, 4> matrix = {{{1.0, 0.0, 0.0, x},
+  std::array<std::array<geometric, 4>, 4> matrix = {{{1.0, 0.0, 0.0, x},
                                                        {0.0, 1.0, 0.0, y},
                                                        {0.0, 0.0, 1.0, z},
                                                        {0.0, 0.0, 0.0, 1.0}}};
-  std::array<std::array<geometric_t, 4>, 4> inverse = {{{1.0, 0.0, 0.0, -x},
+  std::array<std::array<geometric, 4>, 4> inverse = {{{1.0, 0.0, 0.0, -x},
                                                         {0.0, 1.0, 0.0, -y},
                                                         {0.0, 0.0, 1.0, -z},
                                                         {0.0, 0.0, 0.0, 1.0}}};
@@ -223,8 +223,8 @@ absl::StatusOr<Matrix> Matrix::Translation(geometric_t x, geometric_t y,
   return Matrix(matrix, inverse);
 }
 
-absl::StatusOr<Matrix> Matrix::Scalar(geometric_t x, geometric_t y,
-                                      geometric_t z) {
+absl::StatusOr<Matrix> Matrix::Scalar(geometric x, geometric y,
+                                      geometric z) {
   if (!std::isfinite(x) || x == 0.0) {
     return absl::InvalidArgumentError("x");
   }
@@ -237,21 +237,21 @@ absl::StatusOr<Matrix> Matrix::Scalar(geometric_t x, geometric_t y,
     return absl::InvalidArgumentError("z");
   }
 
-  std::array<std::array<geometric_t, 4>, 4> matrix = {{{x, 0.0, 0.0, 0.0},
+  std::array<std::array<geometric, 4>, 4> matrix = {{{x, 0.0, 0.0, 0.0},
                                                        {0.0, y, 0.0, 0.0},
                                                        {0.0, 0.0, z, 0.0},
                                                        {0.0, 0.0, 0.0, 1.0}}};
-  std::array<std::array<geometric_t, 4>, 4> inverse = {
-      {{static_cast<geometric_t>(1.0) / x, 0.0, 0.0, 0.0},
-       {0.0, static_cast<geometric_t>(1.0) / y, 0.0, 0.0},
-       {0.0, 0.0, static_cast<geometric_t>(1.0) / z, 0.0},
+  std::array<std::array<geometric, 4>, 4> inverse = {
+      {{static_cast<geometric>(1.0) / x, 0.0, 0.0, 0.0},
+       {0.0, static_cast<geometric>(1.0) / y, 0.0, 0.0},
+       {0.0, 0.0, static_cast<geometric>(1.0) / z, 0.0},
        {0.0, 0.0, 0.0, 1.0}}};
 
   return Matrix(matrix, inverse);
 }
 
-absl::StatusOr<Matrix> Matrix::Rotation(geometric_t theta, geometric_t x,
-                                        geometric_t y, geometric_t z) {
+absl::StatusOr<Matrix> Matrix::Rotation(geometric theta, geometric x,
+                                        geometric y, geometric z) {
   if (!std::isfinite(theta)) {
     return absl::InvalidArgumentError("theta");
   }
@@ -286,32 +286,32 @@ absl::StatusOr<Matrix> Matrix::Rotation(geometric_t theta, geometric_t x,
   intermediate_t cos_theta = std::cos(theta_intermediate);
   intermediate_t ic = static_cast<intermediate_t>(1.0) - cos_theta;
 
-  geometric_t m00 = static_cast<geometric_t>(
+  geometric m00 = static_cast<geometric>(
       x_intermediate * x_intermediate * ic + cos_theta);
-  geometric_t m01 = static_cast<geometric_t>(
+  geometric m01 = static_cast<geometric>(
       x_intermediate * y_intermediate * ic - z_intermediate * sin_theta);
-  geometric_t m02 = static_cast<geometric_t>(
+  geometric m02 = static_cast<geometric>(
       x_intermediate * z_intermediate * ic + y_intermediate * sin_theta);
 
-  geometric_t a0 = static_cast<geometric_t>(
+  geometric a0 = static_cast<geometric>(
       y_intermediate * x_intermediate * ic + z_intermediate * sin_theta);
-  geometric_t a1 = static_cast<geometric_t>(
+  geometric a1 = static_cast<geometric>(
       y_intermediate * y_intermediate * ic + cos_theta);
-  geometric_t a2 = static_cast<geometric_t>(
+  geometric a2 = static_cast<geometric>(
       y_intermediate * z_intermediate * ic - x_intermediate * sin_theta);
 
-  geometric_t b0 = static_cast<geometric_t>(
+  geometric b0 = static_cast<geometric>(
       z_intermediate * x_intermediate * ic - y_intermediate * sin_theta);
-  geometric_t b1 = static_cast<geometric_t>(
+  geometric b1 = static_cast<geometric>(
       z_intermediate * y_intermediate * ic + x_intermediate * sin_theta);
-  geometric_t b2 = static_cast<geometric_t>(
+  geometric b2 = static_cast<geometric>(
       z_intermediate * z_intermediate * ic + cos_theta);
 
-  std::array<std::array<geometric_t, 4>, 4> matrix = {{{m00, m01, m02, 0.0},
+  std::array<std::array<geometric, 4>, 4> matrix = {{{m00, m01, m02, 0.0},
                                                        {a0, a1, a2, 0.0},
                                                        {b0, b1, b2, 0.0},
                                                        {0.0, 0.0, 0.0, 1.0}}};
-  std::array<std::array<geometric_t, 4>, 4> inverse = {{{m00, a0, b0, 0.0},
+  std::array<std::array<geometric, 4>, 4> inverse = {{{m00, a0, b0, 0.0},
                                                         {m01, a1, b1, 0.0},
                                                         {m02, a2, b2, 0.0},
                                                         {0.0, 0.0, 0.0, 1.0}}};
@@ -319,9 +319,9 @@ absl::StatusOr<Matrix> Matrix::Rotation(geometric_t theta, geometric_t x,
   return Matrix(matrix, inverse);
 }
 
-absl::StatusOr<Matrix> Matrix::Orthographic(geometric_t left, geometric_t right,
-                                            geometric_t bottom, geometric_t top,
-                                            geometric_t near, geometric_t far) {
+absl::StatusOr<Matrix> Matrix::Orthographic(geometric left, geometric right,
+                                            geometric bottom, geometric top,
+                                            geometric near, geometric far) {
   if (!std::isfinite(left)) {
     return absl::InvalidArgumentError("left");
   }
@@ -365,41 +365,41 @@ absl::StatusOr<Matrix> Matrix::Orthographic(geometric_t left, geometric_t right,
   intermediate_t near_intermediate = near;
   intermediate_t far_intermediate = far;
 
-  geometric_t tx =
-      -static_cast<geometric_t>((right_intermediate + left_intermediate) /
+  geometric tx =
+      -static_cast<geometric>((right_intermediate + left_intermediate) /
                                 (right_intermediate - left_intermediate));
-  geometric_t ty =
-      -static_cast<geometric_t>((top_intermediate + bottom_intermediate) /
+  geometric ty =
+      -static_cast<geometric>((top_intermediate + bottom_intermediate) /
                                 (top_intermediate - bottom_intermediate));
-  geometric_t tz =
-      -static_cast<geometric_t>((far_intermediate + near_intermediate) /
+  geometric tz =
+      -static_cast<geometric>((far_intermediate + near_intermediate) /
                                 (far_intermediate - near_intermediate));
 
-  geometric_t sx =
-      static_cast<geometric_t>(static_cast<intermediate_t>(2.0) /
+  geometric sx =
+      static_cast<geometric>(static_cast<intermediate_t>(2.0) /
                                (right_intermediate - left_intermediate));
-  geometric_t sy =
-      static_cast<geometric_t>(static_cast<intermediate_t>(2.0) /
+  geometric sy =
+      static_cast<geometric>(static_cast<intermediate_t>(2.0) /
                                (top_intermediate - bottom_intermediate));
-  geometric_t sz =
-      static_cast<geometric_t>(static_cast<intermediate_t>(-2.0) /
+  geometric sz =
+      static_cast<geometric>(static_cast<intermediate_t>(-2.0) /
                                (far_intermediate - near_intermediate));
 
-  std::array<std::array<geometric_t, 4>, 4> matrix = {{{sx, 0.0, 0.0, tx},
+  std::array<std::array<geometric, 4>, 4> matrix = {{{sx, 0.0, 0.0, tx},
                                                        {0.0, sy, 0.0, ty},
                                                        {0.0, 0.0, sz, tz},
                                                        {0.0, 0.0, 0.0, 1.0}}};
-  std::array<std::array<geometric_t, 4>, 4> inverse = {
-      {{static_cast<geometric_t>(1.0) / sx, 0.0, 0.0, -tx / sx},
-       {0.0, static_cast<geometric_t>(1.0) / sy, 0.0, -ty / sy},
-       {0.0, 0.0, static_cast<geometric_t>(1.0) / sz, -tz / sz},
+  std::array<std::array<geometric, 4>, 4> inverse = {
+      {{static_cast<geometric>(1.0) / sx, 0.0, 0.0, -tx / sx},
+       {0.0, static_cast<geometric>(1.0) / sy, 0.0, -ty / sy},
+       {0.0, 0.0, static_cast<geometric>(1.0) / sz, -tz / sz},
        {0.0, 0.0, 0.0, 1.0}}};
 
   return Matrix(matrix, inverse);
 }
 
 const Matrix& Matrix::Identity() {
-  static const std::array<std::array<geometric_t, 4>, 4> identity_values = {
+  static const std::array<std::array<geometric, 4>, 4> identity_values = {
       {{1.0, 0.0, 0.0, 0.0},
        {0.0, 1.0, 0.0, 0.0},
        {0.0, 0.0, 1.0, 0.0},

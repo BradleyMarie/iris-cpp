@@ -49,7 +49,7 @@ std::unique_ptr<iris::LightScene> TestLightSceneBuilder::Build(
 
 class TestGeometry : public iris::Geometry {
  public:
-  TestGeometry(iris::Point location, iris::geometric_t distance,
+  TestGeometry(iris::Point location, iris::geometric distance,
                const iris::EmissiveMaterial* emissive_material,
                bool allow_sampling = true)
       : location_(location),
@@ -83,7 +83,7 @@ class TestGeometry : public iris::Geometry {
     return iris::Vector(0.0, 0.0, std::copysign(1.0, -location_.z));
   }
 
-  std::optional<iris::visual_t> ComputeArea(iris::face_t face) const override {
+  std::optional<iris::visual> ComputeArea(iris::face_t face) const override {
     return 1.0;
   }
 
@@ -93,7 +93,7 @@ class TestGeometry : public iris::Geometry {
   }
 
   iris::Point location_;
-  iris::geometric_t distance_;
+  iris::geometric distance_;
   const iris::EmissiveMaterial* emissive_material_;
   bool allow_sampling_;
 };

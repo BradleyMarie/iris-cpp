@@ -4,7 +4,7 @@
 
 namespace iris::internal {
 
-Hit& HitArena::Allocate(iris::Hit* next, geometric_t distance, face_t front,
+Hit& HitArena::Allocate(iris::Hit* next, geometric distance, face_t front,
                         face_t back, const void* additional_data,
                         size_t additional_data_size) {
   auto* allocated_additional_data = arena_.Allocate(additional_data_size);

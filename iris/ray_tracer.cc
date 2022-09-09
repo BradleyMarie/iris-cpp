@@ -9,7 +9,7 @@ namespace iris {
 std::optional<RayTracer::Result> RayTracer::Trace(const Ray& ray) {
   auto* hit =
       ray_tracer_.Trace(ray, minimum_distance_,
-                        std::numeric_limits<geometric_t>::infinity(), scene_);
+                        std::numeric_limits<geometric>::infinity(), scene_);
   if (!hit) {
     return std::nullopt;
   }

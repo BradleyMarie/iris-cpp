@@ -5,32 +5,32 @@
 
 class TestSpectrum : public iris::Spectrum {
  public:
-  TestSpectrum(iris::visual_t wavelength, iris::visual_t intensity)
+  TestSpectrum(iris::visual wavelength, iris::visual intensity)
       : wavelength_(wavelength), intensity_(intensity) {}
 
-  iris::visual_t Intensity(iris::visual_t wavelength) const override {
+  iris::visual Intensity(iris::visual wavelength) const override {
     EXPECT_EQ(wavelength_, wavelength);
     return intensity_;
   }
 
  private:
-  iris::visual_t wavelength_;
-  iris::visual_t intensity_;
+  iris::visual wavelength_;
+  iris::visual intensity_;
 };
 
 class TestReflector : public iris::Reflector {
  public:
-  TestReflector(iris::visual_t wavelength, iris::visual_t reflectance)
+  TestReflector(iris::visual wavelength, iris::visual reflectance)
       : wavelength_(wavelength), reflectance_(reflectance) {}
 
-  iris::visual_t Reflectance(iris::visual_t wavelength) const override {
+  iris::visual Reflectance(iris::visual wavelength) const override {
     EXPECT_EQ(wavelength_, wavelength);
     return reflectance_;
   }
 
  private:
-  iris::visual_t wavelength_;
-  iris::visual_t reflectance_;
+  iris::visual wavelength_;
+  iris::visual reflectance_;
 };
 
 TEST(SpectralAllocator, SpectrumAddNullptr) {

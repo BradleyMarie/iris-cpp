@@ -40,7 +40,7 @@ bool VisibilityTester::Intersects(const Ray& ray, const Geometry& geometry,
                                   const Matrix* model_to_world, face_t face) {
   SingleGeometryScene geometry_scene(geometry, model_to_world);
   for (auto* geometry_hit = ray_tracer_.Trace(
-           ray, minimum_distance_, std::numeric_limits<geometric_t>::infinity(),
+           ray, minimum_distance_, std::numeric_limits<geometric>::infinity(),
            geometry_scene);
        geometry_hit;
        geometry_hit = static_cast<internal::Hit*>(geometry_hit->next)) {
@@ -54,7 +54,7 @@ bool VisibilityTester::Intersects(const Ray& ray, const Geometry& geometry,
 
 std::optional<VisibilityTester::VisibleResult> VisibilityTester::Visible(
     const Ray& ray, const Geometry& geometry, const Matrix* model_to_world,
-    face_t face, visual_t geometry_area, visual_t* pdf) {
+    face_t face, visual geometry_area, visual* pdf) {
   assert(std::isfinite(geometry_area) && geometry_area > 0.0);
 
   // Optimization: Check that the face is visible along the ray before tracing
@@ -68,7 +68,7 @@ std::optional<VisibilityTester::VisibleResult> VisibilityTester::Visible(
   // CSG
   auto* scene_hit =
       ray_tracer_.Trace(ray, minimum_distance_,
-                        std::numeric_limits<geometric_t>::infinity(), scene_);
+                        std::numeric_limits<geometric>::infinity(), scene_);
   if (!scene_hit || scene_hit->geometry != &geometry ||
       scene_hit->model_to_world != model_to_world || scene_hit->front != face) {
     return std::nullopt;

@@ -43,7 +43,7 @@ std::optional<Point> Geometry::SampleFace(face_t face, Random& rng) const {
   return std::nullopt;
 }
 
-std::optional<visual_t> Geometry::ComputeArea(face_t face) const {
+std::optional<visual> Geometry::ComputeArea(face_t face) const {
   return std::nullopt;
 }
 

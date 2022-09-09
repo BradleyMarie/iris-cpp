@@ -10,8 +10,7 @@
 namespace iris {
 
 struct Point final {
-  explicit Point(geometric_t x, geometric_t y, geometric_t z)
-      : x(x), y(y), z(z) {
+  explicit Point(geometric x, geometric y, geometric z) : x(x), y(y), z(z) {
     assert(std::isfinite(x));
     assert(std::isfinite(y));
     assert(std::isfinite(z));
@@ -21,15 +20,15 @@ struct Point final {
 
   bool operator==(const Point&) const = default;
 
-  const geometric_t& operator[](size_t index) const {
+  const geometric& operator[](size_t index) const {
     assert(index < 3);
-    const geometric_t* as_array = &x;
+    const geometric* as_array = &x;
     return as_array[index];
   }
 
-  const geometric_t x;
-  const geometric_t y;
-  const geometric_t z;
+  const geometric x;
+  const geometric y;
+  const geometric z;
 };
 
 Vector operator-(const Point& minuend, const Point& subtrahend) {

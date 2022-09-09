@@ -7,7 +7,7 @@ namespace iris {
 
 class Reflector {
  public:
-  virtual visual_t Reflectance(visual_t wavelength) const = 0;
+  virtual visual Reflectance(visual wavelength) const = 0;
   virtual ~Reflector() {}
 };
 

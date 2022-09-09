@@ -16,20 +16,17 @@ struct Matrix final {
 
   static const Matrix& Identity();
 
-  static absl::StatusOr<Matrix> Translation(geometric_t x, geometric_t y,
-                                            geometric_t z);
-  static absl::StatusOr<Matrix> Scalar(geometric_t x, geometric_t y,
-                                       geometric_t z);
-  static absl::StatusOr<Matrix> Rotation(geometric_t theta, geometric_t x,
-                                         geometric_t y, geometric_t z);
-  static absl::StatusOr<Matrix> Orthographic(geometric_t left,
-                                             geometric_t right,
-                                             geometric_t bottom,
-                                             geometric_t top, geometric_t near,
-                                             geometric_t far);
+  static absl::StatusOr<Matrix> Translation(geometric x, geometric y,
+                                            geometric z);
+  static absl::StatusOr<Matrix> Scalar(geometric x, geometric y, geometric z);
+  static absl::StatusOr<Matrix> Rotation(geometric theta, geometric x,
+                                         geometric y, geometric z);
+  static absl::StatusOr<Matrix> Orthographic(geometric left, geometric right,
+                                             geometric bottom, geometric top,
+                                             geometric near, geometric far);
 
   static absl::StatusOr<Matrix> Create(
-      const std::array<std::array<geometric_t, 4>, 4>& m);
+      const std::array<std::array<geometric, 4>, 4>& m);
 
   Point Multiply(const Point& point) const;
   Point InverseMultiply(const Point& point) const;
@@ -45,19 +42,19 @@ struct Matrix final {
   static Matrix Multiply(const Matrix& left, const Matrix& right);
   Matrix Multiply(const Matrix& matrix) const;
 
-  const std::array<geometric_t, 4>& operator[](size_t index) const {
+  const std::array<geometric, 4>& operator[](size_t index) const {
     return m[index];
   }
 
   bool operator==(const Matrix& matrix) const = default;
 
  private:
-  Matrix(const std::array<std::array<geometric_t, 4>, 4>& m,
-         const std::array<std::array<geometric_t, 4>, 4>& i);
+  Matrix(const std::array<std::array<geometric, 4>, 4>& m,
+         const std::array<std::array<geometric, 4>, 4>& i);
 
  public:
-  const std::array<std::array<geometric_t, 4>, 4> m;
-  const std::array<std::array<geometric_t, 4>, 4> i;
+  const std::array<std::array<geometric, 4>, 4> m;
+  const std::array<std::array<geometric, 4>, 4> i;
 };
 
 bool operator<(const Matrix& left, const Matrix& right);

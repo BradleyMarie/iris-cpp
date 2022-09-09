@@ -10,7 +10,7 @@ namespace {
 class AreaLight final : public Light {
  public:
   AreaLight(const Geometry& geometry, const Matrix* model_to_world, face_t face,
-            visual_t surface_area) noexcept
+            visual surface_area) noexcept
       : geometry_(geometry),
         model_to_world_(model_to_world),
         face_(face),
@@ -22,13 +22,13 @@ class AreaLight final : public Light {
 
   const Spectrum* Emission(const Ray& to_light, VisibilityTester& tester,
                            SpectralAllocator& allocator,
-                           visual_t* pdf = nullptr) const override;
+                           visual* pdf = nullptr) const override;
 
  private:
   const Geometry& geometry_;
   const Matrix* model_to_world_;
   const face_t face_;
-  visual_t surface_area_;
+  visual surface_area_;
 };
 
 std::optional<Light::SampleResult> AreaLight::Sample(
@@ -45,7 +45,7 @@ std::optional<Light::SampleResult> AreaLight::Sample(
 
   auto to_light = Normalize(world_sample_point - hit_point);
 
-  visual_t pdf;
+  visual pdf;
   auto* emission = Emission(Ray(hit_point, to_light), tester, allocator, &pdf);
   if (!emission) {
     return std::nullopt;
@@ -57,7 +57,7 @@ std::optional<Light::SampleResult> AreaLight::Sample(
 const Spectrum* AreaLight::Emission(const Ray& to_light,
                                     VisibilityTester& tester,
                                     SpectralAllocator& allocator,
-                                    visual_t* pdf) const {
+                                    visual* pdf) const {
   internal::VisibilityTester& internal_tester =
       static_cast<internal::VisibilityTester&>(tester);
 

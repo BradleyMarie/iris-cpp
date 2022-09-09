@@ -46,14 +46,14 @@ TEST(VectorTest, Add) {
 
 TEST(VectorTest, Scale) {
   auto vector = iris::Vector(1.0, 2.0, 3.0);
-  iris::geometric_t scalar = 2.0;
+  iris::geometric scalar = 2.0;
   EXPECT_EQ(iris::Vector(2.0, 4.0, 6.0), vector * scalar);
   EXPECT_EQ(iris::Vector(2.0, 4.0, 6.0), scalar * vector);
 }
 
 TEST(VectorTest, Divide) {
   auto dividend = iris::Vector(2.0, 4.0, 6.0);
-  iris::geometric_t divisor = 2.0;
+  iris::geometric divisor = 2.0;
   EXPECT_EQ(iris::Vector(1.0, 2.0, 3.0), dividend / divisor);
 }
 
@@ -81,7 +81,7 @@ TEST(VectorTest, Normalize) {
   auto vector = iris::Vector(2.0, 0.0, 0.0);
   EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), iris::Normalize(vector));
 
-  iris::geometric_t length_squared, length;
+  iris::geometric length_squared, length;
   EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
             iris::Normalize(vector, &length_squared, &length));
   EXPECT_EQ(4.0, length_squared);

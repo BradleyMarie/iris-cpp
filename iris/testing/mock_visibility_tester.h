@@ -17,12 +17,12 @@ class MockVisibilityTester : public Scene {
   const_iterator begin() const override { return end(); }
   void Trace(const Ray& ray, Intersector& intersector) const final override;
 
-  MOCK_METHOD(bool, Visible, (const Ray&, geometric_t), (const));
+  MOCK_METHOD(bool, Visible, (const Ray&, geometric), (const));
 
  private:
   class MockGeometry : public Geometry {
    public:
-    MockGeometry(geometric_t distance) : distance_(distance) {}
+    MockGeometry(geometric distance) : distance_(distance) {}
 
     Hit* Trace(const Ray& ray, HitAllocator& hit_allocator) const override {
       return &hit_allocator.Allocate(nullptr, distance_, 1u, 2u);
@@ -38,7 +38,7 @@ class MockVisibilityTester : public Scene {
       return faces;
     }
 
-    geometric_t distance_;
+    geometric distance_;
   };
 
   mutable MockGeometry geometry_;

@@ -13,7 +13,7 @@ static bool g_second_hit = false;
 
 class TestEmissiveMaterial final : public iris::EmissiveMaterial {
  public:
-  TestEmissiveMaterial(std::array<iris::geometric_t, 2> expected,
+  TestEmissiveMaterial(std::array<iris::geometric, 2> expected,
                        const iris::Spectrum* spectrum = nullptr)
       : expected_(expected), spectrum_(spectrum) {}
 
@@ -25,7 +25,7 @@ class TestEmissiveMaterial final : public iris::EmissiveMaterial {
   }
 
  private:
-  std::array<iris::geometric_t, 2> expected_;
+  std::array<iris::geometric, 2> expected_;
   const iris::Spectrum* spectrum_;
 };
 
@@ -312,7 +312,7 @@ TEST(VisibilityTesterTest, SucceedsWithPdf) {
   iris::internal::RayTracer ray_tracer;
   iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
 
-  iris::visual_t pdf;
+  iris::visual pdf;
   auto result = visibility_tester.Visible(world_ray, *geometry_ptr, nullptr, 1,
                                           0.5, &pdf);
   ASSERT_TRUE(result);
@@ -341,7 +341,7 @@ TEST(VisibilityTesterTest, SucceedsWithTransformWithPdf) {
   iris::internal::RayTracer ray_tracer;
   iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
 
-  iris::visual_t pdf;
+  iris::visual pdf;
   auto result = visibility_tester.Visible(
       world_ray, *geometry_ptr, (*scene->begin()).second, 1, 0.5, &pdf);
   ASSERT_TRUE(result);

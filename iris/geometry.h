@@ -41,7 +41,7 @@ class Geometry {
 
   virtual std::optional<Point> SampleFace(face_t face, Random& rng) const;
 
-  virtual std::optional<visual_t> ComputeArea(face_t face) const;
+  virtual std::optional<visual> ComputeArea(face_t face) const;
 
   virtual std::span<const face_t> GetFaces() const = 0;
 

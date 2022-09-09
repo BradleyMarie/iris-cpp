@@ -11,15 +11,15 @@ namespace iris {
 
 struct TextureCoordinates final {
   struct Derivatives {
-    geometric_t du_dx;
-    geometric_t du_dy;
-    geometric_t dv_dx;
-    geometric_t dv_dy;
+    geometric du_dx;
+    geometric du_dy;
+    geometric dv_dx;
+    geometric dv_dy;
     Vector dp_du;
     Vector dp_dv;
   };
 
-  std::array<geometric_t, 2> uv;
+  std::array<geometric, 2> uv;
   std::optional<Derivatives> derivatives;
 };
 

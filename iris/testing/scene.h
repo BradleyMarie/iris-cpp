@@ -21,11 +21,11 @@ class SceneTester {
   struct Hit {
     const Geometry& geometry;
     const Matrix* model_to_world;
-    geometric_t distance;
+    geometric distance;
   };
 
-  void Trace(const Scene& scene, const Ray& ray, geometric_t min_distance,
-             geometric_t max_distance,
+  void Trace(const Scene& scene, const Ray& ray, geometric min_distance,
+             geometric max_distance,
              std::function<void(const std::vector<Hit>& hits)> validator);
 
  private:

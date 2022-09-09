@@ -15,7 +15,7 @@ namespace internal {
 
 class VisibilityTester : public iris::VisibilityTester {
  public:
-  VisibilityTester(const Scene& scene, geometric_t minimum_distance,
+  VisibilityTester(const Scene& scene, geometric minimum_distance,
                    internal::RayTracer& ray_tracer)
       : iris::VisibilityTester(scene, minimum_distance, ray_tracer) {}
 
@@ -26,8 +26,8 @@ class VisibilityTester : public iris::VisibilityTester {
 
   std::optional<VisibleResult> Visible(const Ray& ray, const Geometry& geometry,
                                        const Matrix* model_to_world,
-                                       face_t face, visual_t geometry_area,
-                                       visual_t* pdf);
+                                       face_t face, visual geometry_area,
+                                       visual* pdf);
 
  private:
   VisibilityTester(const VisibilityTester&) = delete;

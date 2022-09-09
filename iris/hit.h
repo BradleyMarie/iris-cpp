@@ -7,7 +7,7 @@ namespace iris {
 
 struct Hit {
   Hit* next;
-  const geometric_t distance;
+  const geometric distance;
 };
 
 }  // namespace iris
