@@ -12,6 +12,16 @@ cc_library(
 )
 
 cc_library(
+    name = "camera",
+    hdrs = ["camera.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":float",
+        ":ray",
+    ],
+)
+
+cc_library(
     name = "color_matcher",
     hdrs = ["color_matcher.h"],
     visibility = ["//visibility:public"],
