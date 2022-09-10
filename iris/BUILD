@@ -116,6 +116,16 @@ cc_test(
 )
 
 cc_library(
+    name = "image_sampler",
+    hdrs = ["image_sampler.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":float",
+        ":random",
+    ],
+)
+
+cc_library(
     name = "hit",
     hdrs = ["hit.h"],
     visibility = ["//visibility:public"],
