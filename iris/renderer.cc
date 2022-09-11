@@ -51,10 +51,10 @@ void RenderChunk(const Scene& scene, const LightScene& light_scene,
     auto y = chunk_index % chunks.size();
     auto& chunk = chunks[y][chunk_index / chunks.size()];
 
-    for (auto x = chunk.chunk_start_x; x < chunk.chunk_end_x; x++) {
-      uint32_t num_samples = chunk.image_sampler->SamplesPerPixel();
-      visual_t sample_weight = 1.0 / static_cast<visual_t>(num_samples);
+    uint32_t num_samples = chunk.image_sampler->SamplesPerPixel();
+    visual_t sample_weight = 1.0 / static_cast<visual_t>(num_samples);
 
+    for (auto x = chunk.chunk_start_x; x < chunk.chunk_end_x; x++) {
       std::array<visual_t, 3> pixel_components = {0.0, 0.0, 0.0};
       for (uint32_t sample_index = 0; sample_index < num_samples;
            sample_index++) {
@@ -122,9 +122,8 @@ Framebuffer Renderer::Render(const Camera& camera,
     }
   }
 
-  auto hardware_threads = std::thread::hardware_concurrency();
-  if (num_threads == 0 || num_threads > hardware_threads) {
-    num_threads = hardware_threads;
+  if (num_threads == 0) {
+    num_threads = std::thread::hardware_concurrency();
   }
 
   std::vector<std::thread> threads;

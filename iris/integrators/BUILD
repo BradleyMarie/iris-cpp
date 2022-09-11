@@ -5,9 +5,9 @@ package(default_visibility = [
 ])
 
 cc_library(
-    name = "mock_integrators",
+    name = "mock_integrator",
     testonly = True,
-    hdrs = ["mock_integrators.h"],
+    hdrs = ["mock_integrator.h"],
     deps = [
         "//iris:integrator",
         "//iris:light_sampler",

@@ -21,10 +21,7 @@ class MockImageSampler final : public ImageSampler {
                uint32_t, bool, Random&),
               (override));
   MOCK_METHOD(uint32_t, SamplesPerPixel, (), (const override));
-
-  virtual std::unique_ptr<ImageSampler> Duplicate() const override {
-    return std::make_unique<MockImageSampler>();
-  }
+  MOCK_METHOD(std::unique_ptr<ImageSampler>, Duplicate, (), (const override));
 };
 
 }  // namespace image_samplers

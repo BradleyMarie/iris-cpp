@@ -15,12 +15,9 @@ class MockRandom : public Random {
   MOCK_METHOD(result_type, max, (), (const override));
   MOCK_METHOD(result_type, Invoke, (), ());
   MOCK_METHOD(void, discard, (unsigned long long z), (override));
+  MOCK_METHOD(std::unique_ptr<Random>, Replicate, (), (override));
 
   result_type operator()() override final { return Invoke(); }
-
-  std::unique_ptr<Random> Replicate() override final {
-    return std::make_unique<MockRandom>();
-  }
 };
 
 }  // namespace random

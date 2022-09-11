@@ -454,6 +454,22 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "renderer_test",
+    srcs = ["renderer_test.cc"],
+    deps = [
+        ":renderer",
+        "//iris/cameras:mock_camera",
+        "//iris/color_matchers:mock_color_matcher",
+        "//iris/image_samplers:mock_image_sampler",
+        "//iris/integrators:mock_integrator",
+        "//iris/light_scenes:all_light_scene",
+        "//iris/random:mock_random",
+        "//iris/scenes:list_scene",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "scene",
     srcs = ["scene.cc"],
