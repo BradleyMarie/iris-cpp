@@ -16,9 +16,9 @@ struct Color final {
 
   explicit Color(visual_t c0, visual_t c1, visual_t c2, Space space)
       : x(c0), y(c1), z(c2), space(space) {
-    assert(x >= 0.0 && std::isfinite(x));
-    assert(y >= 0.0 && std::isfinite(y));
-    assert(z >= 0.0 && std::isfinite(z));
+    assert(x >= 0.0);
+    assert(y >= 0.0);
+    assert(z >= 0.0);
   }
 
   Color(const Color&) = default;

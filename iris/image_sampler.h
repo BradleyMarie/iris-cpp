@@ -2,6 +2,7 @@
 #define _IRIS_IMAGE_SAMPLER_
 
 #include <array>
+#include <memory>
 #include <optional>
 #include <utility>
 
@@ -20,8 +21,11 @@ class ImageSampler {
 
   virtual ImageSample SamplePixel(std::pair<size_t, size_t> image_dimensions,
                                   std::pair<size_t, size_t> pixel,
-                                  uint32_t sample_index, Random& rng) = 0;
+                                  uint32_t sample_index, bool sample_lens,
+                                  Random& rng) = 0;
   virtual uint32_t SamplesPerPixel() const = 0;
+
+  virtual std::unique_ptr<ImageSampler> Duplicate() const = 0;
 
   virtual ~ImageSampler() {}
 };

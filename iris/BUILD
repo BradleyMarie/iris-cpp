@@ -430,6 +430,31 @@ cc_library(
 )
 
 cc_library(
+    name = "renderer",
+    srcs = ["renderer.cc"],
+    hdrs = ["renderer.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":camera",
+        ":color",
+        ":color_matcher",
+        ":float",
+        ":framebuffer",
+        ":image_sampler",
+        ":integrator",
+        ":light_sample_allocator",
+        ":light_sampler",
+        ":light_scene",
+        ":ray_tracer",
+        ":scene",
+        ":spectral_allocator",
+        "//iris/internal:arena",
+        "//iris/internal:ray_tracer",
+        "//iris/internal:visibility_tester",
+    ],
+)
+
+cc_library(
     name = "scene",
     srcs = ["scene.cc"],
     hdrs = ["scene.h"],

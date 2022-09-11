@@ -13,12 +13,12 @@ namespace iris {
 
 class Framebuffer final {
  public:
-  Framebuffer(size_t y, size_t x)
-      : pixels_(y,
+  Framebuffer(std::pair<size_t, size_t> dimensions)
+      : pixels_(dimensions.first,
                 std::vector<std::pair<std::array<visual_t, 3>, Color::Space>>(
-                    x, {{0.0, 0.0, 0.0}, Color::CIE_XYZ})) {
-    assert(x != 0);
-    assert(y != 0);
+                    dimensions.second, {{0.0, 0.0, 0.0}, Color::CIE_XYZ})) {
+    assert(dimensions.first != 0);
+    assert(dimensions.second != 0);
   }
 
   Color Get(size_t y, size_t x) const {
