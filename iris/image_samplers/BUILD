@@ -1,0 +1,17 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+package(default_visibility = [
+    "//iris:__subpackages__",
+])
+
+cc_library(
+    name = "mock_image_sampler",
+    testonly = True,
+    hdrs = ["mock_image_sampler.h"],
+    deps = [
+        "//iris:float",
+        "//iris:image_sampler",
+        "//iris:random",
+        "@com_google_googletest//:gtest",
+    ],
+)
