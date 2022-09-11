@@ -3,6 +3,22 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "mock_light",
+    hdrs = ["mock_light.h"],
+    deps = [
+        "//iris:float",
+        "//iris:light",
+        "//iris:point",
+        "//iris:random",
+        "//iris:ray",
+        "//iris:spectral_allocator",
+        "//iris:spectrum",
+        "//iris:visibility_tester",
+        "@com_google_googletest//:gtest",
+    ],
+)
+
+cc_library(
     name = "point_light",
     srcs = ["point_light.cc"],
     hdrs = ["point_light.h"],

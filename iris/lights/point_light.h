@@ -2,6 +2,7 @@
 #define _IRIS_LIGHTS_POINT_LIGHT_
 
 #include <memory>
+#include <optional>
 
 #include "iris/float.h"
 #include "iris/light.h"
