@@ -517,6 +517,8 @@ cc_test(
     deps = [
         ":spectral_allocator",
         "//iris/internal:arena",
+        "//iris/reflectors:mock_reflector",
+        "//iris/spectra:mock_spectrum",
         "@com_google_googletest//:gtest_main",
     ],
 )

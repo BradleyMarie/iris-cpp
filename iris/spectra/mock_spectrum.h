@@ -8,9 +8,9 @@
 namespace iris {
 namespace spectra {
 
-class MockSpectrum : public Spectrum {
+class MockSpectrum final : public Spectrum {
  public:
-  MOCK_METHOD(visual_t, Intensity, (visual_t), (const));
+  MOCK_METHOD(visual_t, Intensity, (visual_t), (const override));
 };
 
 }  // namespace spectra
