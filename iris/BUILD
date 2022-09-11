@@ -295,7 +295,7 @@ cc_test(
     srcs = ["light_scene_test.cc"],
     deps = [
         ":light_scene",
-        "//iris/emissive:mock_emissive_material",
+        "//iris/emissive_materials:mock_emissive_material",
         "//iris/lights:point_light",
         "//iris/random:mock_random",
         "//iris/scenes:list_scene",

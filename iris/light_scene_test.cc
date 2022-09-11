@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "googletest/include/gtest/gtest.h"
-#include "iris/emissive/mock_emissive_material.h"
+#include "iris/emissive_materials/mock_emissive_material.h"
 #include "iris/lights/point_light.h"
 #include "iris/random/mock_random.h"
 #include "iris/scenes/list_scene.h"
@@ -130,7 +130,7 @@ TEST(ListSceneTest, BuilderOneAreaLight) {
 TEST(ListSceneTest, AreaLightEmission) {
   iris::testing::LightTester light_tester;
   iris::spectra::MockSpectrum spectrum;
-  iris::emissive::MockEmissiveMaterial emissive_material;
+  iris::emissive_materials::MockEmissiveMaterial emissive_material;
   EXPECT_CALL(emissive_material, Compute(testing::_))
       .Times(1)
       .WillOnce(testing::Return(&spectrum));
@@ -155,7 +155,7 @@ TEST(ListSceneTest, AreaLightEmission) {
 TEST(ListSceneTest, AreaLightEmissionMisses) {
   iris::testing::LightTester light_tester;
   iris::spectra::MockSpectrum spectrum;
-  iris::emissive::MockEmissiveMaterial emissive_material;
+  iris::emissive_materials::MockEmissiveMaterial emissive_material;
 
   auto scene_builder = iris::scenes::ListScene::Builder::Create();
   scene_builder->Add(std::make_unique<TestGeometry>(iris::Point(0.0, 0.0, 0.0),
@@ -177,7 +177,7 @@ TEST(ListSceneTest, AreaLightEmissionMisses) {
 TEST(ListSceneTest, AreaLightSampleRngFails) {
   iris::testing::LightTester light_tester;
   iris::spectra::MockSpectrum spectrum;
-  iris::emissive::MockEmissiveMaterial emissive_material;
+  iris::emissive_materials::MockEmissiveMaterial emissive_material;
 
   auto scene_builder = iris::scenes::ListScene::Builder::Create();
   scene_builder->Add(std::make_unique<TestGeometry>(
@@ -197,7 +197,7 @@ TEST(ListSceneTest, AreaLightSampleRngFails) {
 TEST(ListSceneTest, AreaLightSampleNotVisible) {
   iris::testing::LightTester light_tester;
   iris::spectra::MockSpectrum spectrum;
-  iris::emissive::MockEmissiveMaterial emissive_material;
+  iris::emissive_materials::MockEmissiveMaterial emissive_material;
 
   auto scene_builder = iris::scenes::ListScene::Builder::Create();
   scene_builder->Add(std::make_unique<TestGeometry>(iris::Point(0.0, 0.0, 1.0),
@@ -218,7 +218,7 @@ TEST(ListSceneTest, AreaLightSampleNotVisible) {
 TEST(ListSceneTest, AreaLightSampleWorld) {
   iris::testing::LightTester light_tester;
   iris::spectra::MockSpectrum spectrum;
-  iris::emissive::MockEmissiveMaterial emissive_material;
+  iris::emissive_materials::MockEmissiveMaterial emissive_material;
 
   EXPECT_CALL(emissive_material, Compute(testing::_))
       .Times(1)
@@ -246,7 +246,7 @@ TEST(ListSceneTest, AreaLightSampleWorld) {
 TEST(ListSceneTest, AreaLightSampleWithTransform) {
   iris::testing::LightTester light_tester;
   iris::spectra::MockSpectrum spectrum;
-  iris::emissive::MockEmissiveMaterial emissive_material;
+  iris::emissive_materials::MockEmissiveMaterial emissive_material;
 
   EXPECT_CALL(emissive_material, Compute(testing::_))
       .Times(1)
