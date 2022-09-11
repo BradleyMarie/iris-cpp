@@ -22,7 +22,6 @@ TEST(PointLightTest, SampleHits) {
               Visible(testing::Eq(iris::Ray(iris::Point(0.0, 0.0, -1.0),
                                             iris::Vector(0.0, 0.0, 1.0))),
                       testing::_))
-      .Times(1)
       .WillOnce(testing::Return(true));
 
   iris::lights::PointLight light(std::move(spectrum),
@@ -45,7 +44,6 @@ TEST(PointLightTest, SampleMisses) {
               Visible(testing::Eq(iris::Ray(iris::Point(0.0, 0.0, -1.0),
                                             iris::Vector(0.0, 0.0, 1.0))),
                       testing::_))
-      .Times(1)
       .WillOnce(testing::Return(false));
 
   iris::lights::PointLight light(std::move(spectrum),

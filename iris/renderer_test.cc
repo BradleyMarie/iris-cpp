@@ -40,8 +40,7 @@ void RunTestBody(unsigned num_threads_requested, unsigned actual_num_threads) {
         auto result =
             std::make_unique<iris::image_samplers::MockImageSampler>();
         EXPECT_CALL(*result, SamplesPerPixel())
-            .Times(1)
-            .WillRepeatedly(testing::Return(samples_per_pixel));
+            .WillOnce(testing::Return(samples_per_pixel));
         EXPECT_CALL(*result, SamplePixel(testing::_, testing::_, testing::_,
                                          testing::_, testing::_))
             .Times(sampler_index++ % 2 == 0 ? samples_per_pixel * 32
