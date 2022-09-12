@@ -9,9 +9,9 @@ class Geometry;
 class Matrix;
 namespace internal {
 
-struct Hit : public iris::Hit {
+struct Hit final : public iris::Hit {
   Hit(iris::Hit* next, geometric_t distance, face_t front, face_t back,
-      const void* additional_data)
+      const void* additional_data) noexcept
       : iris::Hit{next, distance},
         geometry(nullptr),
         model_to_world(nullptr),

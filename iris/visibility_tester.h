@@ -16,7 +16,7 @@ class VisibilityTester;
 class VisibilityTester {
  public:
   VisibilityTester(const Scene& scene, geometric_t minimum_distance,
-                   internal::RayTracer& ray_tracer)
+                   internal::RayTracer& ray_tracer) noexcept
       : scene_(scene),
         minimum_distance_(minimum_distance),
         ray_tracer_(ray_tracer) {}

@@ -14,14 +14,14 @@ struct Color final {
     LINEAR_SRGB,
   };
 
-  explicit Color(visual_t c0, visual_t c1, visual_t c2, Space space)
+  explicit Color(visual_t c0, visual_t c1, visual_t c2, Space space) noexcept
       : x(c0), y(c1), z(c2), space(space) {
     assert(x >= 0.0);
     assert(y >= 0.0);
     assert(z >= 0.0);
   }
 
-  Color(const Color&) = default;
+  Color(const Color&) noexcept = default;
 
   const visual_t& operator[](size_t index) const {
     assert(index < 3);

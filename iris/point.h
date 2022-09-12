@@ -10,13 +10,14 @@
 namespace iris {
 
 struct Point final {
-  explicit Point(geometric x, geometric y, geometric z) : x(x), y(y), z(z) {
+  explicit Point(geometric x, geometric y, geometric z) noexcept
+      : x(x), y(y), z(z) {
     assert(std::isfinite(x));
     assert(std::isfinite(y));
     assert(std::isfinite(z));
   }
 
-  Point(const Point&) = default;
+  Point(const Point&) noexcept = default;
 
   bool operator==(const Point&) const = default;
 

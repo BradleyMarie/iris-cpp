@@ -16,7 +16,7 @@ class HitArena;
 
 class HitAllocator final {
  public:
-  HitAllocator(const Ray& ray, internal::HitArena& arena)
+  HitAllocator(const Ray& ray, internal::HitArena& arena) noexcept
       : ray_(ray), arena_(arena) {}
 
   Hit& Allocate(Hit* next, geometric distance, face_t front, face_t back) {

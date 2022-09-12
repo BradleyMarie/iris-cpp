@@ -11,7 +11,7 @@
 namespace iris {
 namespace testing {
 
-class LightSceneTester {
+class LightSceneTester final {
  public:
   LightSample* Sample(const LightScene& scene, const Point& hit_point,
                       Random& rng);

@@ -8,7 +8,7 @@
 namespace iris {
 namespace emissive_materials {
 
-class MockEmissiveMaterial : public EmissiveMaterial {
+class MockEmissiveMaterial final : public EmissiveMaterial {
  public:
   MOCK_METHOD(const Spectrum*, Compute, (const TextureCoordinates&),
               (const override));

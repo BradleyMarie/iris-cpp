@@ -16,7 +16,7 @@
 namespace iris {
 namespace testing {
 
-class SceneTester {
+class SceneTester final {
  public:
   struct Hit {
     const Geometry& geometry;

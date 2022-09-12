@@ -10,9 +10,9 @@
 namespace iris {
 namespace testing {
 
-class MockVisibilityTester : public Scene {
+class MockVisibilityTester final : public Scene {
  public:
-  MockVisibilityTester() : geometry_(0.0) {}
+  MockVisibilityTester() noexcept : geometry_(0.0) {}
 
   const_iterator begin() const override { return end(); }
   void Trace(const Ray& ray, Intersector& intersector) const final override;
@@ -20,7 +20,7 @@ class MockVisibilityTester : public Scene {
   MOCK_METHOD(bool, Visible, (const Ray&, geometric), (const));
 
  private:
-  class MockGeometry : public Geometry {
+  class MockGeometry final : public Geometry {
    public:
     MockGeometry(geometric distance) : distance_(distance) {}
 

@@ -16,7 +16,7 @@
 namespace iris {
 namespace testing {
 
-class LightTester {
+class LightTester final {
  public:
   std::optional<iris::Light::SampleResult> Sample(const Light& light,
                                                   const Point& hit_point,

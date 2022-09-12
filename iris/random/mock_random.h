@@ -9,7 +9,7 @@
 namespace iris {
 namespace random {
 
-class MockRandom : public Random {
+class MockRandom final : public Random {
  public:
   MOCK_METHOD(result_type, min, (), (const override));
   MOCK_METHOD(result_type, max, (), (const override));

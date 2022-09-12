@@ -18,7 +18,7 @@ namespace lights {
 
 class PointLight final : public Light {
  public:
-  PointLight(std::shared_ptr<Spectrum> spectrum, Point location)
+  PointLight(std::shared_ptr<Spectrum> spectrum, Point location) noexcept
       : spectrum_(std::move(spectrum)), location_(location) {}
 
   std::optional<SampleResult> Sample(

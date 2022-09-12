@@ -15,7 +15,7 @@ namespace scenes {
 
 class ListScene final : public Scene {
  public:
-  class Builder : public Scene::Builder {
+  class Builder final : public Scene::Builder {
    public:
     static std::unique_ptr<Scene::Builder> Create() {
       return std::make_unique<Builder>();
@@ -29,7 +29,7 @@ class ListScene final : public Scene {
   };
 
   ListScene(std::vector<std::shared_ptr<Geometry>> geometry,
-            std::vector<std::shared_ptr<Matrix>> matrices)
+            std::vector<std::shared_ptr<Matrix>> matrices) noexcept
       : geometry_(std::move(geometry)), matrices_(std::move(matrices)) {
     assert(geometry_.size() == matrices_.size());
   }

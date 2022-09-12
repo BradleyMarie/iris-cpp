@@ -11,13 +11,14 @@
 namespace iris {
 
 struct Vector final {
-  explicit Vector(geometric x, geometric y, geometric z) : x(x), y(y), z(z) {
+  explicit Vector(geometric x, geometric y, geometric z) noexcept
+      : x(x), y(y), z(z) {
     assert(std::isfinite(x));
     assert(std::isfinite(y));
     assert(std::isfinite(z));
   }
 
-  Vector(const Vector&) = default;
+  Vector(const Vector&) noexcept = default;
 
   bool operator==(const Vector&) const = default;
 

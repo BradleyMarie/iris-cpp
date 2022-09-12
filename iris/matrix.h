@@ -12,7 +12,7 @@
 namespace iris {
 
 struct Matrix final {
-  Matrix(const Matrix& matrix) = default;
+  Matrix(const Matrix& matrix) noexcept = default;
 
   static const Matrix& Identity();
 

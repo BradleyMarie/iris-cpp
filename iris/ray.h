@@ -12,10 +12,10 @@
 namespace iris {
 
 struct Ray final {
-  explicit Ray(const Point& origin, const Vector& direction)
+  explicit Ray(const Point& origin, const Vector& direction) noexcept
       : origin(origin), direction(direction) {}
 
-  Ray(const Ray&) = default;
+  Ray(const Ray&) noexcept = default;
 
   bool operator==(const Ray&) const = default;
 

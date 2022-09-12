@@ -9,7 +9,7 @@
 namespace iris {
 namespace random {
 
-class MersenneTwisterRandom : public Random {
+class MersenneTwisterRandom final : public Random {
  public:
   MersenneTwisterRandom(
       Random::result_type default_seed = std::mt19937::default_seed)

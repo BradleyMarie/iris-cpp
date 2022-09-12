@@ -11,7 +11,7 @@ class Arena;
 
 class SpectralAllocator {
  public:
-  SpectralAllocator(internal::Arena& arena) : arena_(arena) {}
+  SpectralAllocator(internal::Arena& arena) noexcept : arena_(arena) {}
 
   const Spectrum* Add(const Spectrum* addend0, const Spectrum* addend1);
   const Spectrum* Scale(const Spectrum* spectrum, visual_t attenuation);

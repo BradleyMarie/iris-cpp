@@ -26,7 +26,7 @@ class AllLightScene final : public LightScene {
         std::vector<std::unique_ptr<Light>> lights) override;
   };
 
-  AllLightScene(std::vector<std::unique_ptr<Light>> lights)
+  AllLightScene(std::vector<std::unique_ptr<Light>> lights) noexcept
       : lights_(std::move(lights)) {}
 
   LightSample* Sample(const Point& hit_point, Random& rng,
