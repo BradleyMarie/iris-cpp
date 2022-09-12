@@ -13,3 +13,21 @@ cc_library(
         "@com_google_googletest//:gtest",
     ],
 )
+
+cc_library(
+    name = "mersenne_twister_random",
+    srcs = ["mersenne_twister_random.cc"],
+    hdrs = ["mersenne_twister_random.h"],
+    deps = [
+        "//iris:random",
+    ],
+)
+
+cc_test(
+    name = "mersenne_twister_random_test",
+    srcs = ["mersenne_twister_random_test.cc"],
+    deps = [
+        ":mersenne_twister_random",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
