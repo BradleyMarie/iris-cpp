@@ -18,7 +18,7 @@ namespace lights {
 
 class PointLight final : public Light {
  public:
-  PointLight(std::shared_ptr<Spectrum> spectrum, Point location) noexcept
+  PointLight(const Spectrum& spectrum, Point location) noexcept
       : spectrum_(std::move(spectrum)), location_(location) {}
 
   std::optional<SampleResult> Sample(
@@ -30,7 +30,7 @@ class PointLight final : public Light {
                            visual_t* pdf) const override;
 
  private:
-  std::shared_ptr<Spectrum> spectrum_;
+  const Spectrum& spectrum_;
   Point location_;
 };
 

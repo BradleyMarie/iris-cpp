@@ -13,7 +13,7 @@ std::optional<Light::SampleResult> PointLight::Sample(
     return std::nullopt;
   }
 
-  return Light::SampleResult{*spectrum_, Normalize(to_light),
+  return Light::SampleResult{spectrum_, Normalize(to_light),
                              std::numeric_limits<visual_t>::infinity()};
 }
 

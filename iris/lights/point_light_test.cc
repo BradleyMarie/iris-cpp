@@ -15,8 +15,7 @@ TEST(PointLightTest, SampleHits) {
   iris::testing::LightTester light_tester;
   iris::testing::MockVisibilityTester visibility_tester;
   iris::random::MockRandom random;
-  auto spectrum = std::make_unique<iris::spectra::MockSpectrum>();
-  auto spectrum_ptr = spectrum.get();
+  iris::spectra::MockSpectrum spectrum;
 
   EXPECT_CALL(visibility_tester,
               Visible(testing::Eq(iris::Ray(iris::Point(0.0, 0.0, -1.0),
@@ -24,12 +23,11 @@ TEST(PointLightTest, SampleHits) {
                       testing::_))
       .WillOnce(testing::Return(true));
 
-  iris::lights::PointLight light(std::move(spectrum),
-                                 iris::Point(0.0, 0.0, 0.0));
+  iris::lights::PointLight light(spectrum, iris::Point(0.0, 0.0, 0.0));
   auto result = light_tester.Sample(light, iris::Point(0.0, 0.0, -1.0), random,
                                     visibility_tester);
   EXPECT_TRUE(result);
-  EXPECT_EQ(spectrum_ptr, &result->emission);
+  EXPECT_EQ(&spectrum, &result->emission);
   EXPECT_EQ(result->pdf, std::numeric_limits<iris::visual_t>::infinity());
   EXPECT_EQ(iris::Vector(0.0, 0.0, 1.0), result->to_light);
 }
@@ -38,7 +36,7 @@ TEST(PointLightTest, SampleMisses) {
   iris::testing::LightTester light_tester;
   iris::testing::MockVisibilityTester visibility_tester;
   iris::random::MockRandom random;
-  auto spectrum = std::make_unique<iris::spectra::MockSpectrum>();
+  iris::spectra::MockSpectrum spectrum;
 
   EXPECT_CALL(visibility_tester,
               Visible(testing::Eq(iris::Ray(iris::Point(0.0, 0.0, -1.0),
@@ -46,8 +44,7 @@ TEST(PointLightTest, SampleMisses) {
                       testing::_))
       .WillOnce(testing::Return(false));
 
-  iris::lights::PointLight light(std::move(spectrum),
-                                 iris::Point(0.0, 0.0, 0.0));
+  iris::lights::PointLight light(spectrum, iris::Point(0.0, 0.0, 0.0));
   EXPECT_FALSE(light_tester.Sample(light, iris::Point(0.0, 0.0, -1.0), random,
                                    visibility_tester));
 }
@@ -55,10 +52,9 @@ TEST(PointLightTest, SampleMisses) {
 TEST(PointLightTest, Emission) {
   iris::testing::LightTester light_tester;
   iris::testing::MockVisibilityTester visibility_tester;
-  auto spectrum = std::make_unique<iris::spectra::MockSpectrum>();
+  iris::spectra::MockSpectrum spectrum;
 
-  iris::lights::PointLight light(std::move(spectrum),
-                                 iris::Point(0.0, 0.0, 0.0));
+  iris::lights::PointLight light(spectrum, iris::Point(0.0, 0.0, 0.0));
   EXPECT_EQ(nullptr,
             light_tester.Emission(light,
                                   iris::Ray(iris::Point(0.0, 0.0, 0.0),

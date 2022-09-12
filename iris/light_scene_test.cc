@@ -106,8 +106,9 @@ TEST(ListSceneTest, BuilderEmpty) {
 }
 
 TEST(ListSceneTest, BuilderOneLight) {
+  iris::spectra::MockSpectrum spectrum;
   auto test_light = std::make_unique<iris::lights::PointLight>(
-      nullptr, iris::Point(1.0, 1.0, 1.0));
+      spectrum, iris::Point(1.0, 1.0, 1.0));
   auto scene = iris::scenes::ListScene::Builder::Create()->Build();
   std::unique_ptr<iris::LightScene::Builder> builder =
       std::make_unique<TestLightSceneBuilder>(
