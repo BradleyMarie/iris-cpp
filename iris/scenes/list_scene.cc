@@ -7,23 +7,8 @@ std::unique_ptr<Scene> ListScene::Builder::Build(
     std::vector<std::pair<size_t, size_t>> geometry_and_matrix,
     std::vector<std::unique_ptr<Geometry>> geometry,
     std::vector<Matrix> matrices) {
-  std::vector<std::shared_ptr<Geometry>> shared_geometry;
-  for (auto& geom : geometry) {
-    shared_geometry.push_back(std::move(geom));
-  }
-
-  std::vector<std::shared_ptr<Geometry>> scene_geometry;
-  std::vector<std::shared_ptr<Matrix>> scene_matrices;
-  for (const auto& [geometry_index, matrix_index] : geometry_and_matrix) {
-    scene_geometry.push_back(shared_geometry[geometry_index]);
-    auto matrix = (matrix_index != 0u)
-                      ? std::make_shared<Matrix>(matrices[matrix_index])
-                      : nullptr;
-    scene_matrices.push_back(std::move(matrix));
-  }
-
-  return std::make_unique<ListScene>(std::move(scene_geometry),
-                                     std::move(scene_matrices));
+  return std::make_unique<ListScene>(std::move(geometry_and_matrix),
+                                     std::move(geometry), std::move(matrices));
 }
 
 Scene::const_iterator ListScene::begin() const {
@@ -31,19 +16,26 @@ Scene::const_iterator ListScene::begin() const {
   return Scene::const_iterator(
       [this,
        index]() mutable -> std::optional<Scene::const_iterator::value_type> {
-        if (index == geometry_.size()) {
+        if (index == geometry_and_matrix_.size()) {
           return std::nullopt;
         }
 
         size_t current = index++;
-        return std::make_pair(std::cref(*geometry_[current]),
-                              matrices_[current].get());
+        bool has_matrix = geometry_and_matrix_[current].second != 0;
+        return std::make_pair(
+            std::cref(*geometry_[geometry_and_matrix_[current].first]),
+            has_matrix ? &matrices_[geometry_and_matrix_[current].second]
+                       : nullptr);
       });
 }
 
 void ListScene::Trace(const Ray& ray, Intersector& intersector) const {
-  for (size_t i = 0u; i < geometry_.size(); i++) {
-    intersector.Intersect(*geometry_[i], matrices_[i].get());
+  for (const auto& entry : geometry_and_matrix_) {
+    if (entry.second != 0) {
+      intersector.Intersect(*geometry_[entry.first], matrices_[entry.second]);
+    } else {
+      intersector.Intersect(*geometry_[entry.first]);
+    }
   }
 }
 

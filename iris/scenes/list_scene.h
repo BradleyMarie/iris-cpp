@@ -1,7 +1,6 @@
 #ifndef _IRIS_SCENES_LIST_SCENE_
 #define _IRIS_SCENES_LIST_SCENE_
 
-#include <cassert>
 #include <memory>
 
 #include "iris/geometry.h"
@@ -28,19 +27,21 @@ class ListScene final : public Scene {
         std::vector<Matrix> matrices) override;
   };
 
-  ListScene(std::vector<std::shared_ptr<Geometry>> geometry,
-            std::vector<std::shared_ptr<Matrix>> matrices) noexcept
-      : geometry_(std::move(geometry)), matrices_(std::move(matrices)) {
-    assert(geometry_.size() == matrices_.size());
-  }
+  ListScene(std::vector<std::pair<size_t, size_t>> geometry_and_matrix,
+            std::vector<std::unique_ptr<Geometry>> geometry,
+            std::vector<Matrix> matrices) noexcept
+      : geometry_and_matrix_(std::move(geometry_and_matrix)),
+        geometry_(std::move(geometry)),
+        matrices_(std::move(matrices)) {}
 
   const_iterator begin() const override;
 
   void Trace(const Ray& ray, Intersector& intersector) const override;
 
  private:
-  std::vector<std::shared_ptr<Geometry>> geometry_;
-  std::vector<std::shared_ptr<Matrix>> matrices_;
+  std::vector<std::pair<size_t, size_t>> geometry_and_matrix_;
+  std::vector<std::unique_ptr<Geometry>> geometry_;
+  std::vector<Matrix> matrices_;
 };
 
 }  // namespace scenes
