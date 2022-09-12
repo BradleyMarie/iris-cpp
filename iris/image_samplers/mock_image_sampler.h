@@ -1,5 +1,5 @@
-#ifndef _IRIS_IMAGE_SAMPLERS_MOCK_MOCK_IMAGE_SAMPLER_
-#define _IRIS_IMAGE_SAMPLERS_MOCK_MOCK_IMAGE_SAMPLER_
+#ifndef _IRIS_IMAGE_SAMPLERS_MOCK_IMAGE_SAMPLER_
+#define _IRIS_IMAGE_SAMPLERS_MOCK_IMAGE_SAMPLER_
 
 #include <array>
 #include <memory>
@@ -16,7 +16,7 @@ namespace image_samplers {
 
 class MockImageSampler final : public ImageSampler {
  public:
-  MOCK_METHOD(ImageSample, SamplePixel,
+  MOCK_METHOD(Sample, SamplePixel,
               ((std::pair<size_t, size_t>), (std::pair<size_t, size_t>),
                uint32_t, bool, Random&),
               (override));
@@ -27,4 +27,4 @@ class MockImageSampler final : public ImageSampler {
 }  // namespace image_samplers
 }  // namespace iris
 
-#endif  // _IRIS_IMAGE_SAMPLERS_MOCK_MOCK_IMAGE_SAMPLER_
+#endif  // _IRIS_IMAGE_SAMPLERS_MOCK_IMAGE_SAMPLER_

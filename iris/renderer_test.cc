@@ -45,8 +45,8 @@ void RunTestBody(unsigned num_threads_requested, unsigned actual_num_threads) {
                                          testing::_, testing::_))
             .Times(sampler_index++ % 2 == 0 ? samples_per_pixel * 32
                                             : samples_per_pixel)
-            .WillRepeatedly(testing::Return(iris::ImageSampler::ImageSample{
-                {0.0, 0.0}, std::nullopt, rng}));
+            .WillRepeatedly(testing::Return(
+                iris::ImageSampler::Sample{{0.0, 0.0}, std::nullopt, rng}));
         return result;
       }));
 

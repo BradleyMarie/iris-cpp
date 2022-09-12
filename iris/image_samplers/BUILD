@@ -15,3 +15,24 @@ cc_library(
         "@com_google_googletest//:gtest",
     ],
 )
+
+cc_library(
+    name = "random_image_sampler",
+    srcs = ["random_image_sampler.cc"],
+    hdrs = ["random_image_sampler.h"],
+    deps = [
+        "//iris:float",
+        "//iris:image_sampler",
+        "//iris:random",
+    ],
+)
+
+cc_test(
+    name = "random_image_sampler_test",
+    srcs = ["random_image_sampler_test.cc"],
+    deps = [
+        ":random_image_sampler",
+        "//iris/random:mock_random",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
