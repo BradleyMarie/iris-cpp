@@ -74,6 +74,7 @@ const Spectrum* AreaLight::Emission(const Ray& to_light,
 }  // namespace
 
 void LightScene::Builder::Add(std::unique_ptr<Light> light) {
+  assert(light);
   lights_.push_back(std::move(light));
 }
 

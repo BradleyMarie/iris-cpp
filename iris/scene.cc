@@ -4,6 +4,7 @@ namespace iris {
 
 void Scene::Builder::Add(std::unique_ptr<Geometry> geometry,
                          const Matrix& matrix) {
+  assert(geometry);
   auto iter = numbered_matrices_.insert({matrix, numbered_matrices_.size()});
   size_t geometry_index = geometry_.size();
   geometry_.push_back(std::move(geometry));
