@@ -14,7 +14,7 @@ namespace cameras {
 class OrthographicCamera final : public Camera {
  public:
   // fov is specified in degrees
-  OrthographicCamera(const Matrix& camera_to_world)
+  OrthographicCamera(const Matrix& camera_to_world) noexcept
       : camera_to_world_(camera_to_world) {}
 
   Ray Compute(const std::array<geometric_t, 2>& image_uv,
