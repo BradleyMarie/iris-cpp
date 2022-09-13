@@ -15,6 +15,27 @@ cc_library(
 )
 
 cc_library(
+    name = "orthographic_camera",
+    srcs = ["orthographic_camera.cc"],
+    hdrs = ["orthographic_camera.h"],
+    deps = [
+        "//iris:camera",
+        "//iris:float",
+        "//iris:matrix",
+        "//iris:ray",
+    ],
+)
+
+cc_test(
+    name = "orthographic_camera_test",
+    srcs = ["orthographic_camera_test.cc"],
+    deps = [
+        ":orthographic_camera",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "perspective_camera",
     srcs = ["perspective_camera.cc"],
     hdrs = ["perspective_camera.h"],
