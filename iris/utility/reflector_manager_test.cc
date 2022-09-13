@@ -14,6 +14,6 @@ TEST(ReflectorManagerTest, AddGet) {
 
   iris::utility::ReflectorManager manager;
   auto index = manager.Add(std::move(reflector));
-  EXPECT_NE(0, index);
+  EXPECT_NE(0u, index);
   EXPECT_EQ(ptr, manager.Get(index));
 }

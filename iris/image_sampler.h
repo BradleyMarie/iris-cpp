@@ -14,8 +14,8 @@ namespace iris {
 class ImageSampler {
  public:
   struct Sample {
-    std::array<visual_t, 2> image_uv;
-    std::optional<std::array<visual_t, 2>> lens_uv;
+    std::array<geometric_t, 2> image_uv;
+    std::optional<std::array<geometric_t, 2>> lens_uv;
     Random& rng;
   };
 

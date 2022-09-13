@@ -14,6 +14,6 @@ TEST(SpectrumManagerTest, AddGet) {
 
   iris::utility::SpectrumManager manager;
   auto index = manager.Add(std::move(spectrum));
-  EXPECT_NE(0, index);
+  EXPECT_NE(0u, index);
   EXPECT_EQ(ptr, manager.Get(index));
 }

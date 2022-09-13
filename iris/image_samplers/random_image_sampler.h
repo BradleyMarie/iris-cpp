@@ -27,7 +27,7 @@ class RandomImageSampler final : public ImageSampler {
   std::unique_ptr<ImageSampler> Duplicate() const override;
 
  private:
-  std::uniform_real_distribution<geometric_t> distribution_;
+  std::uniform_real_distribution<geometric> distribution_;
   uint32_t samples_per_pixel_;
 };
 

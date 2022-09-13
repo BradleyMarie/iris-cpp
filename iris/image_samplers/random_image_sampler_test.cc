@@ -35,10 +35,10 @@ TEST(RandomImageSamplerTest, SampleNoLens) {
 
   auto sample = sampler.SamplePixel(std::make_pair(2, 2), std::make_pair(0, 1),
                                     0, false, rng);
-  EXPECT_TRUE(sample.image_uv[0] >= 0.0);
-  EXPECT_TRUE(sample.image_uv[0] < 0.5);
-  EXPECT_TRUE(sample.image_uv[1] >= 0.5);
-  EXPECT_TRUE(sample.image_uv[1] < 1.0);
+  EXPECT_TRUE(sample.image_uv[0] >= 0.5);
+  EXPECT_TRUE(sample.image_uv[0] < 1.0);
+  EXPECT_TRUE(sample.image_uv[1] >= 0.0);
+  EXPECT_TRUE(sample.image_uv[1] < 0.5);
   EXPECT_FALSE(sample.lens_uv);
   EXPECT_EQ(&rng, &sample.rng);
 }
@@ -61,10 +61,10 @@ TEST(RandomImageSamplerTest, SampleWithLens) {
 
   auto sample = sampler.SamplePixel(std::make_pair(2, 2), std::make_pair(0, 1),
                                     0, true, rng);
-  EXPECT_TRUE(sample.image_uv[0] >= 0.0);
-  EXPECT_TRUE(sample.image_uv[0] < 0.5);
-  EXPECT_TRUE(sample.image_uv[1] >= 0.5);
-  EXPECT_TRUE(sample.image_uv[1] < 1.0);
+  EXPECT_TRUE(sample.image_uv[0] >= 0.5);
+  EXPECT_TRUE(sample.image_uv[0] < 1.0);
+  EXPECT_TRUE(sample.image_uv[1] >= 0.0);
+  EXPECT_TRUE(sample.image_uv[1] < 0.5);
   ASSERT_TRUE(sample.lens_uv);
   EXPECT_TRUE((*sample.lens_uv)[0] >= 0.0);
   EXPECT_TRUE((*sample.lens_uv)[0] < 1.0);
