@@ -31,6 +31,7 @@ cc_library(
         "//iris:spectral_allocator",
         "//iris:spectrum",
         "//iris:visibility_tester",
+        "//iris/utility:spectrum_manager",
     ],
 )
 
@@ -43,6 +44,7 @@ cc_test(
         "//iris/spectra:mock_spectrum",
         "//iris/testing:light_tester",
         "//iris/testing:mock_visibility_tester",
+        "//iris/utility:spectrum_manager",
         "@com_google_googletest//:gtest_main",
     ],
 )

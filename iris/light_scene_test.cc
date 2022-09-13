@@ -6,7 +6,7 @@
 
 #include "googletest/include/gtest/gtest.h"
 #include "iris/emissive_materials/mock_emissive_material.h"
-#include "iris/lights/point_light.h"
+#include "iris/lights/mock_light.h"
 #include "iris/random/mock_random.h"
 #include "iris/scenes/list_scene.h"
 #include "iris/spectra/mock_spectrum.h"
@@ -107,8 +107,7 @@ TEST(ListSceneTest, BuilderEmpty) {
 
 TEST(ListSceneTest, BuilderOneLight) {
   iris::spectra::MockSpectrum spectrum;
-  auto test_light = std::make_unique<iris::lights::PointLight>(
-      spectrum, iris::Point(1.0, 1.0, 1.0));
+  auto test_light = std::make_unique<iris::lights::MockLight>();
   auto scene = iris::scenes::ListScene::Builder::Create()->Build();
   std::unique_ptr<iris::LightScene::Builder> builder =
       std::make_unique<TestLightSceneBuilder>(
