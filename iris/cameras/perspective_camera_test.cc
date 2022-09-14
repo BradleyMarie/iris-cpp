@@ -63,3 +63,19 @@ TEST(PerspectiveCameraTest, TranslatedCenter) {
   EXPECT_NEAR(0.0, ray.direction.y, 0.001);
   EXPECT_NEAR(1.0, ray.direction.z, 0.001);
 }
+
+TEST(PerspectiveCameraTest, FovX) {
+  iris::cameras::PerspectiveCamera camera(iris::Matrix::Identity(), 0.5, 90.0);
+  auto ray = camera.Compute({0.0, 0.5}, nullptr);
+  EXPECT_NEAR(0.707106,
+              iris::DotProduct(iris::Vector(0.0, 0.0, 1.0), ray.direction),
+              0.001);
+}
+
+TEST(PerspectiveCameraTest, FovY) {
+  iris::cameras::PerspectiveCamera camera(iris::Matrix::Identity(), 2.0, 90.0);
+  auto ray = camera.Compute({0.5, 0.0}, nullptr);
+  EXPECT_NEAR(0.707106,
+              iris::DotProduct(iris::Vector(0.0, 0.0, 1.0), ray.direction),
+              0.001);
+}

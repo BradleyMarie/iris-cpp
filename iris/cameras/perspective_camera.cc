@@ -33,7 +33,8 @@ std::tuple<Vector, Vector, Vector> ComputeImagePlane(geometric_t aspect_ratio,
 }  // namespace
 
 PerspectiveCamera::PerspectiveCamera(const Matrix& camera_to_world,
-                                     geometric_t aspect_ratio, geometric_t fov)
+                                     geometric_t aspect_ratio,
+                                     geometric_t fov) noexcept
     : camera_to_world_(camera_to_world),
       image_plane_(ComputeImagePlane(aspect_ratio, fov)) {
   assert(std::isfinite(aspect_ratio) && aspect_ratio > 0.0);
