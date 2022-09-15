@@ -7,7 +7,11 @@ cc_library(
     hdrs = ["bsdf.h"],
     visibility = ["//visibility:public"],
     deps = [
+        ":float",
+        ":random",
         ":reflector",
+        ":spectral_allocator",
+        ":vector",
     ],
 )
 
