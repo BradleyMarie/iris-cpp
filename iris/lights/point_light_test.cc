@@ -31,7 +31,7 @@ TEST(PointLightTest, SampleHits) {
                                     visibility_tester);
   EXPECT_TRUE(result);
   EXPECT_EQ(manager->Get(index), &result->emission);
-  EXPECT_EQ(result->pdf, std::numeric_limits<iris::visual_t>::infinity());
+  EXPECT_FALSE(result->pdf);
   EXPECT_EQ(iris::Vector(0.0, 0.0, 1.0), result->to_light);
 }
 
