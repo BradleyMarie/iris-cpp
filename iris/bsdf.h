@@ -30,22 +30,17 @@ class Bsdf {
       const Vector& shading_normal, Random& rng,
       SpectralAllocator& allocator) const = 0;
 
-  struct Reflectance {
-    const Reflector& reflector;
-    Vector direction;
-    bool transmitted;
-    visual_t pdf;
-  };
+  virtual const Reflector* ReflectanceAll(const Vector& incoming,
+                                          const Vector& surface_normal,
+                                          const Vector& shading_normal,
+                                          const Vector& outgoing,
+                                          SpectralAllocator& allocator,
+                                          visual_t* pdf = nullptr) const = 0;
 
-  virtual std::optional<Reflectance> ReflectanceAll(
+  virtual const Reflector* ReflectanceDiffuse(
       const Vector& incoming, const Vector& surface_normal,
       const Vector& shading_normal, const Vector& outgoing,
-      SpectralAllocator& allocator) const = 0;
-
-  virtual std::optional<Reflectance> ReflectanceDiffuse(
-      const Vector& incoming, const Vector& surface_normal,
-      const Vector& shading_normal, const Vector& outgoing,
-      SpectralAllocator& allocator) const = 0;
+      SpectralAllocator& allocator, visual_t* pdf = nullptr) const = 0;
 };
 
 }  // namespace iris
