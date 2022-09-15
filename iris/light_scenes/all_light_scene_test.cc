@@ -40,13 +40,11 @@ TEST(AllLightSceneTest, TwoLights) {
 
   auto* light1_sample = light_samples;
   EXPECT_EQ(light1_ptr, &light1_sample->light);
-  EXPECT_EQ(std::numeric_limits<iris::visual_t>::infinity(),
-            light1_sample->pdf);
+  EXPECT_FALSE(light1_sample->pdf);
   ASSERT_NE(nullptr, light1_sample->next);
 
   auto* light0_sample = light1_sample->next;
   EXPECT_EQ(light0_ptr, &light0_sample->light);
-  EXPECT_EQ(std::numeric_limits<iris::visual_t>::infinity(),
-            light0_sample->pdf);
+  EXPECT_FALSE(light0_sample->pdf);
   EXPECT_EQ(nullptr, light0_sample->next);
 }

@@ -1,7 +1,5 @@
 #include "iris/light_scenes/all_light_scene.h"
 
-#include <limits>
-
 namespace iris {
 namespace light_scenes {
 
@@ -14,8 +12,7 @@ LightSample* AllLightScene::Sample(const Point& hit_point, Random& rng,
                                    LightSampleAllocator& allocator) const {
   LightSample* next = nullptr;
   for (const auto& light : lights_) {
-    next = &allocator.Allocate(*light,
-                               std::numeric_limits<visual_t>::infinity(), next);
+    next = &allocator.Allocate(*light, std::nullopt, next);
   }
   return next;
 }
