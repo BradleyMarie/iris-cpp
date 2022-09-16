@@ -87,3 +87,18 @@ TEST(VectorTest, Normalize) {
   EXPECT_EQ(4.0, length_squared);
   EXPECT_EQ(2.0, length);
 }
+
+TEST(VectorTest, DiminishedAxis) {
+  EXPECT_EQ(iris::Vector::X_AXIS,
+            iris::Vector(1.0, -2.0, 3.0).DiminishedAxis());
+  EXPECT_EQ(iris::Vector::Y_AXIS,
+            iris::Vector(-2.0, 1.0, 3.0).DiminishedAxis());
+  EXPECT_EQ(iris::Vector::Z_AXIS,
+            iris::Vector(3.0, -2.0, 1.0).DiminishedAxis());
+}
+
+TEST(VectorTest, DominantAxis) {
+  EXPECT_EQ(iris::Vector::X_AXIS, iris::Vector(3.0, -2.0, 1.0).DominantAxis());
+  EXPECT_EQ(iris::Vector::Y_AXIS, iris::Vector(-2.0, 3.0, 1.0).DominantAxis());
+  EXPECT_EQ(iris::Vector::Z_AXIS, iris::Vector(1.0, -2.0, 3.0).DominantAxis());
+}

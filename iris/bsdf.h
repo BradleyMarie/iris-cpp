@@ -12,6 +12,7 @@
 namespace iris {
 
 class Bsdf {
+ public:
   struct Sample {
     const Reflector& reflector;
     Vector direction;
@@ -30,16 +31,14 @@ class Bsdf {
       const Vector& shading_normal, Random& rng,
       SpectralAllocator& allocator) const = 0;
 
-  virtual const Reflector* ReflectanceAll(const Vector& incoming,
-                                          const Vector& surface_normal,
-                                          const Vector& shading_normal,
-                                          const Vector& outgoing,
-                                          SpectralAllocator& allocator,
-                                          visual_t* pdf = nullptr) const = 0;
+  virtual const Reflector* ReflectanceAll(
+      const Vector& incoming, const Vector& surface_normal,
+      const Vector& shading_normal, const Vector& outgoing, bool transmitted,
+      SpectralAllocator& allocator, visual_t* pdf = nullptr) const = 0;
 
   virtual const Reflector* ReflectanceDiffuse(
       const Vector& incoming, const Vector& surface_normal,
-      const Vector& shading_normal, const Vector& outgoing,
+      const Vector& shading_normal, const Vector& outgoing, bool transmitted,
       SpectralAllocator& allocator, visual_t* pdf = nullptr) const = 0;
 };
 

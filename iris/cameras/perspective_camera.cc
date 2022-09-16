@@ -1,5 +1,6 @@
 #include "iris/cameras/perspective_camera.h"
 
+#define _USE_MATH_CONSTANTS
 #include <cassert>
 #include <cmath>
 
@@ -9,8 +10,7 @@ namespace {
 
 std::tuple<Vector, Vector, Vector> ComputeImagePlane(geometric_t aspect_ratio,
                                                      geometric_t fov) {
-  geometric_t pi = std::acos(-1.0);
-  geometric_t half_fov_radians = fov * pi / 360.0;
+  geometric_t half_fov_radians = fov * M_PI / 360.0;
   geometric_t image_dimension = 2.0 * std::tan(half_fov_radians);
 
   geometric_t x_dim, y_dim;

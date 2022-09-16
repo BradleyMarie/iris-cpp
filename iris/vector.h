@@ -11,6 +11,12 @@
 namespace iris {
 
 struct Vector final {
+  enum Axis {
+    X_AXIS = 0,
+    Y_AXIS = 1,
+    Z_AXIS = 2,
+  };
+
   explicit Vector(geometric x, geometric y, geometric z) noexcept
       : x(x), y(y), z(z) {
     assert(std::isfinite(x));
@@ -27,6 +33,9 @@ struct Vector final {
     const geometric* as_array = &x;
     return as_array[index];
   }
+
+  Axis DiminishedAxis() const;
+  Axis DominantAxis() const;
 
   geometric_t Length() const;
 
@@ -100,6 +109,17 @@ Vector Normalize(const Vector& vector, geometric_t* length_squared = nullptr,
   }
 
   return vector / old_length;
+}
+
+Vector::Axis Vector::DiminishedAxis() const {
+  Axis smallest_axis = (std::abs(x) <= std::abs(y)) ? X_AXIS : Y_AXIS;
+  return std::abs((*this)[smallest_axis]) <= std::abs(z) ? smallest_axis
+                                                         : Z_AXIS;
+}
+
+Vector::Axis Vector::DominantAxis() const {
+  Axis largest_axis = (std::abs(x) >= std::abs(y)) ? X_AXIS : Y_AXIS;
+  return std::abs((*this)[largest_axis]) >= std::abs(z) ? largest_axis : Z_AXIS;
 }
 
 geometric_t Vector::Length() const {
