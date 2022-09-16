@@ -37,7 +37,7 @@ Vector SampleHemisphereWithCosineWeighting(const Vector& surface_normal,
   auto radius_squared = distribution(rng);
   auto radius = std::sqrt(radius_squared);
 
-  auto theta = distribution(rng) * 2.0 * M_PI - M_PI;
+  auto theta = distribution(rng) * (2.0 * M_PI) - M_PI;
   auto sin_theta = std::sin(theta);
   auto cos_theta = std::cos(theta);
 
@@ -69,10 +69,7 @@ std::optional<Bsdf::Sample> LambertianBrdf::SampleDiffuse(
   }
 
   auto* reflector = allocator.Scale(&reflector_, M_1_PI);
-
-  auto dot_product = DotProduct(sampled_direction, shading_normal);
-  auto pdf =
-      std::max(static_cast<visual_t>(0.0), static_cast<visual_t>(dot_product));
+  auto pdf = PositiveDotProduct(sampled_direction, shading_normal);
 
   return Bsdf::Sample{*reflector, sampled_direction, /*transmitted=*/false,
                       /*specular=*/false, pdf};
@@ -81,7 +78,7 @@ std::optional<Bsdf::Sample> LambertianBrdf::SampleDiffuse(
 const Reflector* LambertianBrdf::ReflectanceAll(
     const Vector& incoming, const Vector& surface_normal,
     const Vector& shading_normal, const Vector& outgoing, bool transmitted,
-    SpectralAllocator& allocator, visual_t* pdf = nullptr) const {
+    SpectralAllocator& allocator, visual_t* pdf) const {
   return ReflectanceDiffuse(incoming, surface_normal, shading_normal, outgoing,
                             transmitted, allocator, pdf);
 }
@@ -89,15 +86,13 @@ const Reflector* LambertianBrdf::ReflectanceAll(
 const Reflector* LambertianBrdf::ReflectanceDiffuse(
     const Vector& incoming, const Vector& surface_normal,
     const Vector& shading_normal, const Vector& outgoing, bool transmitted,
-    SpectralAllocator& allocator, visual_t* pdf = nullptr) const {
+    SpectralAllocator& allocator, visual_t* pdf) const {
   if (transmitted) {
     return nullptr;
   }
 
   if (pdf) {
-    auto dot_product = DotProduct(outgoing, shading_normal);
-    *pdf = std::max(static_cast<visual_t>(0.0),
-                    static_cast<visual_t>(dot_product));
+    *pdf = PositiveDotProduct(outgoing, shading_normal);
   }
 
   return allocator.Scale(&reflector_, M_1_PI);

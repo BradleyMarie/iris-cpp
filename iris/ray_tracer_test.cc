@@ -1,11 +1,13 @@
 #include "iris/ray_tracer.h"
 
 #include "googletest/include/gtest/gtest.h"
+#include "iris/bsdfs/mock_bsdf.h"
 #include "iris/internal/ray_tracer.h"
 #include "iris/scenes/list_scene.h"
+#include "iris/spectra/mock_spectrum.h"
 
-const iris::Bsdf* g_bsdf = reinterpret_cast<iris::Bsdf*>(1);
-const iris::Spectrum* g_spectrum = reinterpret_cast<iris::Spectrum*>(2);
+auto g_bsdf = std::make_unique<iris::bsdfs::MockBsdf>();
+auto g_spectrum = std::make_unique<iris::spectra::MockSpectrum>();
 static const uint32_t g_data = 0xDEADBEEF;
 
 class TestEmissiveMaterial : public iris::EmissiveMaterial {
@@ -17,7 +19,7 @@ class TestEmissiveMaterial : public iris::EmissiveMaterial {
       const iris::TextureCoordinates& texture_coordinates) const override {
     EXPECT_EQ(expected_, texture_coordinates.uv);
     EXPECT_FALSE(texture_coordinates.derivatives);
-    return g_spectrum;
+    return g_spectrum.get();
   }
 
  private:
@@ -33,7 +35,7 @@ class TestMaterial : public iris::Material {
       const iris::TextureCoordinates& texture_coordinates) const override {
     EXPECT_EQ(expected_, texture_coordinates.uv);
     EXPECT_FALSE(texture_coordinates.derivatives);
-    return g_bsdf;
+    return g_bsdf.get();
   }
 
  private:
@@ -199,7 +201,7 @@ TEST(RayTracerTest, WithTextureCoordinates) {
   auto result = ray_tracer.Trace(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
   ASSERT_TRUE(result);
-  EXPECT_EQ(g_bsdf, result->bsdf);
+  EXPECT_EQ(g_bsdf.get(), result->bsdf);
   EXPECT_EQ(nullptr, result->emission);
   EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result->hit_point);
   EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), result->surface_normal);
@@ -221,7 +223,7 @@ TEST(RayTracerTest, WithMaterial) {
   auto result = ray_tracer.Trace(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
   ASSERT_TRUE(result);
-  EXPECT_EQ(g_bsdf, result->bsdf);
+  EXPECT_EQ(g_bsdf.get(), result->bsdf);
   EXPECT_EQ(nullptr, result->emission);
   EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result->hit_point);
   EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), result->surface_normal);
@@ -244,7 +246,7 @@ TEST(RayTracerTest, WithEmissiveMaterial) {
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
   ASSERT_TRUE(result);
   EXPECT_EQ(nullptr, result->bsdf);
-  EXPECT_EQ(g_spectrum, result->emission);
+  EXPECT_EQ(g_spectrum.get(), result->emission);
   EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result->hit_point);
   EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), result->surface_normal);
   EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), result->shading_normal);

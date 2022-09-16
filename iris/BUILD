@@ -418,8 +418,10 @@ cc_test(
     srcs = ["ray_tracer_test.cc"],
     deps = [
         ":ray_tracer",
+        "//iris/bsdfs:mock_bsdf",
         "//iris/internal:ray_tracer",
         "//iris/scenes:list_scene",
+        "//iris/spectra:mock_spectrum",
         "@com_google_googletest//:gtest_main",
     ],
 )
