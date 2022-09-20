@@ -13,6 +13,7 @@ cc_library(
         "//iris:reflector",
         "//iris:spectral_allocator",
         "//iris:vector",
+        "//iris/bsdfs/utility:local",
     ],
 )
 

@@ -4,31 +4,11 @@
 #include <cmath>
 #include <random>
 
+#include "iris/bsdfs/utility/local.h"
+
 namespace iris {
 namespace bsdfs {
 namespace {
-
-Vector Orthogonal(const Vector& vector) {
-  geometric values[] = {0.0, 0.0, 0.0};
-  values[vector.DiminishedAxis()] = 1.0;
-  return CrossProduct(vector, Vector(values[0], values[1], values[2]));
-}
-
-Vector TransformVector(const Vector& surface_normal, const Vector& vector) {
-  Vector orthogonal = Orthogonal(surface_normal);
-  Vector cross_product = CrossProduct(surface_normal, orthogonal);
-
-  auto x = orthogonal.x * vector.x + cross_product.x * vector.y +
-           surface_normal.x * vector.z;
-
-  auto y = orthogonal.y * vector.x + cross_product.y * vector.y +
-           surface_normal.y * vector.z;
-
-  auto z = orthogonal.z * vector.x + cross_product.z * vector.y +
-           surface_normal.z * vector.z;
-
-  return Vector(x, y, z);
-}
 
 Vector SampleHemisphereWithCosineWeighting(const Vector& surface_normal,
                                            Random& rng) {
@@ -44,8 +24,11 @@ Vector SampleHemisphereWithCosineWeighting(const Vector& surface_normal,
   float_t x = radius * cos_theta;
   float_t y = radius * sin_theta;
 
-  return TransformVector(surface_normal,
-                         Vector(x, y, std::sqrt(1.0 - radius_squared)));
+  auto coordinate_system = utility::CreateLocalCoordinateSpace(surface_normal);
+
+  return utility::Transform(Vector(x, y, std::sqrt(1.0 - radius_squared)),
+                            surface_normal, coordinate_system.first,
+                            coordinate_system.second);
 }
 
 }  // namespace
