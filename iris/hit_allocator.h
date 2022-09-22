@@ -24,9 +24,10 @@ class HitAllocator final {
   }
 
   template <class T>
-  requires(std::is_trivially_destructible<T>::value) Hit& Allocate(
-      Hit* next, geometric distance, face_t front, face_t back,
-      const T& additional_data) {
+  requires(std::is_trivially_copyable<T>::value &&
+           std::is_trivially_destructible<T>::value)
+  Hit& Allocate(Hit* next, geometric distance, face_t front, face_t back,
+                const T& additional_data) {
     return Allocate(next, distance, front, back, &additional_data, sizeof(T));
   }
 
