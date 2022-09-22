@@ -3,6 +3,19 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 package(default_visibility = ["//visibility:private"])
 
 cc_library(
+    name = "bxdf",
+    hdrs = ["bxdf.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":float",
+        ":random",
+        ":reflector",
+        ":spectral_allocator",
+        ":vector",
+    ],
+)
+
+cc_library(
     name = "bsdf",
     hdrs = ["bsdf.h"],
     visibility = ["//visibility:public"],
