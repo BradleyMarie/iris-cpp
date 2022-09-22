@@ -21,17 +21,17 @@ class Bxdf {
     ALL = 0xF,
   };
 
-  Bxdf(Type type) : type(type) {}
+  Bxdf(Type type) noexcept : type(type) {}
 
-  struct Sample {
+  struct SampleResult {
     const Reflector& reflector;
     Vector direction;
     std::optional<visual_t> pdf;
     Type type;
   };
 
-  virtual Sample Sample(const Vector& incoming, Random& rng,
-                        SpectralAllocator& allocator) const = 0;
+  virtual SampleResult Sample(const Vector& incoming, Random& rng,
+                              SpectralAllocator& allocator) const = 0;
 
   virtual const Reflector* Reflectance(const Vector& incoming,
                                        const Vector& outgoing,
