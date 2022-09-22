@@ -5,6 +5,40 @@
 #include "iris/internal/ray_tracer.h"
 
 namespace iris {
+namespace {
+
+std::pair<Vector, Vector> Transform(const Matrix& model_to_world,
+                                    const std::pair<Vector, Vector>& vectors) {
+  return std::make_pair(
+      Normalize(model_to_world.InverseTransposeMultiply(vectors.first)),
+      Normalize(model_to_world.InverseTransposeMultiply(vectors.second)));
+}
+
+std::pair<Vector, Vector> MaybeTransform(const Matrix* model_to_world,
+                                         const Vector& surface_normal,
+                                         const Vector& shading_normal) {
+  auto vectors = std::make_pair(surface_normal, shading_normal);
+  return model_to_world ? Transform(*model_to_world, vectors) : vectors;
+}
+
+std::optional<Bsdf> MakeBsdf(const iris::internal::Hit& hit,
+                             const TextureCoordinates& texture_coordinates,
+                             const Vector& world_surface_normal,
+                             const Vector& world_shading_normal) {
+  auto* material = hit.geometry->GetMaterial(hit.front, hit.additional_data);
+  if (!material) {
+    return std::nullopt;
+  }
+
+  auto* bxdf = material->Compute(texture_coordinates);
+  if (!bxdf) {
+    return std::nullopt;
+  }
+
+  return Bsdf(*bxdf, world_surface_normal, world_shading_normal);
+}
+
+}  // namespace
 
 std::optional<RayTracer::Result> RayTracer::Trace(const Ray& ray) {
   auto* hit =
@@ -45,28 +79,14 @@ std::optional<RayTracer::Result> RayTracer::Trace(const Ray& ray) {
                 : model_surface_normal
           : std::get<Vector>(shading_normal_variant);
 
-  Vector world_surface_normal =
-      hit->model_to_world
-          ? Normalize(hit->model_to_world->InverseTransposeMultiply(
-                model_surface_normal))
-          : model_surface_normal;
-  Vector world_shading_normal =
-      hit->model_to_world
-          ? Normalize(hit->model_to_world->InverseTransposeMultiply(
-                model_shading_normal))
-          : model_shading_normal;
+  auto vectors = MaybeTransform(hit->model_to_world, model_surface_normal,
+                                model_shading_normal);
 
-  if (auto* material =
-          hit->geometry->GetMaterial(hit->front, hit->additional_data)) {
-    if (auto* bxdf = material->Compute(texture_coordinates)) {
-      return RayTracer::Result{
-          Bsdf(*bxdf, world_surface_normal, world_shading_normal), spectrum,
-          world_hit_point, world_surface_normal, world_shading_normal};
-    }
-  }
+  auto bsdf =
+      MakeBsdf(*hit, texture_coordinates, vectors.first, vectors.second);
 
-  return RayTracer::Result{std::nullopt, spectrum, world_hit_point,
-                           world_surface_normal, world_shading_normal};
+  return RayTracer::Result{bsdf, spectrum, world_hit_point, vectors.first,
+                           vectors.second};
 }
 
 }  // namespace iris

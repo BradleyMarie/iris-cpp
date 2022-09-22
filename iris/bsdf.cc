@@ -15,20 +15,24 @@ std::pair<Vector, Vector> CreateLocalCoordinateSpace(
   return std::make_pair(orthogonal0, orthogonal1);
 }
 
-std::array<Vector, 4> ComputeState(const Vector& surface_normal,
-                                   const Vector& shading_normal) {
-  auto coordinate_space = CreateLocalCoordinateSpace(shading_normal);
-  return {coordinate_space.first, coordinate_space.second, shading_normal,
-          surface_normal};
+std::pair<Vector, Vector> Normalize(const std::pair<Vector, Vector>& vectors) {
+  return std::make_pair(Normalize(vectors.first), Normalize(vectors.second));
+}
+
+std::pair<Vector, Vector> MaybeNormalize(const Vector& surface_normal,
+                                         const Vector& shading_normal,
+                                         bool normalize) {
+  auto vectors = std::make_pair(surface_normal, shading_normal);
+  return normalize ? Normalize(vectors) : vectors;
 }
 
 std::array<Vector, 4> ComputeState(const Vector& surface_normal,
                                    const Vector& shading_normal,
                                    bool normalize) {
-  if (normalize) {
-    return ComputeState(Normalize(surface_normal), Normalize(shading_normal));
-  }
-  return ComputeState(surface_normal, shading_normal);
+  auto vectors = MaybeNormalize(surface_normal, shading_normal, normalize);
+  auto coordinate_space = CreateLocalCoordinateSpace(vectors.second);
+  return {coordinate_space.first, coordinate_space.second, vectors.second,
+          vectors.first};
 }
 
 }  // namespace
