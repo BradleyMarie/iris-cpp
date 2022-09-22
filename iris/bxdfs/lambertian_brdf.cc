@@ -25,14 +25,17 @@ Bxdf::SampleResult LambertianBrdf::Sample(const Vector& incoming, Random& rng,
   auto z = std::sqrt(static_cast<geometric>(1.0) - radius_squared);
   auto pdf = z;
 
-  return {reflector_, Vector(x, y, std::copysign(z, -incoming.z)), pdf,
-          Type(REFLECTION | DIFFUSE)};
+  return {reflector_, Vector(x, y, std::copysign(z, -incoming.z)), pdf};
 }
 
 const Reflector* LambertianBrdf::Reflectance(const Vector& incoming,
-                                             const Vector& outgoing,
+                                             const Vector& outgoing, Type type,
                                              SpectralAllocator& allocator,
                                              visual_t* pdf) const {
+  if (type != Bxdf::BRDF) {
+    return nullptr;
+  }
+
   if ((incoming.z < 0) == (outgoing.z < 0)) {
     return nullptr;
   }

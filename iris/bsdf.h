@@ -1,8 +1,9 @@
 #ifndef _IRIS_BSDF_
 #define _IRIS_BSDF_
 
-#include <optional>
+#include <utility>
 
+#include "iris/bxdf.h"
 #include "iris/float.h"
 #include "iris/random.h"
 #include "iris/reflector.h"
@@ -11,35 +12,38 @@
 
 namespace iris {
 
-class Bsdf {
+class Bsdf final {
  public:
-  struct Sample {
+  Bsdf(const Bxdf& bxdf, const Vector& surface_normal,
+       const Vector& shading_normal, bool normalize = false) noexcept;
+
+  struct SampleResult {
     const Reflector& reflector;
     Vector direction;
-    bool transmitted;
-    bool specular;
     std::optional<visual_t> pdf;
   };
 
-  virtual std::optional<Sample> SampleAll(
-      const Vector& incoming, const Vector& surface_normal,
-      const Vector& shading_normal, Random& rng,
-      SpectralAllocator& allocator) const = 0;
+  SampleResult Sample(const Vector& incoming, Random& rng,
+                      SpectralAllocator& allocator) const;
 
-  virtual std::optional<Sample> SampleDiffuse(
-      const Vector& incoming, const Vector& surface_normal,
-      const Vector& shading_normal, Random& rng,
-      SpectralAllocator& allocator) const = 0;
+  const Reflector* Reflectance(const Vector& incoming, const Vector& outgoing,
+                               SpectralAllocator& allocator,
+                               visual_t* pdf = nullptr) const;
 
-  virtual const Reflector* ReflectanceAll(
-      const Vector& incoming, const Vector& surface_normal,
-      const Vector& shading_normal, const Vector& outgoing, bool transmitted,
-      SpectralAllocator& allocator, visual_t* pdf = nullptr) const = 0;
+ private:
+  Bsdf(const Bxdf& bxdf, const Vector vectors[4]) noexcept
+      : bxdf_(bxdf),
+        x_(vectors[0]),
+        y_(vectors[1]),
+        z_(vectors[2]),
+        surface_normal_(vectors[3]) {}
 
-  virtual const Reflector* ReflectanceDiffuse(
-      const Vector& incoming, const Vector& surface_normal,
-      const Vector& shading_normal, const Vector& outgoing, bool transmitted,
-      SpectralAllocator& allocator, visual_t* pdf = nullptr) const = 0;
+  Vector ToLocal(const Vector& vector) const;
+  Vector ToWorld(const Vector& vector) const;
+
+  const Bxdf& bxdf_;
+  const Vector x_, y_, z_;
+  const Vector surface_normal_;
 };
 
 }  // namespace iris

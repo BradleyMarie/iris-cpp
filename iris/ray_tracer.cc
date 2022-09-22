@@ -26,12 +26,6 @@ std::optional<RayTracer::Result> RayTracer::Trace(const Ray& ray) {
                                       hit->additional_data)
           .value_or(TextureCoordinates{0.0, 0.0});
 
-  const Bsdf* bsdf = nullptr;
-  if (auto material =
-          hit->geometry->GetMaterial(hit->front, hit->additional_data)) {
-    bsdf = material->Compute(texture_coordinates);
-  }
-
   const Spectrum* spectrum = nullptr;
   if (auto* emissive_material = hit->geometry->GetEmissiveMaterial(
           hit->front, hit->additional_data)) {
@@ -51,17 +45,29 @@ std::optional<RayTracer::Result> RayTracer::Trace(const Ray& ray) {
                 : model_surface_normal
           : std::get<Vector>(shading_normal_variant);
 
-  if (!hit->model_to_world) {
-    return RayTracer::Result{bsdf, spectrum, world_hit_point,
-                             model_surface_normal, model_shading_normal};
+  Vector world_surface_normal =
+      hit->model_to_world
+          ? Normalize(hit->model_to_world->InverseTransposeMultiply(
+                model_surface_normal))
+          : model_surface_normal;
+  Vector world_shading_normal =
+      hit->model_to_world
+          ? Normalize(hit->model_to_world->InverseTransposeMultiply(
+                model_shading_normal))
+          : model_shading_normal;
+
+  if (auto material =
+          hit->geometry->GetMaterial(hit->front, hit->additional_data)) {
+    auto* bxdf = material->Compute(texture_coordinates);
+    if (bxdf) {
+      return RayTracer::Result{
+          Bsdf(*bxdf, world_surface_normal, world_shading_normal), spectrum,
+          world_hit_point, world_surface_normal, world_shading_normal};
+    }
   }
 
-  return RayTracer::Result{
-      bsdf, spectrum, world_hit_point,
-      Normalize(
-          hit->model_to_world->InverseTransposeMultiply(model_surface_normal)),
-      Normalize(
-          hit->model_to_world->InverseTransposeMultiply(model_shading_normal))};
+  return RayTracer::Result{std::nullopt, spectrum, world_hit_point,
+                           world_surface_normal, world_shading_normal};
 }
 
 }  // namespace iris

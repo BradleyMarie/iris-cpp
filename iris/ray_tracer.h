@@ -17,7 +17,7 @@ class RayTracer;
 class RayTracer final {
  public:
   struct Result {
-    const Bsdf* bsdf;
+    std::optional<Bsdf> bsdf;
     const Spectrum* emission;
     const Point hit_point;
     const Vector surface_normal;

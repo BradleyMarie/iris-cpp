@@ -17,9 +17,11 @@ cc_library(
 
 cc_library(
     name = "bsdf",
+    srcs = ["bsdf.cc"],
     hdrs = ["bsdf.h"],
     visibility = ["//visibility:public"],
     deps = [
+        ":bxdf",
         ":float",
         ":random",
         ":reflector",
@@ -327,7 +329,7 @@ cc_library(
     hdrs = ["material.h"],
     visibility = ["//visibility:public"],
     deps = [
-        ":bsdf",
+        ":bxdf",
         ":texture_coordinates",
     ],
 )
@@ -431,7 +433,7 @@ cc_test(
     srcs = ["ray_tracer_test.cc"],
     deps = [
         ":ray_tracer",
-        "//iris/bsdfs:mock_bsdf",
+        "//iris/bxdfs:mock_bxdf",
         "//iris/internal:ray_tracer",
         "//iris/scenes:list_scene",
         "//iris/spectra:mock_spectrum",
