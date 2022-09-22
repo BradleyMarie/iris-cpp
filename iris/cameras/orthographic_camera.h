@@ -22,7 +22,7 @@ class OrthographicCamera final : public Camera {
   bool HasLens() const override;
 
  private:
-  Matrix camera_to_world_;
+  const Matrix camera_to_world_;
 };
 
 }  // namespace cameras

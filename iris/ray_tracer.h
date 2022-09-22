@@ -19,9 +19,9 @@ class RayTracer final {
   struct Result {
     std::optional<Bsdf> bsdf;
     const Spectrum* emission;
-    const Point hit_point;
-    const Vector surface_normal;
-    const Vector shading_normal;
+    Point hit_point;
+    Vector surface_normal;
+    Vector shading_normal;
   };
 
   RayTracer(const Scene& scene, geometric_t minimum_distance,

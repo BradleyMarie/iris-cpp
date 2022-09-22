@@ -38,9 +38,9 @@ class PointLight final : public Light {
                            visual_t* pdf) const override;
 
  private:
-  std::shared_ptr<iris::utility::SpectrumManager> spectrum_manager_;
+  const std::shared_ptr<iris::utility::SpectrumManager> spectrum_manager_;
   const Spectrum& spectrum_;
-  Point location_;
+  const Point location_;
 };
 
 }  // namespace lights

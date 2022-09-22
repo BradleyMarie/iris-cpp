@@ -28,7 +28,7 @@ class RandomImageSampler final : public ImageSampler {
 
  private:
   std::uniform_real_distribution<geometric> distribution_;
-  uint32_t samples_per_pixel_;
+  const uint32_t samples_per_pixel_;
 };
 
 }  // namespace image_samplers

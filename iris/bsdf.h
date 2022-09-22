@@ -19,8 +19,8 @@ class Bsdf final {
 
   struct SampleResult {
     const Reflector& reflector;
-    Vector direction;
-    std::optional<visual_t> pdf;
+    const Vector direction;
+    const std::optional<visual_t> pdf;
   };
 
   SampleResult Sample(const Vector& incoming, Random& rng,

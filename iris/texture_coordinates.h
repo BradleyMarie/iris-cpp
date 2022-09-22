@@ -19,8 +19,8 @@ struct TextureCoordinates final {
     Vector dp_dv;
   };
 
-  std::array<geometric_t, 2> uv;
-  std::optional<Derivatives> derivatives;
+  const std::array<geometric_t, 2> uv;
+  const std::optional<Derivatives> derivatives;
 };
 
 }  // namespace iris

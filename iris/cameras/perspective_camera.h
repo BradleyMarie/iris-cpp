@@ -24,8 +24,8 @@ class PerspectiveCamera final : public Camera {
   bool HasLens() const override;
 
  private:
-  Matrix camera_to_world_;
-  std::tuple<Vector, Vector, Vector> image_plane_;
+  const Matrix camera_to_world_;
+  const std::tuple<Vector, Vector, Vector> image_plane_;
 };
 
 }  // namespace cameras

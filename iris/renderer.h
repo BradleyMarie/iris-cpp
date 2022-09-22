@@ -29,8 +29,8 @@ class Renderer {
                      unsigned num_threads = 0) const;
 
  private:
-  std::unique_ptr<const Scene> scene_;
-  std::unique_ptr<const LightScene> light_scene_;
+  const std::unique_ptr<const Scene> scene_;
+  const std::unique_ptr<const LightScene> light_scene_;
 };
 
 }  // namespace iris

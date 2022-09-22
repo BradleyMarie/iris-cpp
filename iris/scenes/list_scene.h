@@ -39,9 +39,9 @@ class ListScene final : public Scene {
   void Trace(const Ray& ray, Intersector& intersector) const override;
 
  private:
-  std::vector<std::pair<size_t, size_t>> geometry_and_matrix_;
-  std::vector<std::unique_ptr<Geometry>> geometry_;
-  std::vector<Matrix> matrices_;
+  const std::vector<std::pair<size_t, size_t>> geometry_and_matrix_;
+  const std::vector<std::unique_ptr<Geometry>> geometry_;
+  const std::vector<Matrix> matrices_;
 };
 
 }  // namespace scenes

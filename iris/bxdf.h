@@ -20,8 +20,8 @@ class Bxdf {
 
   struct SampleResult {
     const Reflector& reflector;
-    Vector direction;
-    std::optional<visual_t> pdf;
+    const Vector direction;
+    const std::optional<visual_t> pdf;
   };
 
   virtual SampleResult Sample(const Vector& incoming, Random& rng,

@@ -18,8 +18,8 @@ class Light {
  public:
   struct SampleResult {
     const Spectrum& emission;
-    Vector to_light;
-    std::optional<visual_t> pdf;
+    const Vector to_light;
+    const std::optional<visual_t> pdf;
   };
 
   virtual std::optional<SampleResult> Sample(
