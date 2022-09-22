@@ -15,13 +15,14 @@ Bxdf::SampleResult LambertianBrdf::Sample(const Vector& incoming, Random& rng,
   auto radius_squared = distribution(rng);
   auto radius = std::sqrt(radius_squared);
 
-  auto theta = distribution(rng) * (2.0 * M_PI) - M_PI;
+  auto theta = distribution(rng) * static_cast<geometric>(2.0 * M_PI) -
+               static_cast<geometric>(M_PI);
   auto sin_theta = std::sin(theta);
   auto cos_theta = std::cos(theta);
 
   auto x = radius * cos_theta;
   auto y = radius * sin_theta;
-  auto z = std::sqrt(1.0 - radius_squared);
+  auto z = std::sqrt(static_cast<geometric>(1.0) - radius_squared);
   auto pdf = z;
 
   return {reflector_, Vector(x, y, std::copysign(z, -incoming.z)), pdf,

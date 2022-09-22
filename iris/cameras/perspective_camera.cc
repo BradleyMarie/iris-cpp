@@ -10,8 +10,9 @@ namespace {
 
 std::tuple<Vector, Vector, Vector> ComputeImagePlane(geometric_t aspect_ratio,
                                                      geometric_t fov) {
-  geometric_t half_fov_radians = fov * M_PI / 360.0;
-  geometric_t image_dimension = 2.0 * std::tan(half_fov_radians);
+  geometric_t half_fov_radians = fov * static_cast<geometric>(M_PI / 360.0);
+  geometric_t image_dimension =
+      static_cast<geometric>(2.0) * std::tan(half_fov_radians);
 
   geometric_t x_dim, y_dim;
   if (aspect_ratio < 1.0) {
