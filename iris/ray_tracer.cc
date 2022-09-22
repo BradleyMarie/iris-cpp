@@ -56,10 +56,9 @@ std::optional<RayTracer::Result> RayTracer::Trace(const Ray& ray) {
                 model_shading_normal))
           : model_shading_normal;
 
-  if (auto material =
+  if (auto* material =
           hit->geometry->GetMaterial(hit->front, hit->additional_data)) {
-    auto* bxdf = material->Compute(texture_coordinates);
-    if (bxdf) {
+    if (auto* bxdf = material->Compute(texture_coordinates)) {
       return RayTracer::Result{
           Bsdf(*bxdf, world_surface_normal, world_shading_normal), spectrum,
           world_hit_point, world_surface_normal, world_shading_normal};
