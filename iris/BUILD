@@ -30,6 +30,19 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "bsdf_test",
+    srcs = ["bsdf_test.cc"],
+    deps = [
+        ":bsdf",
+        "//iris/bxdfs:mock_bxdf",
+        "//iris/internal:arena",
+        "//iris/random:mock_random",
+        "//iris/reflectors:mock_reflector",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "camera",
     hdrs = ["camera.h"],
