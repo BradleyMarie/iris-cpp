@@ -11,12 +11,6 @@
 TEST(LambertianBrdfTest, Sample) {
   iris::reflectors::MockReflector reflector;
   iris::random::MockRandom rng;
-  EXPECT_CALL(rng, min())
-      .WillRepeatedly(testing::Return(
-          std::numeric_limits<iris::Random::result_type>::min()));
-  EXPECT_CALL(rng, max())
-      .WillRepeatedly(testing::Return(
-          std::numeric_limits<iris::Random::result_type>::max()));
   EXPECT_CALL(rng, Invoke())
       .WillRepeatedly(testing::Return(
           std::numeric_limits<iris::Random::result_type>::min()));

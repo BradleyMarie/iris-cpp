@@ -2,6 +2,7 @@
 #define _IRIS_BXDFS_COMPOSITE_BXDF_
 
 #include <array>
+#include <cassert>
 #include <random>
 
 #include "iris/bxdf.h"
@@ -14,30 +15,41 @@
 namespace iris {
 namespace bxdfs {
 
-template <const Bxdf&... Bxdfs>
+template <typename... Bxdfs>
 class CompositeBxdf final : public Bxdf {
  public:
-  CompositeBxdf(Bxdfs... args) : bxdfs_{&args, ...} {}
+  CompositeBxdf(Bxdfs&&... bxdfs) {
+    size_t i = 0;
+    (void(bxdfs_[i++] = &bxdfs), ...);
+    assert(std::all_of(bxdfs_.begin(), bxdfs_.end(),
+                       [](const Bxdf* bxdf) { return bxdf != nullptr; }));
+  }
 
-  SampleResult Sample(const Vector& incoming, Random& rng,
-                      SpectralAllocator& allocator) const override {
+  Vector Sample(const Vector& incoming, Random& rng) const override {
     size_t index = distribution_(rng);
-    return bxdfs_[index]->Sample(incoming, rng, allocator);
+    return bxdfs_[index]->Sample(incoming, rng);
   }
 
   std::optional<visual_t> Pdf(const Vector& incoming,
                               const Vector& outgoing) const override {
-    auto result = bxdfs_[0]->Pdf(incoming, outgoing);
-    if (bxdfs_.size() == 1) {
-      return result;
+    visual_t specular_pdf = 0.0;
+
+    std::optional<visual_t> result;
+    for (const auto* bxdf : bxdfs_) {
+      auto pdf = bxdf->Pdf(incoming, outgoing);
+      if (!pdf.has_value()) {
+        specular_pdf += 1.0;
+      } else {
+        result = result.value_or(0.0) + *pdf;
+      }
     }
 
-    visual_t pdf = result.value_or(1.0);
-    for (size_t i = 0; i < bxdfs_.size(); i++) {
-      pdf += bxdfs_[0]->Pdf(incoming, outgoing).value_or(1.0);
+    if (result) {
+      *result += specular_pdf;
+      *result /= static_cast<visual_t>(sizeof...(Bxdfs));
     }
 
-    return pdf / static_cast<visual_t>(sizeof...(Bxdfs));
+    return result;
   }
 
   const Reflector* Reflectance(const Vector& incoming, const Vector& outgoing,
@@ -52,11 +64,20 @@ class CompositeBxdf final : public Bxdf {
   }
 
  private:
-  static uniform_int_distribution<size_t> distribution_;
+  static std::uniform_int_distribution<uint_fast32_t> distribution_;
   std::array<const Bxdf*, sizeof...(Bxdfs)> bxdfs_;
 
   static_assert(sizeof...(Bxdfs) != 0);
 };
+
+template <typename... Bxdfs>
+std::uniform_int_distribution<uint_fast32_t>
+    CompositeBxdf<Bxdfs...>::distribution_(0, sizeof...(Bxdfs));
+
+template <typename... Bxdfs>
+CompositeBxdf<Bxdfs...> MakeComposite(Bxdfs&&... bxdfs) {
+  return CompositeBxdf<Bxdfs...>(bxdfs...);
+}
 
 }  // namespace bxdfs
 }  // namespace iris

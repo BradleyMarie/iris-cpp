@@ -5,11 +5,6 @@
 
 #include "googletest/include/gtest/gtest.h"
 
-TEST(MersenneTwisterRandomTest, MinMax) {
-  iris::random::MersenneTwisterRandom rng;
-  EXPECT_LE(rng.min(), rng.max());
-}
-
 TEST(MersenneTwisterRandomTest, Invoke) {
   iris::random::MersenneTwisterRandom rng;
   auto next = rng();

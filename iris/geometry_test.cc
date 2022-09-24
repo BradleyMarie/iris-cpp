@@ -2,6 +2,7 @@
 
 #include "googletest/include/gtest/gtest.h"
 #include "iris/internal/hit_arena.h"
+#include "iris/random/mock_random.h"
 
 class TestGeometry final : public iris::Geometry {
  public:
@@ -34,30 +35,6 @@ class TestGeometry final : public iris::Geometry {
 
   iris::Ray expected_ray_;
   const iris::Geometry* nested_;
-};
-
-class TestRandom final : public iris::Random {
-  result_type min() const override {
-    EXPECT_FALSE(true);
-    return 0u;
-  }
-
-  result_type max() const override {
-    EXPECT_FALSE(true);
-    return 0u;
-  }
-
-  result_type operator()() override {
-    EXPECT_FALSE(true);
-    return 0u;
-  }
-
-  void discard(unsigned long long z) override { EXPECT_FALSE(true); }
-
-  std::unique_ptr<Random> Replicate() override {
-    EXPECT_FALSE(true);
-    return nullptr;
-  }
 };
 
 TEST(GeometryTest, Trace) {
@@ -129,7 +106,7 @@ TEST(GeometryTest, SampleFace) {
   TestGeometry geom(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)),
       nullptr);
-  TestRandom rng;
+  iris::random::MockRandom rng;
   EXPECT_FALSE(geom.SampleFace(0, rng));
 }
 
@@ -137,6 +114,6 @@ TEST(GeometryTest, ComputeArea) {
   TestGeometry geom(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)),
       nullptr);
-  TestRandom rng;
+  iris::random::MockRandom rng;
   EXPECT_FALSE(geom.ComputeArea(0));
 }

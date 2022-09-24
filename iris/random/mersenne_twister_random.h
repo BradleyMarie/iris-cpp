@@ -15,8 +15,6 @@ class MersenneTwisterRandom final : public Random {
       Random::result_type default_seed = std::mt19937::default_seed)
       : rng_(default_seed) {}
 
-  result_type min() const override;
-  result_type max() const override;
   result_type operator()() override;
   void discard(unsigned long long z) override;
 

@@ -2,6 +2,7 @@
 #define _IRIS_RANDOM_
 
 #include <cstdint>
+#include <limits>
 #include <memory>
 
 namespace iris {
@@ -9,8 +10,15 @@ namespace iris {
 class Random {
  public:
   typedef uint_fast32_t result_type;
-  virtual result_type min() const = 0;
-  virtual result_type max() const = 0;
+
+  static constexpr result_type min() {
+    return std::numeric_limits<uint32_t>::min();
+  }
+
+  static constexpr result_type max() {
+    return std::numeric_limits<uint32_t>::max();
+  }
+
   virtual result_type operator()() = 0;
   virtual void discard(unsigned long long z) = 0;
 

@@ -22,12 +22,6 @@ TEST(RandomImageSamplerTest, SampleNoLens) {
   EXPECT_EQ(5u, sampler.SamplesPerPixel());
 
   iris::random::MockRandom rng;
-  EXPECT_CALL(rng, min())
-      .WillRepeatedly(testing::Return(
-          std::numeric_limits<iris::Random::result_type>::min()));
-  EXPECT_CALL(rng, max())
-      .WillRepeatedly(testing::Return(
-          std::numeric_limits<iris::Random::result_type>::max()));
   iris::Random::result_type result = 0;
   EXPECT_CALL(rng, Invoke()).WillRepeatedly(testing::Invoke([&]() {
     return result++;
@@ -48,12 +42,6 @@ TEST(RandomImageSamplerTest, SampleWithLens) {
   EXPECT_EQ(5u, sampler.SamplesPerPixel());
 
   iris::random::MockRandom rng;
-  EXPECT_CALL(rng, min())
-      .WillRepeatedly(testing::Return(
-          std::numeric_limits<iris::Random::result_type>::min()));
-  EXPECT_CALL(rng, max())
-      .WillRepeatedly(testing::Return(
-          std::numeric_limits<iris::Random::result_type>::max()));
   iris::Random::result_type result = 0;
   EXPECT_CALL(rng, Invoke()).WillRepeatedly(testing::Invoke([&]() {
     return result++;

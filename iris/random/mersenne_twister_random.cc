@@ -3,10 +3,6 @@
 namespace iris {
 namespace random {
 
-Random::result_type MersenneTwisterRandom::min() const { return rng_.min(); }
-
-Random::result_type MersenneTwisterRandom::max() const { return rng_.max(); }
-
 Random::result_type MersenneTwisterRandom::operator()() { return rng_(); }
 
 void MersenneTwisterRandom::discard(unsigned long long z) {

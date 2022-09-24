@@ -15,6 +15,19 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "composite_bxdf_test",
+    srcs = ["composite_bxdf_test.cc"],
+    deps = [
+        ":composite_bxdf",
+        ":mock_bxdf",
+        "//iris/random:mock_random",
+        "//iris/reflectors:mock_reflector",
+        "//iris/testing:bxdf_tester",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "lambertian_brdf",
     srcs = ["lambertian_brdf.cc"],
