@@ -8,8 +8,7 @@
 namespace iris {
 namespace bxdfs {
 
-Bxdf::SampleResult LambertianBrdf::Sample(const Vector& incoming, Random& rng,
-                                          SpectralAllocator& allocator) const {
+Vector LambertianBrdf::Sample(const Vector& incoming, Random& rng) const {
   std::uniform_real_distribution<geometric> distribution;
 
   auto radius_squared = distribution(rng);
@@ -23,25 +22,24 @@ Bxdf::SampleResult LambertianBrdf::Sample(const Vector& incoming, Random& rng,
   auto x = radius * cos_theta;
   auto y = radius * sin_theta;
   auto z = std::sqrt(static_cast<geometric>(1.0) - radius_squared);
-  auto pdf = z;
 
-  return {reflector_, Vector(x, y, std::copysign(z, -incoming.z)), pdf};
+  return Vector(x, y, std::copysign(z, -incoming.z));
 }
 
-const Reflector* LambertianBrdf::Reflectance(const Vector& incoming,
-                                             const Vector& outgoing, Type type,
-                                             SpectralAllocator& allocator,
-                                             visual_t* pdf) const {
+std::optional<visual_t> LambertianBrdf::Pdf(const Vector& incoming,
+                                            const Vector& outgoing) const {
+  return std::max(static_cast<visual>(0.0), outgoing.z);
+}
+
+const Reflector* LambertianBrdf::Reflectance(
+    const Vector& incoming, const Vector& outgoing, Type type,
+    SpectralAllocator& allocator) const {
   if (type != Bxdf::BRDF) {
     return nullptr;
   }
 
   if ((incoming.z < 0) == (outgoing.z < 0)) {
     return nullptr;
-  }
-
-  if (pdf) {
-    *pdf = std::abs(outgoing.z);
   }
 
   return allocator.Scale(&reflector_, M_1_PI);

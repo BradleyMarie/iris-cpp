@@ -16,12 +16,11 @@ namespace bxdfs {
 
 class MockBxdf final : public Bxdf {
  public:
-  MOCK_METHOD(SampleResult, Sample,
-              (const Vector&, Random&, SpectralAllocator&), (const override));
-
+  MOCK_METHOD(Vector, Sample, (const Vector&, Random&), (const override));
+  MOCK_METHOD(std::optional<visual_t>, Pdf, (const Vector&, const Vector&),
+              (const override));
   MOCK_METHOD(const Reflector*, Reflectance,
-              (const Vector&, const Vector&, Type, SpectralAllocator&,
-               visual_t*),
+              (const Vector&, const Vector&, Type, SpectralAllocator&),
               (const override));
 };
 

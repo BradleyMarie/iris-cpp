@@ -18,19 +18,14 @@ class Bxdf {
     BTDF,
   };
 
-  struct SampleResult {
-    const Reflector& reflector;
-    const Vector direction;
-    const std::optional<visual_t> pdf;
-  };
+  virtual Vector Sample(const Vector& incoming, Random& rng) const = 0;
 
-  virtual SampleResult Sample(const Vector& incoming, Random& rng,
-                              SpectralAllocator& allocator) const = 0;
+  virtual std::optional<visual_t> Pdf(const Vector& incoming,
+                                      const Vector& outgoing) const = 0;
 
   virtual const Reflector* Reflectance(const Vector& incoming,
                                        const Vector& outgoing, Type type,
-                                       SpectralAllocator& allocator,
-                                       visual_t* pdf = nullptr) const = 0;
+                                       SpectralAllocator& allocator) const = 0;
 
  protected:
   ~Bxdf() = default;

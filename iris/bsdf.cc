@@ -53,21 +53,50 @@ Vector Bsdf::ToWorld(const Vector& vector) const {
                 x_.z * vector.x + y_.z * vector.y + z_.z * vector.z);
 }
 
-Bsdf::SampleResult Bsdf::Sample(const Vector& incoming, Random& rng,
-                                SpectralAllocator& allocator) const {
-  auto sample = bxdf_.Sample(ToLocal(incoming), rng, allocator);
-  return {sample.reflector, ToWorld(sample.direction), sample.pdf};
+std::optional<Bsdf::SampleResult> Bsdf::Sample(
+    const Vector& incoming, Random& rng, SpectralAllocator& allocator) const {
+  auto local_incoming = ToLocal(incoming);
+  auto local_outgoing = bxdf_.Sample(local_incoming, rng);
+  auto world_outgoing = ToWorld(local_outgoing);
+
+  auto pdf = bxdf_.Pdf(local_incoming, local_outgoing);
+  if (pdf.has_value() && *pdf == 0.0) {
+    return std::nullopt;
+  }
+
+  bool transmitted = (DotProduct(incoming, surface_normal_) > 0) ==
+                     (DotProduct(world_outgoing, surface_normal_) > 0);
+  auto type = transmitted ? Bxdf::BTDF : Bxdf::BRDF;
+
+  auto reflector =
+      bxdf_.Reflectance(local_incoming, local_outgoing, type, allocator);
+  if (!reflector) {
+    return std::nullopt;
+  }
+
+  return Bsdf::SampleResult{*reflector, world_outgoing, pdf};
 }
 
-const Reflector* Bsdf::Reflectance(const Vector& incoming,
-                                   const Vector& outgoing,
-                                   SpectralAllocator& allocator,
-                                   visual_t* pdf) const {
+std::optional<Bsdf::ReflectanceResult> Bsdf::Reflectance(
+    const Vector& incoming, const Vector& outgoing,
+    SpectralAllocator& allocator) const {
+  auto local_incoming = ToLocal(incoming);
+  auto local_outgoing = ToLocal(outgoing);
+  auto pdf = bxdf_.Pdf(local_incoming, local_outgoing).value_or(0.0);
+  if (pdf == 0.0) {
+    return std::nullopt;
+  }
+
   bool transmitted = (DotProduct(incoming, surface_normal_) > 0) ==
                      (DotProduct(outgoing, surface_normal_) > 0);
-  return bxdf_.Reflectance(ToLocal(incoming), ToLocal(outgoing),
-                           transmitted ? Bxdf::BTDF : Bxdf::BRDF, allocator,
-                           pdf);
+  auto type = transmitted ? Bxdf::BTDF : Bxdf::BRDF;
+  auto* reflector =
+      bxdf_.Reflectance(local_incoming, local_outgoing, type, allocator);
+  if (!reflector) {
+    return std::nullopt;
+  }
+
+  return Bsdf::ReflectanceResult{*reflector, pdf};
 }
 
 }  // namespace iris

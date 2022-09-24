@@ -15,12 +15,14 @@ class LambertianBrdf final : public Bxdf {
  public:
   LambertianBrdf(const Reflector& reflector) noexcept : reflector_(reflector) {}
 
-  SampleResult Sample(const Vector& incoming, Random& rng,
-                      SpectralAllocator& allocator) const override;
+  Vector Sample(const Vector& incoming, Random& rng) const override;
+
+  std::optional<visual_t> Pdf(const Vector& incoming,
+                              const Vector& outgoing) const override;
 
   const Reflector* Reflectance(const Vector& incoming, const Vector& outgoing,
-                               Type type, SpectralAllocator& allocator,
-                               visual_t* pdf = nullptr) const override;
+                               Type type,
+                               SpectralAllocator& allocator) const override;
 
  private:
   const Reflector& reflector_;

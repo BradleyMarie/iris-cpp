@@ -1,6 +1,7 @@
 #ifndef _IRIS_BSDF_
 #define _IRIS_BSDF_
 
+#include <optional>
 #include <utility>
 
 #include "iris/bxdf.h"
@@ -23,12 +24,17 @@ class Bsdf final {
     const std::optional<visual_t> pdf;
   };
 
-  SampleResult Sample(const Vector& incoming, Random& rng,
-                      SpectralAllocator& allocator) const;
+  std::optional<SampleResult> Sample(const Vector& incoming, Random& rng,
+                                     SpectralAllocator& allocator) const;
 
-  const Reflector* Reflectance(const Vector& incoming, const Vector& outgoing,
-                               SpectralAllocator& allocator,
-                               visual_t* pdf = nullptr) const;
+  struct ReflectanceResult {
+    const Reflector& reflector;
+    const visual_t pdf;
+  };
+
+  std::optional<ReflectanceResult> Reflectance(
+      const Vector& incoming, const Vector& outgoing,
+      SpectralAllocator& allocator) const;
 
  private:
   Bsdf(const Bxdf& bxdf, const Vector vectors[4]) noexcept
