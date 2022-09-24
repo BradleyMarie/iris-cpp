@@ -5,6 +5,19 @@ package(default_visibility = [
 ])
 
 cc_library(
+    name = "bxdf_tester",
+    testonly = True,
+    srcs = ["bxdf_tester.cc"],
+    hdrs = ["bxdf_tester.h"],
+    deps = [
+        "//iris:bxdf",
+        "//iris:reflector",
+        "//iris:vector",
+        "//iris/internal:arena",
+    ],
+)
+
+cc_library(
     name = "light_scene_tester",
     testonly = True,
     srcs = ["light_scene_tester.cc"],

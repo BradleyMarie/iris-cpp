@@ -29,6 +29,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "lambertian_brdf_test",
+    srcs = ["lambertian_brdf_test.cc"],
+    deps = [
+        ":lambertian_brdf",
+        "//iris/random:mock_random",
+        "//iris/reflectors:mock_reflector",
+        "//iris/testing:bxdf_tester",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "mock_bxdf",
     hdrs = ["mock_bxdf.h"],
