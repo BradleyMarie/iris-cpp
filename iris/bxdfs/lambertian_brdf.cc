@@ -3,19 +3,15 @@
 #define _USE_MATH_CONSTANTS
 #include <cassert>
 #include <cmath>
-#include <random>
 
 namespace iris {
 namespace bxdfs {
 
 Vector LambertianBrdf::Sample(const Vector& incoming, Random& rng) const {
-  std::uniform_real_distribution<geometric> distribution;
-
-  auto radius_squared = distribution(rng);
+  auto radius_squared = rng.NextGeometric();
   auto radius = std::sqrt(radius_squared);
 
-  auto theta = distribution(rng) * static_cast<geometric>(2.0 * M_PI) -
-               static_cast<geometric>(M_PI);
+  auto theta = rng.NextGeometric() * static_cast<geometric>(2.0 * M_PI);
   auto sin_theta = std::sin(theta);
   auto cos_theta = std::cos(theta);
 

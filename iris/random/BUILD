@@ -7,6 +7,7 @@ cc_library(
     testonly = True,
     hdrs = ["mock_random.h"],
     deps = [
+        "//iris:float",
         "//iris:random",
         "@com_google_googletest//:gtest",
     ],
@@ -17,6 +18,7 @@ cc_library(
     srcs = ["mersenne_twister_random.cc"],
     hdrs = ["mersenne_twister_random.h"],
     deps = [
+        "//iris:float",
         "//iris:random",
     ],
 )

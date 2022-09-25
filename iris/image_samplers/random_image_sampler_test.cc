@@ -22,10 +22,9 @@ TEST(RandomImageSamplerTest, SampleNoLens) {
   EXPECT_EQ(5u, sampler.SamplesPerPixel());
 
   iris::random::MockRandom rng;
-  iris::Random::result_type result = 0;
-  EXPECT_CALL(rng, Invoke()).WillRepeatedly(testing::Invoke([&]() {
-    return result++;
-  }));
+  EXPECT_CALL(rng, NextGeometric())
+      .Times(2)
+      .WillRepeatedly(testing::Return(0.1));
 
   auto sample = sampler.SamplePixel(std::make_pair(2, 2), std::make_pair(0, 1),
                                     0, false, rng);
@@ -42,10 +41,9 @@ TEST(RandomImageSamplerTest, SampleWithLens) {
   EXPECT_EQ(5u, sampler.SamplesPerPixel());
 
   iris::random::MockRandom rng;
-  iris::Random::result_type result = 0;
-  EXPECT_CALL(rng, Invoke()).WillRepeatedly(testing::Invoke([&]() {
-    return result++;
-  }));
+  EXPECT_CALL(rng, NextGeometric())
+      .Times(4)
+      .WillRepeatedly(testing::Return(0.1));
 
   auto sample = sampler.SamplePixel(std::make_pair(2, 2), std::make_pair(0, 1),
                                     0, true, rng);

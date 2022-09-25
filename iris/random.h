@@ -5,22 +5,20 @@
 #include <limits>
 #include <memory>
 
+#include "iris/float.h"
+
 namespace iris {
 
 class Random {
  public:
-  typedef uint_fast32_t result_type;
+  virtual size_t NextIndex(size_t size) = 0;
+  virtual void DiscardIndex(size_t num_to_discard);
 
-  static constexpr result_type min() {
-    return std::numeric_limits<uint32_t>::min();
-  }
+  virtual geometric NextGeometric() = 0;
+  virtual void DiscardGeometric(size_t num_to_discard);
 
-  static constexpr result_type max() {
-    return std::numeric_limits<uint32_t>::max();
-  }
-
-  virtual result_type operator()() = 0;
-  virtual void discard(unsigned long long z) = 0;
+  virtual visual NextVisual() = 0;
+  virtual void DiscardVisual(size_t num_to_discard);
 
   virtual std::unique_ptr<Random> Replicate() = 0;
 

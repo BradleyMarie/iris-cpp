@@ -4,7 +4,6 @@
 #include <array>
 #include <memory>
 #include <optional>
-#include <random>
 #include <utility>
 
 #include "iris/float.h"
@@ -17,7 +16,7 @@ namespace image_samplers {
 class RandomImageSampler final : public ImageSampler {
  public:
   RandomImageSampler(uint32_t samples_per_pixel)
-      : distribution_(0.0, 1.0), samples_per_pixel_(samples_per_pixel) {}
+      : samples_per_pixel_(samples_per_pixel) {}
 
   Sample SamplePixel(std::pair<size_t, size_t> image_dimensions,
                      std::pair<size_t, size_t> pixel, uint32_t sample_index,
@@ -27,7 +26,6 @@ class RandomImageSampler final : public ImageSampler {
   std::unique_ptr<ImageSampler> Duplicate() const override;
 
  private:
-  std::uniform_real_distribution<geometric> distribution_;
   const uint32_t samples_per_pixel_;
 };
 

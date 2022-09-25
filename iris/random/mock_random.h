@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "googlemock/include/gmock/gmock.h"
+#include "iris/float.h"
 #include "iris/random.h"
 
 namespace iris {
@@ -11,11 +12,16 @@ namespace random {
 
 class MockRandom final : public Random {
  public:
-  MOCK_METHOD(result_type, Invoke, (), ());
-  MOCK_METHOD(void, discard, (unsigned long long z), (override));
-  MOCK_METHOD(std::unique_ptr<Random>, Replicate, (), (override));
+  MOCK_METHOD(size_t, NextIndex, (size_t), (override));
+  MOCK_METHOD(void, DiscardIndex, (size_t), (override));
 
-  result_type operator()() override final { return Invoke(); }
+  MOCK_METHOD(geometric, NextGeometric, (), (override));
+  MOCK_METHOD(void, DiscardGeometric, (size_t), (override));
+
+  MOCK_METHOD(visual, NextVisual, (), (override));
+  MOCK_METHOD(void, DiscardVisual, (size_t), (override));
+
+  MOCK_METHOD(std::unique_ptr<Random>, Replicate, (), (override));
 };
 
 }  // namespace random

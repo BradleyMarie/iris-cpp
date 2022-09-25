@@ -11,9 +11,9 @@
 TEST(LambertianBrdfTest, Sample) {
   iris::reflectors::MockReflector reflector;
   iris::random::MockRandom rng;
-  EXPECT_CALL(rng, Invoke())
-      .WillRepeatedly(testing::Return(
-          std::numeric_limits<iris::Random::result_type>::min()));
+  EXPECT_CALL(rng, NextGeometric())
+      .Times(2)
+      .WillRepeatedly(testing::Return(0.0));
 
   iris::bxdfs::LambertianBrdf bxdf(reflector);
   auto result = bxdf.Sample(iris::Vector(0.0, 0.0, -1.0), rng);

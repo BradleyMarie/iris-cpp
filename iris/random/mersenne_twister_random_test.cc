@@ -5,26 +5,29 @@
 
 #include "googletest/include/gtest/gtest.h"
 
-TEST(MersenneTwisterRandomTest, Invoke) {
+TEST(MersenneTwisterRandomTest, NextIndex) {
   iris::random::MersenneTwisterRandom rng;
-  auto next = rng();
-  EXPECT_GE(next, rng.min());
-  EXPECT_LT(next, rng.max());
+  auto next = rng.NextIndex(10u);
+  EXPECT_GE(next, 0u);
+  EXPECT_LT(next, 10u);
 }
 
-TEST(MersenneTwisterRandomTest, Discard) {
-  iris::random::MersenneTwisterRandom rng0;
-  rng0();
-  rng0();
+TEST(MersenneTwisterRandomTest, NextGeometric) {
+  iris::random::MersenneTwisterRandom rng;
+  auto next = rng.NextGeometric();
+  EXPECT_GE(next, 0.0);
+  EXPECT_LT(next, 1.0);
+}
 
-  iris::random::MersenneTwisterRandom rng1;
-  rng1.discard(2);
-
-  EXPECT_EQ(rng0(), rng1());
+TEST(MersenneTwisterRandomTest, NextVisual) {
+  iris::random::MersenneTwisterRandom rng;
+  auto next = rng.NextVisual();
+  EXPECT_GE(next, 0.0);
+  EXPECT_LT(next, 1.0);
 }
 
 TEST(MersenneTwisterRandomTest, Replicate) {
   iris::random::MersenneTwisterRandom rng0;
   auto rng1 = rng0.Replicate();
-  EXPECT_NE(rng0(), (*rng1)());
+  EXPECT_NE(rng0.NextGeometric(), rng1->NextGeometric());
 }

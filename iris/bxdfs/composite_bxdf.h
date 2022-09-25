@@ -3,7 +3,6 @@
 
 #include <array>
 #include <cassert>
-#include <random>
 
 #include "iris/bxdf.h"
 #include "iris/float.h"
@@ -26,7 +25,7 @@ class CompositeBxdf final : public Bxdf {
   }
 
   Vector Sample(const Vector& incoming, Random& rng) const override {
-    size_t index = distribution_(rng);
+    size_t index = rng.NextIndex(sizeof...(Bxdfs));
     return bxdfs_[index]->Sample(incoming, rng);
   }
 
@@ -64,15 +63,9 @@ class CompositeBxdf final : public Bxdf {
   }
 
  private:
-  static std::uniform_int_distribution<uint_fast32_t> distribution_;
   std::array<const Bxdf*, sizeof...(Bxdfs)> bxdfs_;
-
   static_assert(sizeof...(Bxdfs) != 0);
 };
-
-template <typename... Bxdfs>
-std::uniform_int_distribution<uint_fast32_t>
-    CompositeBxdf<Bxdfs...>::distribution_(0, sizeof...(Bxdfs));
 
 template <typename... Bxdfs>
 CompositeBxdf<Bxdfs...> MakeComposite(Bxdfs&&... bxdfs) {
