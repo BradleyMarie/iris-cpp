@@ -9,47 +9,70 @@
 #include "iris/reflectors/mock_reflector.h"
 #include "iris/testing/bxdf_tester.h"
 
-static iris::random::MockRandom g_rng;
-
 TEST(CompositeBxdfTest, Sample) {
-  // TODO
+  iris::random::MockRandom rng;
+  EXPECT_CALL(rng, NextIndex(2)).Times(1).WillOnce(testing::Return(1));
+
+  iris::bxdfs::MockBxdf bxdf0;
+  iris::bxdfs::MockBxdf bxdf1;
+  EXPECT_CALL(bxdf1, Sample(iris::Vector(1.0, 0.0, 0.0), testing::_))
+      .WillOnce(testing::Return(iris::Vector(1.0, 0.0, 0.0)));
+
+  auto composite = iris::bxdfs::MakeComposite(bxdf0, bxdf1);
+  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
+            composite.Sample(iris::Vector(1.0, 0.0, 0.0), rng));
 }
 
-TEST(CompositeBxdfTest, PdfOneBxdf) {
+TEST(CompositeBxdfTest, SamplePdfOneBxdf) {
   iris::bxdfs::MockBxdf bxdf;
-  EXPECT_CALL(bxdf,
-              Pdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(-1.0, 0.0, 0.0)))
+  EXPECT_CALL(bxdf, SamplePdf(iris::Vector(1.0, 0.0, 0.0),
+                              iris::Vector(-1.0, 0.0, 0.0)))
       .WillOnce(testing::Return(std::nullopt));
 
   auto composite = iris::bxdfs::MakeComposite(bxdf);
-  EXPECT_EQ(std::nullopt, composite.Pdf(iris::Vector(1.0, 0.0, 0.0),
-                                        iris::Vector(-1.0, 0.0, 0.0)));
+  EXPECT_EQ(std::nullopt, composite.SamplePdf(iris::Vector(1.0, 0.0, 0.0),
+                                              iris::Vector(-1.0, 0.0, 0.0)));
 }
 
-TEST(CompositeBxdfTest, PdfTwoBxdfsEmpty) {
+TEST(CompositeBxdfTest, SamplePdfTwoBxdfsEmpty) {
   iris::bxdfs::MockBxdf bxdf;
-  EXPECT_CALL(bxdf,
-              Pdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(-1.0, 0.0, 0.0)))
+  EXPECT_CALL(bxdf, SamplePdf(iris::Vector(1.0, 0.0, 0.0),
+                              iris::Vector(-1.0, 0.0, 0.0)))
       .WillRepeatedly(testing::Return(std::nullopt));
 
   auto composite = iris::bxdfs::MakeComposite(bxdf, bxdf);
-  EXPECT_EQ(std::nullopt, composite.Pdf(iris::Vector(1.0, 0.0, 0.0),
-                                        iris::Vector(-1.0, 0.0, 0.0)));
+  EXPECT_EQ(std::nullopt, composite.SamplePdf(iris::Vector(1.0, 0.0, 0.0),
+                                              iris::Vector(-1.0, 0.0, 0.0)));
 }
 
-TEST(CompositeBxdfTest, PdfTwoBxdfs) {
+TEST(CompositeBxdfTest, SamplePdfTwoBxdfs) {
   iris::bxdfs::MockBxdf bxdf0;
-  EXPECT_CALL(bxdf0,
-              Pdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(-1.0, 0.0, 0.0)))
+  EXPECT_CALL(bxdf0, SamplePdf(iris::Vector(1.0, 0.0, 0.0),
+                               iris::Vector(-1.0, 0.0, 0.0)))
       .WillOnce(testing::Return(std::nullopt));
   iris::bxdfs::MockBxdf bxdf1;
-  EXPECT_CALL(bxdf1,
-              Pdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(-1.0, 0.0, 0.0)))
+  EXPECT_CALL(bxdf1, SamplePdf(iris::Vector(1.0, 0.0, 0.0),
+                               iris::Vector(-1.0, 0.0, 0.0)))
       .WillOnce(testing::Return(2.0));
 
   auto composite = iris::bxdfs::MakeComposite(bxdf0, bxdf1);
-  EXPECT_EQ(1.5, composite.Pdf(iris::Vector(1.0, 0.0, 0.0),
-                               iris::Vector(-1.0, 0.0, 0.0)));
+  EXPECT_EQ(1.5, composite.SamplePdf(iris::Vector(1.0, 0.0, 0.0),
+                                     iris::Vector(-1.0, 0.0, 0.0)));
+}
+
+TEST(CompositeBxdfTest, DiffusePdfTwoBxdfs) {
+  iris::bxdfs::MockBxdf bxdf0;
+  EXPECT_CALL(bxdf0, DiffusePdf(iris::Vector(1.0, 0.0, 0.0),
+                                iris::Vector(-1.0, 0.0, 0.0)))
+      .WillOnce(testing::Return(0.0));
+  iris::bxdfs::MockBxdf bxdf1;
+  EXPECT_CALL(bxdf1, DiffusePdf(iris::Vector(1.0, 0.0, 0.0),
+                                iris::Vector(-1.0, 0.0, 0.0)))
+      .WillOnce(testing::Return(2.0));
+
+  auto composite = iris::bxdfs::MakeComposite(bxdf0, bxdf1);
+  EXPECT_EQ(1.0, composite.DiffusePdf(iris::Vector(1.0, 0.0, 0.0),
+                                      iris::Vector(-1.0, 0.0, 0.0)));
 }
 
 TEST(CompositeBxdfTest, Reflectance) {

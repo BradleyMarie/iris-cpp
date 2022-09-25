@@ -59,7 +59,7 @@ std::optional<Bsdf::SampleResult> Bsdf::Sample(
   auto local_outgoing = bxdf_.Sample(local_incoming, rng);
   auto world_outgoing = ToWorld(local_outgoing);
 
-  auto pdf = bxdf_.Pdf(local_incoming, local_outgoing);
+  auto pdf = bxdf_.SamplePdf(local_incoming, local_outgoing);
   if (pdf.has_value() && *pdf == 0.0) {
     return std::nullopt;
   }
@@ -82,7 +82,7 @@ std::optional<Bsdf::ReflectanceResult> Bsdf::Reflectance(
     SpectralAllocator& allocator) const {
   auto local_incoming = ToLocal(incoming);
   auto local_outgoing = ToLocal(outgoing);
-  auto pdf = bxdf_.Pdf(local_incoming, local_outgoing).value_or(0.0);
+  auto pdf = bxdf_.DiffusePdf(local_incoming, local_outgoing);
   if (pdf == 0.0) {
     return std::nullopt;
   }

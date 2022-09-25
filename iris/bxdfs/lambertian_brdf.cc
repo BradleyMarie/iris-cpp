@@ -22,9 +22,14 @@ Vector LambertianBrdf::Sample(const Vector& incoming, Random& rng) const {
   return Vector(x, y, std::copysign(z, -incoming.z));
 }
 
-std::optional<visual_t> LambertianBrdf::Pdf(const Vector& incoming,
-                                            const Vector& outgoing) const {
+visual_t LambertianBrdf::DiffusePdf(const Vector& incoming,
+                                    const Vector& outgoing) const {
   return (incoming.z < 0) == (outgoing.z < 0) ? 0.0 : std::abs(outgoing.z);
+}
+
+std::optional<visual_t> LambertianBrdf::SamplePdf(
+    const Vector& incoming, const Vector& outgoing) const {
+  return DiffusePdf(incoming, outgoing);
 }
 
 const Reflector* LambertianBrdf::Reflectance(

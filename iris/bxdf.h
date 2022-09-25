@@ -20,8 +20,11 @@ class Bxdf {
 
   virtual Vector Sample(const Vector& incoming, Random& rng) const = 0;
 
-  virtual std::optional<visual_t> Pdf(const Vector& incoming,
-                                      const Vector& outgoing) const = 0;
+  virtual visual_t DiffusePdf(const Vector& incoming,
+                              const Vector& outgoing) const = 0;
+
+  virtual std::optional<visual_t> SamplePdf(const Vector& incoming,
+                                            const Vector& outgoing) const = 0;
 
   virtual const Reflector* Reflectance(const Vector& incoming,
                                        const Vector& outgoing, Type type,

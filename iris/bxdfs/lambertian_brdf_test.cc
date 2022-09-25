@@ -20,18 +20,32 @@ TEST(LambertianBrdfTest, Sample) {
   EXPECT_EQ(iris::Vector(0.0, 0.0, 1.0), result);
 }
 
-TEST(LambertianBrdfTest, PdfTransmitted) {
+TEST(LambertianBrdfTest, DiffusePdfTransmitted) {
   iris::reflectors::MockReflector reflector;
   iris::bxdfs::LambertianBrdf bxdf(reflector);
-  EXPECT_EQ(0.0, bxdf.Pdf(iris::Vector(0.0, 0.0, -1.0),
-                          iris::Vector(0.0, 0.0, -1.0)));
+  EXPECT_EQ(0.0, bxdf.DiffusePdf(iris::Vector(0.0, 0.0, -1.0),
+                                 iris::Vector(0.0, 0.0, -1.0)));
 }
 
-TEST(LambertianBrdfTest, PdfReflected) {
+TEST(LambertianBrdfTest, DiffusePdfReflected) {
   iris::reflectors::MockReflector reflector;
   iris::bxdfs::LambertianBrdf bxdf(reflector);
-  EXPECT_EQ(
-      1.0, bxdf.Pdf(iris::Vector(0.0, 0.0, -1.0), iris::Vector(0.0, 0.0, 1.0)));
+  EXPECT_EQ(1.0, bxdf.DiffusePdf(iris::Vector(0.0, 0.0, -1.0),
+                                 iris::Vector(0.0, 0.0, 1.0)));
+}
+
+TEST(LambertianBrdfTest, SamplePdfTransmitted) {
+  iris::reflectors::MockReflector reflector;
+  iris::bxdfs::LambertianBrdf bxdf(reflector);
+  EXPECT_EQ(0.0, bxdf.SamplePdf(iris::Vector(0.0, 0.0, -1.0),
+                                iris::Vector(0.0, 0.0, -1.0)));
+}
+
+TEST(LambertianBrdfTest, SamplePdfReflected) {
+  iris::reflectors::MockReflector reflector;
+  iris::bxdfs::LambertianBrdf bxdf(reflector);
+  EXPECT_EQ(1.0, bxdf.SamplePdf(iris::Vector(0.0, 0.0, -1.0),
+                                iris::Vector(0.0, 0.0, 1.0)));
 }
 
 TEST(LambertianBrdfTest, ReflectanceBtdf) {

@@ -16,8 +16,8 @@ TEST(BsdfTest, SampleNoPdf) {
   iris::bxdfs::MockBxdf bxdf;
   EXPECT_CALL(bxdf, Sample(iris::Vector(1.0, 0.0, 0.0), testing::_))
       .WillOnce(testing::Return(iris::Vector(1.0, 0.0, 0.0)));
-  EXPECT_CALL(bxdf,
-              Pdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0)))
+  EXPECT_CALL(
+      bxdf, SamplePdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0)))
       .WillOnce(testing::Return(std::optional<iris::visual_t>(0.0)));
 
   iris::Bsdf bsdf(bxdf, iris::Vector(0.0, 0.0, 1.0),
@@ -33,8 +33,8 @@ TEST(BsdfTest, SampleNoReflector) {
   iris::bxdfs::MockBxdf bxdf;
   EXPECT_CALL(bxdf, Sample(iris::Vector(1.0, 0.0, 0.0), testing::_))
       .WillOnce(testing::Return(iris::Vector(1.0, 0.0, 0.0)));
-  EXPECT_CALL(bxdf,
-              Pdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0)))
+  EXPECT_CALL(
+      bxdf, SamplePdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0)))
       .WillOnce(testing::Return(std::optional<iris::visual_t>(0.5)));
   EXPECT_CALL(bxdf, Reflectance(iris::Vector(1.0, 0.0, 0.0),
                                 iris::Vector(1.0, 0.0, 0.0), iris::Bxdf::BTDF,
@@ -54,8 +54,8 @@ TEST(BsdfTest, SampleBtdf) {
   iris::bxdfs::MockBxdf bxdf;
   EXPECT_CALL(bxdf, Sample(iris::Vector(1.0, 0.0, 0.0), testing::_))
       .WillOnce(testing::Return(iris::Vector(1.0, 0.0, 0.0)));
-  EXPECT_CALL(bxdf,
-              Pdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0)))
+  EXPECT_CALL(
+      bxdf, SamplePdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0)))
       .WillOnce(testing::Return(std::optional<iris::visual_t>(0.5)));
   EXPECT_CALL(bxdf, Reflectance(iris::Vector(1.0, 0.0, 0.0),
                                 iris::Vector(1.0, 0.0, 0.0), iris::Bxdf::BTDF,
@@ -78,8 +78,8 @@ TEST(BsdfTest, SampleBrdf) {
   iris::bxdfs::MockBxdf bxdf;
   EXPECT_CALL(bxdf, Sample(iris::Vector(0.0, 0.0, 1.0), testing::_))
       .WillOnce(testing::Return(iris::Vector(0.0, 0.0, -1.0)));
-  EXPECT_CALL(bxdf,
-              Pdf(iris::Vector(0.0, 0.0, 1.0), iris::Vector(0.0, 0.0, -1.0)))
+  EXPECT_CALL(bxdf, SamplePdf(iris::Vector(0.0, 0.0, 1.0),
+                              iris::Vector(0.0, 0.0, -1.0)))
       .WillOnce(testing::Return(std::optional<iris::visual_t>(0.5)));
   EXPECT_CALL(bxdf, Reflectance(iris::Vector(0.0, 0.0, 1.0),
                                 iris::Vector(0.0, 0.0, -1.0), iris::Bxdf::BRDF,
@@ -95,29 +95,13 @@ TEST(BsdfTest, SampleBrdf) {
   EXPECT_EQ(0.5, result->pdf.value());
 }
 
-TEST(BsdfTest, ReflectanceMissingPdf) {
-  iris::internal::Arena arena;
-  iris::SpectralAllocator allocator(arena);
-
-  iris::bxdfs::MockBxdf bxdf;
-  EXPECT_CALL(bxdf,
-              Pdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0)))
-      .WillOnce(testing::Return(std::nullopt));
-
-  iris::Bsdf bsdf(bxdf, iris::Vector(0.0, 0.0, 1.0),
-                  iris::Vector(0.0, 0.0, 1.0), true);
-  auto result = bsdf.Reflectance(iris::Vector(1.0, 0.0, 0.0),
-                                 iris::Vector(1.0, 0.0, 0.0), allocator);
-  EXPECT_FALSE(result);
-}
-
 TEST(BsdfTest, ReflectanceNoPdf) {
   iris::internal::Arena arena;
   iris::SpectralAllocator allocator(arena);
 
   iris::bxdfs::MockBxdf bxdf;
-  EXPECT_CALL(bxdf,
-              Pdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0)))
+  EXPECT_CALL(bxdf, DiffusePdf(iris::Vector(1.0, 0.0, 0.0),
+                               iris::Vector(1.0, 0.0, 0.0)))
       .WillOnce(testing::Return(0.0));
 
   iris::Bsdf bsdf(bxdf, iris::Vector(0.0, 0.0, 1.0),
@@ -132,9 +116,9 @@ TEST(BsdfTest, ReflectanceNoReflector) {
   iris::SpectralAllocator allocator(arena);
 
   iris::bxdfs::MockBxdf bxdf;
-  EXPECT_CALL(bxdf,
-              Pdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0)))
-      .WillOnce(testing::Return(std::optional<iris::visual_t>(0.5)));
+  EXPECT_CALL(bxdf, DiffusePdf(iris::Vector(1.0, 0.0, 0.0),
+                               iris::Vector(1.0, 0.0, 0.0)))
+      .WillOnce(testing::Return(0.5));
   EXPECT_CALL(bxdf, Reflectance(iris::Vector(1.0, 0.0, 0.0),
                                 iris::Vector(1.0, 0.0, 0.0), iris::Bxdf::BTDF,
                                 testing::_))
@@ -152,9 +136,9 @@ TEST(BsdfTest, ReflectanceBtdf) {
   iris::SpectralAllocator allocator(arena);
 
   iris::bxdfs::MockBxdf bxdf;
-  EXPECT_CALL(bxdf,
-              Pdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0)))
-      .WillOnce(testing::Return(std::optional<iris::visual_t>(0.5)));
+  EXPECT_CALL(bxdf, DiffusePdf(iris::Vector(1.0, 0.0, 0.0),
+                               iris::Vector(1.0, 0.0, 0.0)))
+      .WillOnce(testing::Return(0.5));
   EXPECT_CALL(bxdf, Reflectance(iris::Vector(1.0, 0.0, 0.0),
                                 iris::Vector(1.0, 0.0, 0.0), iris::Bxdf::BTDF,
                                 testing::_))
@@ -174,9 +158,9 @@ TEST(BsdfTest, ReflectanceBrdf) {
   iris::SpectralAllocator allocator(arena);
 
   iris::bxdfs::MockBxdf bxdf;
-  EXPECT_CALL(bxdf,
-              Pdf(iris::Vector(0.0, 0.0, 1.0), iris::Vector(0.0, 0.0, -1.0)))
-      .WillOnce(testing::Return(std::optional<iris::visual_t>(0.5)));
+  EXPECT_CALL(bxdf, DiffusePdf(iris::Vector(0.0, 0.0, 1.0),
+                               iris::Vector(0.0, 0.0, -1.0)))
+      .WillOnce(testing::Return(0.5));
   EXPECT_CALL(bxdf, Reflectance(iris::Vector(0.0, 0.0, 1.0),
                                 iris::Vector(0.0, 0.0, -1.0), iris::Bxdf::BRDF,
                                 testing::_))
@@ -198,8 +182,8 @@ TEST(BsdfTest, Normalize) {
   iris::bxdfs::MockBxdf bxdf;
   EXPECT_CALL(bxdf, Sample(iris::Vector(1.0, 0.0, 0.0), testing::_))
       .WillOnce(testing::Return(iris::Vector(1.0, 0.0, 0.0)));
-  EXPECT_CALL(bxdf,
-              Pdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0)))
+  EXPECT_CALL(
+      bxdf, SamplePdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0)))
       .WillOnce(testing::Return(std::optional<iris::visual_t>(0.5)));
   EXPECT_CALL(bxdf, Reflectance(iris::Vector(1.0, 0.0, 0.0),
                                 iris::Vector(1.0, 0.0, 0.0), iris::Bxdf::BTDF,

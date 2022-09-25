@@ -20,8 +20,6 @@ class CompositeBxdf final : public Bxdf {
   CompositeBxdf(Bxdfs&&... bxdfs) {
     size_t i = 0;
     (void(bxdfs_[i++] = &bxdfs), ...);
-    assert(std::all_of(bxdfs_.begin(), bxdfs_.end(),
-                       [](const Bxdf* bxdf) { return bxdf != nullptr; }));
   }
 
   Vector Sample(const Vector& incoming, Random& rng) const override {
@@ -29,13 +27,22 @@ class CompositeBxdf final : public Bxdf {
     return bxdfs_[index]->Sample(incoming, rng);
   }
 
-  std::optional<visual_t> Pdf(const Vector& incoming,
-                              const Vector& outgoing) const override {
+  visual_t DiffusePdf(const Vector& incoming,
+                      const Vector& outgoing) const override {
+    visual_t result = 0.0;
+    for (const auto* bxdf : bxdfs_) {
+      result += bxdf->DiffusePdf(incoming, outgoing);
+    }
+    return result / static_cast<visual_t>(sizeof...(Bxdfs));
+  }
+
+  std::optional<visual_t> SamplePdf(const Vector& incoming,
+                                    const Vector& outgoing) const override {
     visual_t specular_pdf = 0.0;
 
     std::optional<visual_t> result;
     for (const auto* bxdf : bxdfs_) {
-      auto pdf = bxdf->Pdf(incoming, outgoing);
+      auto pdf = bxdf->SamplePdf(incoming, outgoing);
       if (!pdf.has_value()) {
         specular_pdf += 1.0;
       } else {
