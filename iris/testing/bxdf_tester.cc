@@ -6,9 +6,11 @@ namespace testing {
 const Reflector* BxdfTester::Reflectance(const Bxdf& bxdf,
                                          const Vector& incoming,
                                          const Vector& outgoing,
-                                         Bxdf::Type type) {
+                                         Bxdf::SampleSource sample_source,
+                                         Bxdf::Hemisphere hemisphere) {
   SpectralAllocator allocator(arena_);
-  return bxdf.Reflectance(incoming, outgoing, type, allocator);
+  return bxdf.Reflectance(incoming, outgoing, sample_source, hemisphere,
+                          allocator);
 }
 
 }  // namespace testing

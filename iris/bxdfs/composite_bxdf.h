@@ -27,43 +27,39 @@ class CompositeBxdf final : public Bxdf {
     return bxdfs_[index]->Sample(incoming, rng);
   }
 
-  visual_t DiffusePdf(const Vector& incoming,
-                      const Vector& outgoing) const override {
-    visual_t result = 0.0;
+  std::optional<visual_t> Pdf(const Vector& incoming, const Vector& outgoing,
+                              SampleSource sample_source) const override {
+    visual_t diffuse_pdf = 0.0;
+    size_t num_diffuse = 0;
     for (const auto* bxdf : bxdfs_) {
-      result += bxdf->DiffusePdf(incoming, outgoing);
-    }
-    return result / static_cast<visual_t>(sizeof...(Bxdfs));
-  }
-
-  std::optional<visual_t> SamplePdf(const Vector& incoming,
-                                    const Vector& outgoing) const override {
-    visual_t specular_pdf = 0.0;
-
-    std::optional<visual_t> result;
-    for (const auto* bxdf : bxdfs_) {
-      auto pdf = bxdf->SamplePdf(incoming, outgoing);
-      if (!pdf.has_value()) {
-        specular_pdf += 1.0;
-      } else {
-        result = result.value_or(0.0) + *pdf;
+      auto pdf = bxdf->Pdf(incoming, outgoing, sample_source);
+      if (pdf.has_value()) {
+        diffuse_pdf += *pdf;
+        num_diffuse += 1;
       }
     }
 
-    if (result) {
-      *result += specular_pdf;
-      *result /= static_cast<visual_t>(sizeof...(Bxdfs));
+    std::optional<visual_t> result;
+    if (num_diffuse != 0) {
+      visual_t specular_pdf =
+          (sample_source == Bxdf::SampleSource::LIGHT) ? 0.0 : 1.0;
+      result =
+          (diffuse_pdf + static_cast<visual_t>(sizeof...(Bxdfs) - num_diffuse) *
+                             specular_pdf) /
+          static_cast<visual_t>(sizeof...(Bxdfs));
     }
 
     return result;
   }
 
   const Reflector* Reflectance(const Vector& incoming, const Vector& outgoing,
-                               Type type,
+                               SampleSource sample_source,
+                               Hemisphere hemisphere,
                                SpectralAllocator& allocator) const override {
     const Reflector* result = nullptr;
     for (const auto* bxdf : bxdfs_) {
-      auto reflectance = bxdf->Reflectance(incoming, outgoing, type, allocator);
+      auto reflectance = bxdf->Reflectance(incoming, outgoing, sample_source,
+                                           hemisphere, allocator);
       result = allocator.Add(result, reflectance);
     }
     return result;

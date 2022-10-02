@@ -12,7 +12,9 @@ namespace testing {
 class BxdfTester final {
  public:
   const Reflector* Reflectance(const Bxdf& bxdf, const Vector& incoming,
-                               const Vector& outgoing, Bxdf::Type type);
+                               const Vector& outgoing,
+                               Bxdf::SampleSource sample_source,
+                               Bxdf::Hemisphere hemisphere);
 
  private:
   internal::Arena arena_;

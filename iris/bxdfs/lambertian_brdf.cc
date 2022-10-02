@@ -22,20 +22,16 @@ Vector LambertianBrdf::Sample(const Vector& incoming, Random& rng) const {
   return Vector(x, y, std::copysign(z, -incoming.z));
 }
 
-visual_t LambertianBrdf::DiffusePdf(const Vector& incoming,
-                                    const Vector& outgoing) const {
+std::optional<visual_t> LambertianBrdf::Pdf(const Vector& incoming,
+                                            const Vector& outgoing,
+                                            SampleSource sample_source) const {
   return (incoming.z < 0) == (outgoing.z < 0) ? 0.0 : std::abs(outgoing.z);
 }
 
-std::optional<visual_t> LambertianBrdf::SamplePdf(
-    const Vector& incoming, const Vector& outgoing) const {
-  return DiffusePdf(incoming, outgoing);
-}
-
 const Reflector* LambertianBrdf::Reflectance(
-    const Vector& incoming, const Vector& outgoing, Type type,
-    SpectralAllocator& allocator) const {
-  if (type != Bxdf::BRDF) {
+    const Vector& incoming, const Vector& outgoing, SampleSource sample_source,
+    Hemisphere hemisphere, SpectralAllocator& allocator) const {
+  if (hemisphere != Hemisphere::BRDF) {
     return nullptr;
   }
 

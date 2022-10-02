@@ -23,29 +23,17 @@ TEST(LambertianBrdfTest, Sample) {
 TEST(LambertianBrdfTest, DiffusePdfTransmitted) {
   iris::reflectors::MockReflector reflector;
   iris::bxdfs::LambertianBrdf bxdf(reflector);
-  EXPECT_EQ(0.0, bxdf.DiffusePdf(iris::Vector(0.0, 0.0, -1.0),
-                                 iris::Vector(0.0, 0.0, -1.0)));
+  EXPECT_EQ(0.0,
+            bxdf.Pdf(iris::Vector(0.0, 0.0, -1.0), iris::Vector(0.0, 0.0, -1.0),
+                     iris::Bxdf::SampleSource::BXDF));
 }
 
 TEST(LambertianBrdfTest, DiffusePdfReflected) {
   iris::reflectors::MockReflector reflector;
   iris::bxdfs::LambertianBrdf bxdf(reflector);
-  EXPECT_EQ(1.0, bxdf.DiffusePdf(iris::Vector(0.0, 0.0, -1.0),
-                                 iris::Vector(0.0, 0.0, 1.0)));
-}
-
-TEST(LambertianBrdfTest, SamplePdfTransmitted) {
-  iris::reflectors::MockReflector reflector;
-  iris::bxdfs::LambertianBrdf bxdf(reflector);
-  EXPECT_EQ(0.0, bxdf.SamplePdf(iris::Vector(0.0, 0.0, -1.0),
-                                iris::Vector(0.0, 0.0, -1.0)));
-}
-
-TEST(LambertianBrdfTest, SamplePdfReflected) {
-  iris::reflectors::MockReflector reflector;
-  iris::bxdfs::LambertianBrdf bxdf(reflector);
-  EXPECT_EQ(1.0, bxdf.SamplePdf(iris::Vector(0.0, 0.0, -1.0),
-                                iris::Vector(0.0, 0.0, 1.0)));
+  EXPECT_EQ(1.0,
+            bxdf.Pdf(iris::Vector(0.0, 0.0, -1.0), iris::Vector(0.0, 0.0, 1.0),
+                     iris::Bxdf::SampleSource::BXDF));
 }
 
 TEST(LambertianBrdfTest, ReflectanceBtdf) {
@@ -56,9 +44,9 @@ TEST(LambertianBrdfTest, ReflectanceBtdf) {
       .WillRepeatedly(testing::Return(1.0));
 
   iris::bxdfs::LambertianBrdf bxdf(reflector);
-  auto* result =
-      tester.Reflectance(bxdf, iris::Vector(0.0, 0.0, 1.0),
-                         iris::Vector(0.0, 0.0, -1.0), iris::Bxdf::BTDF);
+  auto* result = tester.Reflectance(
+      bxdf, iris::Vector(0.0, 0.0, 1.0), iris::Vector(0.0, 0.0, -1.0),
+      iris::Bxdf::SampleSource::BXDF, iris::Bxdf::Hemisphere::BTDF);
   ASSERT_FALSE(result);
 }
 
@@ -70,9 +58,9 @@ TEST(LambertianBrdfTest, ReflectanceTransmitted) {
       .WillRepeatedly(testing::Return(1.0));
 
   iris::bxdfs::LambertianBrdf bxdf(reflector);
-  auto* result =
-      tester.Reflectance(bxdf, iris::Vector(0.0, 0.0, 1.0),
-                         iris::Vector(0.0, 0.0, 1.0), iris::Bxdf::BRDF);
+  auto* result = tester.Reflectance(
+      bxdf, iris::Vector(0.0, 0.0, 1.0), iris::Vector(0.0, 0.0, 1.0),
+      iris::Bxdf::SampleSource::BXDF, iris::Bxdf::Hemisphere::BRDF);
   ASSERT_FALSE(result);
 }
 
@@ -84,9 +72,9 @@ TEST(LambertianBrdfTest, Reflectance) {
       .WillRepeatedly(testing::Return(1.0));
 
   iris::bxdfs::LambertianBrdf bxdf(reflector);
-  auto* result =
-      tester.Reflectance(bxdf, iris::Vector(0.0, 0.0, 1.0),
-                         iris::Vector(0.0, 0.0, -1.0), iris::Bxdf::BRDF);
+  auto* result = tester.Reflectance(
+      bxdf, iris::Vector(0.0, 0.0, 1.0), iris::Vector(0.0, 0.0, -1.0),
+      iris::Bxdf::SampleSource::BXDF, iris::Bxdf::Hemisphere::BRDF);
   ASSERT_TRUE(result);
   EXPECT_NEAR(M_1_PI, result->Reflectance(1.0), 0.0001);
 }

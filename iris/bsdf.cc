@@ -59,17 +59,18 @@ std::optional<Bsdf::SampleResult> Bsdf::Sample(
   auto local_outgoing = bxdf_.Sample(local_incoming, rng);
   auto world_outgoing = ToWorld(local_outgoing);
 
-  auto pdf = bxdf_.SamplePdf(local_incoming, local_outgoing);
+  auto pdf =
+      bxdf_.Pdf(local_incoming, local_outgoing, Bxdf::SampleSource::BXDF);
   if (pdf.has_value() && *pdf == 0.0) {
     return std::nullopt;
   }
 
   bool transmitted = (DotProduct(incoming, surface_normal_) > 0) ==
                      (DotProduct(world_outgoing, surface_normal_) > 0);
-  auto type = transmitted ? Bxdf::BTDF : Bxdf::BRDF;
+  auto type = transmitted ? Bxdf::Hemisphere::BTDF : Bxdf::Hemisphere::BRDF;
 
-  auto reflector =
-      bxdf_.Reflectance(local_incoming, local_outgoing, type, allocator);
+  auto reflector = bxdf_.Reflectance(local_incoming, local_outgoing,
+                                     Bxdf::SampleSource::BXDF, type, allocator);
   if (!reflector) {
     return std::nullopt;
   }
@@ -82,21 +83,23 @@ std::optional<Bsdf::ReflectanceResult> Bsdf::Reflectance(
     SpectralAllocator& allocator) const {
   auto local_incoming = ToLocal(incoming);
   auto local_outgoing = ToLocal(outgoing);
-  auto pdf = bxdf_.DiffusePdf(local_incoming, local_outgoing);
-  if (pdf == 0.0) {
+  auto pdf =
+      bxdf_.Pdf(local_incoming, local_outgoing, Bxdf::SampleSource::LIGHT);
+  if (pdf.value_or(0.0) == 0.0) {
     return std::nullopt;
   }
 
   bool transmitted = (DotProduct(incoming, surface_normal_) > 0) ==
                      (DotProduct(outgoing, surface_normal_) > 0);
-  auto type = transmitted ? Bxdf::BTDF : Bxdf::BRDF;
+  auto type = transmitted ? Bxdf::Hemisphere::BTDF : Bxdf::Hemisphere::BRDF;
   auto* reflector =
-      bxdf_.Reflectance(local_incoming, local_outgoing, type, allocator);
+      bxdf_.Reflectance(local_incoming, local_outgoing,
+                        Bxdf::SampleSource::LIGHT, type, allocator);
   if (!reflector) {
     return std::nullopt;
   }
 
-  return Bsdf::ReflectanceResult{*reflector, pdf};
+  return Bsdf::ReflectanceResult{*reflector, *pdf};
 }
 
 }  // namespace iris

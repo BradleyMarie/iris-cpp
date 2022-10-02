@@ -13,21 +13,26 @@ namespace iris {
 
 class Bxdf {
  public:
-  enum Type {
+  virtual Vector Sample(const Vector& incoming, Random& rng) const = 0;
+
+  enum class SampleSource {
+    BXDF,
+    LIGHT,
+  };
+
+  virtual std::optional<visual_t> Pdf(const Vector& incoming,
+                                      const Vector& outgoing,
+                                      SampleSource sample_source) const = 0;
+
+  enum class Hemisphere {
     BRDF,
     BTDF,
   };
 
-  virtual Vector Sample(const Vector& incoming, Random& rng) const = 0;
-
-  virtual visual_t DiffusePdf(const Vector& incoming,
-                              const Vector& outgoing) const = 0;
-
-  virtual std::optional<visual_t> SamplePdf(const Vector& incoming,
-                                            const Vector& outgoing) const = 0;
-
   virtual const Reflector* Reflectance(const Vector& incoming,
-                                       const Vector& outgoing, Type type,
+                                       const Vector& outgoing,
+                                       SampleSource sample_source,
+                                       Hemisphere hemisphere,
                                        SpectralAllocator& allocator) const = 0;
 
  protected:

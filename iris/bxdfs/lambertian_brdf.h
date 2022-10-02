@@ -17,14 +17,12 @@ class LambertianBrdf final : public Bxdf {
 
   Vector Sample(const Vector& incoming, Random& rng) const override;
 
-  visual_t DiffusePdf(const Vector& incoming,
-                      const Vector& outgoing) const override;
-
-  std::optional<visual_t> SamplePdf(const Vector& incoming,
-                                    const Vector& outgoing) const override;
+  std::optional<visual_t> Pdf(const Vector& incoming, const Vector& outgoing,
+                              SampleSource sample_source) const override;
 
   const Reflector* Reflectance(const Vector& incoming, const Vector& outgoing,
-                               Type type,
+                               SampleSource sample_source,
+                               Hemisphere hemisphere,
                                SpectralAllocator& allocator) const override;
 
  private:
