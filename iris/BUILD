@@ -3,19 +3,6 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 package(default_visibility = ["//visibility:private"])
 
 cc_library(
-    name = "bxdf",
-    hdrs = ["bxdf.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":float",
-        ":random",
-        ":reflector",
-        ":spectral_allocator",
-        ":vector",
-    ],
-)
-
-cc_library(
     name = "bsdf",
     srcs = ["bsdf.cc"],
     hdrs = ["bsdf.h"],
@@ -40,6 +27,41 @@ cc_test(
         "//iris/random:mock_random",
         "//iris/reflectors:mock_reflector",
         "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "bxdf_allocator",
+    srcs = ["bxdf_allocator.cc"],
+    hdrs = ["bxdf_allocator.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":bxdf",
+        "//iris/internal:arena",
+    ],
+)
+
+cc_test(
+    name = "bxdf_allocator_test",
+    srcs = ["bxdf_allocator_test.cc"],
+    deps = [
+        ":bxdf_allocator",
+        "//iris/bxdfs:lambertian_brdf",
+        "//iris/reflectors:mock_reflector",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "bxdf",
+    hdrs = ["bxdf.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":float",
+        ":random",
+        ":reflector",
+        ":spectral_allocator",
+        ":vector",
     ],
 )
 
@@ -344,6 +366,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":bxdf",
+        ":bxdf_allocator",
         ":texture_coordinates",
     ],
 )
@@ -447,6 +470,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":bsdf",
+        ":bxdf_allocator",
         ":float",
         ":ray",
         ":scene",

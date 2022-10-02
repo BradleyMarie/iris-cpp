@@ -11,11 +11,19 @@
 
 namespace iris {
 namespace internal {
+class Arena;
 class RayTracer;
 }  // namespace internal
 
 class RayTracer final {
  public:
+  RayTracer(const Scene& scene, geometric_t minimum_distance,
+            internal::RayTracer& ray_tracer, internal::Arena& arena) noexcept
+      : scene_(scene),
+        minimum_distance_(minimum_distance),
+        ray_tracer_(ray_tracer),
+        arena_(arena) {}
+
   struct Result {
     std::optional<Bsdf> bsdf;
     const Spectrum* emission;
@@ -23,12 +31,6 @@ class RayTracer final {
     Vector surface_normal;
     Vector shading_normal;
   };
-
-  RayTracer(const Scene& scene, geometric_t minimum_distance,
-            internal::RayTracer& ray_tracer) noexcept
-      : scene_(scene),
-        minimum_distance_(minimum_distance),
-        ray_tracer_(ray_tracer) {}
 
   std::optional<Result> Trace(const Ray& ray);
 
@@ -39,6 +41,7 @@ class RayTracer final {
   const Scene& scene_;
   geometric_t minimum_distance_;
   internal::RayTracer& ray_tracer_;
+  internal::Arena& arena_;
 };
 
 }  // namespace iris

@@ -2,6 +2,7 @@
 
 #include <limits>
 
+#include "iris/bxdf_allocator.h"
 #include "iris/internal/ray_tracer.h"
 
 namespace iris {
@@ -24,13 +25,14 @@ std::pair<Vector, Vector> MaybeTransform(const Matrix* model_to_world,
 std::optional<Bsdf> MakeBsdf(const iris::internal::Hit& hit,
                              const TextureCoordinates& texture_coordinates,
                              const Vector& world_surface_normal,
-                             const Vector& world_shading_normal) {
+                             const Vector& world_shading_normal,
+                             BxdfAllocator& bxdf_allocator) {
   auto* material = hit.geometry->GetMaterial(hit.front, hit.additional_data);
   if (!material) {
     return std::nullopt;
   }
 
-  auto* bxdf = material->Compute(texture_coordinates);
+  auto* bxdf = material->Compute(texture_coordinates, bxdf_allocator);
   if (!bxdf) {
     return std::nullopt;
   }
@@ -82,8 +84,9 @@ std::optional<RayTracer::Result> RayTracer::Trace(const Ray& ray) {
   auto vectors = MaybeTransform(hit->model_to_world, model_surface_normal,
                                 model_shading_normal);
 
-  auto bsdf =
-      MakeBsdf(*hit, texture_coordinates, vectors.first, vectors.second);
+  BxdfAllocator bxdf_allocator(arena_);
+  auto bsdf = MakeBsdf(*hit, texture_coordinates, vectors.first, vectors.second,
+                       bxdf_allocator);
 
   return RayTracer::Result{bsdf, spectrum, world_hit_point, vectors.first,
                            vectors.second};

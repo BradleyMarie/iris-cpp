@@ -37,14 +37,14 @@ void RenderChunk(const Scene& scene, const LightScene& light_scene,
   bool has_lens = camera.HasLens();
   auto color_space = color_matcher.ColorSpace();
 
-  internal::RayTracer internal_tracer;
-  internal::VisibilityTester visibility_tester(scene, minimum_distance,
-                                               internal_tracer);
-  RayTracer ray_tracer(scene, minimum_distance, internal_tracer);
-
   internal::Arena arena;
   LightSampleAllocator light_sample_allocator(arena);
   SpectralAllocator spectral_allocator(arena);
+
+  internal::RayTracer internal_tracer;
+  internal::VisibilityTester visibility_tester(scene, minimum_distance,
+                                               internal_tracer);
+  RayTracer ray_tracer(scene, minimum_distance, internal_tracer, arena);
 
   for (auto chunk_index = chunk_counter.fetch_add(1); chunk_index < num_chunks;
        chunk_index = chunk_counter.fetch_add(1)) {

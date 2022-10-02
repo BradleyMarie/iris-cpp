@@ -2,6 +2,7 @@
 
 #include "googletest/include/gtest/gtest.h"
 #include "iris/bxdfs/mock_bxdf.h"
+#include "iris/internal/arena.h"
 #include "iris/internal/ray_tracer.h"
 #include "iris/scenes/list_scene.h"
 #include "iris/spectra/mock_spectrum.h"
@@ -31,8 +32,8 @@ class TestMaterial : public iris::Material {
   TestMaterial(std::array<iris::geometric_t, 2> expected)
       : expected_(expected) {}
 
-  const iris::Bxdf* Compute(
-      const iris::TextureCoordinates& texture_coordinates) const override {
+  const iris::Bxdf* Compute(const iris::TextureCoordinates& texture_coordinates,
+                            iris::BxdfAllocator& allocator) const override {
     EXPECT_EQ(expected_, texture_coordinates.uv);
     EXPECT_FALSE(texture_coordinates.derivatives);
     return g_bxdf.get();
@@ -135,8 +136,9 @@ class TestGeometry : public iris::Geometry {
 
 TEST(RayTracerTest, NoGeometry) {
   iris::internal::RayTracer internal_ray_tracer;
+  iris::internal::Arena arena;
   auto scene = iris::scenes::ListScene::Builder::Create()->Build();
-  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer);
+  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer, arena);
 
   EXPECT_FALSE(ray_tracer.Trace(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0))));
@@ -150,7 +152,8 @@ TEST(RayTracerTest, Minimal) {
   auto scene = builder->Build();
 
   iris::internal::RayTracer internal_ray_tracer;
-  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer);
+  iris::internal::Arena arena;
+  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer, arena);
 
   auto result = ray_tracer.Trace(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
@@ -173,7 +176,8 @@ TEST(RayTracerTest, WithTransform) {
   TestGeometry geometry(ray, iris::Point(-1.0, 1.0, 1.0));
 
   iris::internal::RayTracer internal_ray_tracer;
-  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer);
+  iris::internal::Arena arena;
+  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer, arena);
 
   auto result = ray_tracer.Trace(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
@@ -196,7 +200,8 @@ TEST(RayTracerTest, WithTextureCoordinates) {
   auto scene = builder->Build();
 
   iris::internal::RayTracer internal_ray_tracer;
-  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer);
+  iris::internal::Arena arena;
+  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer, arena);
 
   auto result = ray_tracer.Trace(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
@@ -218,7 +223,8 @@ TEST(RayTracerTest, WithMaterial) {
   auto scene = builder->Build();
 
   iris::internal::RayTracer internal_ray_tracer;
-  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer);
+  iris::internal::Arena arena;
+  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer, arena);
 
   auto result = ray_tracer.Trace(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
@@ -240,7 +246,8 @@ TEST(RayTracerTest, WithEmissiveMaterial) {
   auto scene = builder->Build();
 
   iris::internal::RayTracer internal_ray_tracer;
-  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer);
+  iris::internal::Arena arena;
+  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer, arena);
 
   auto result = ray_tracer.Trace(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
@@ -262,7 +269,8 @@ TEST(RayTracerTest, WithNormal) {
   auto scene = builder->Build();
 
   iris::internal::RayTracer internal_ray_tracer;
-  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer);
+  iris::internal::Arena arena;
+  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer, arena);
 
   auto result = ray_tracer.Trace(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
@@ -284,7 +292,8 @@ TEST(RayTracerTest, WithNormalMap) {
   auto scene = builder->Build();
 
   iris::internal::RayTracer internal_ray_tracer;
-  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer);
+  iris::internal::Arena arena;
+  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer, arena);
 
   auto result = ray_tracer.Trace(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
