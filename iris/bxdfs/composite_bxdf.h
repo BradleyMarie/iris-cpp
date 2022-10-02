@@ -33,10 +33,8 @@ class CompositeBxdf final : public Bxdf {
     size_t num_diffuse = 0;
     for (const auto* bxdf : bxdfs_) {
       auto pdf = bxdf->Pdf(incoming, outgoing, sample_source);
-      if (pdf.has_value()) {
-        diffuse_pdf += *pdf;
-        num_diffuse += 1;
-      }
+      diffuse_pdf += pdf.value_or(0.0);
+      num_diffuse += pdf.has_value();
     }
 
     std::optional<visual_t> result;

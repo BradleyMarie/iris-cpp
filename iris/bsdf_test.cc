@@ -9,7 +9,7 @@
 iris::random::MockRandom g_rng;
 iris::reflectors::MockReflector g_reflector;
 
-TEST(BsdfTest, SampleNoPdf) {
+TEST(BsdfTest, SampleZeroPdf) {
   iris::internal::Arena arena;
   iris::SpectralAllocator allocator(arena);
 
@@ -102,7 +102,33 @@ TEST(BsdfTest, SampleBrdf) {
   EXPECT_EQ(0.5, result->pdf.value());
 }
 
-TEST(BsdfTest, ReflectanceNoPdf) {
+TEST(BsdfTest, SampleNoPdf) {
+  iris::internal::Arena arena;
+  iris::SpectralAllocator allocator(arena);
+
+  iris::bxdfs::MockBxdf bxdf;
+  EXPECT_CALL(bxdf, Sample(iris::Vector(1.0, 0.0, 0.0), testing::_))
+      .WillOnce(testing::Return(iris::Vector(1.0, 0.0, 0.0)));
+  EXPECT_CALL(bxdf,
+              Pdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0),
+                  iris::Bxdf::SampleSource::BXDF))
+      .WillOnce(testing::Return(std::nullopt));
+  EXPECT_CALL(bxdf, Reflectance(iris::Vector(1.0, 0.0, 0.0),
+                                iris::Vector(1.0, 0.0, 0.0),
+                                iris::Bxdf::SampleSource::BXDF,
+                                iris::Bxdf::Hemisphere::BTDF, testing::_))
+      .WillOnce(testing::Return(&g_reflector));
+
+  iris::Bsdf bsdf(bxdf, iris::Vector(0.0, 0.0, 1.0),
+                  iris::Vector(0.0, 0.0, 1.0), true);
+  auto result = bsdf.Sample(iris::Vector(1.0, 0.0, 0.0), g_rng, allocator);
+  EXPECT_TRUE(result);
+  EXPECT_EQ(&g_reflector, &result->reflector);
+  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), result->direction);
+  EXPECT_FALSE(result->pdf);
+}
+
+TEST(BsdfTest, ReflectanceZeroPdf) {
   iris::internal::Arena arena;
   iris::SpectralAllocator allocator(arena);
 
@@ -111,6 +137,23 @@ TEST(BsdfTest, ReflectanceNoPdf) {
               Pdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0),
                   iris::Bxdf::SampleSource::LIGHT))
       .WillOnce(testing::Return(0.0));
+
+  iris::Bsdf bsdf(bxdf, iris::Vector(0.0, 0.0, 1.0),
+                  iris::Vector(0.0, 0.0, 1.0), true);
+  auto result = bsdf.Reflectance(iris::Vector(1.0, 0.0, 0.0),
+                                 iris::Vector(1.0, 0.0, 0.0), allocator);
+  EXPECT_FALSE(result);
+}
+
+TEST(BsdfTest, ReflectanceNoPdf) {
+  iris::internal::Arena arena;
+  iris::SpectralAllocator allocator(arena);
+
+  iris::bxdfs::MockBxdf bxdf;
+  EXPECT_CALL(bxdf,
+              Pdf(iris::Vector(1.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0),
+                  iris::Bxdf::SampleSource::LIGHT))
+      .WillOnce(testing::Return(std::nullopt));
 
   iris::Bsdf bsdf(bxdf, iris::Vector(0.0, 0.0, 1.0),
                   iris::Vector(0.0, 0.0, 1.0), true);

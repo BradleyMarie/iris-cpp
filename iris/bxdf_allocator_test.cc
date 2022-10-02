@@ -11,6 +11,7 @@ TEST(BxdfAllocatorTest, Allocate) {
   iris::reflectors::MockReflector reflector;
   const iris::Bxdf& bxdf =
       allocator.Allocate<iris::bxdfs::LambertianBrdf>(reflector);
-  EXPECT_EQ(1.0, bxdf.DiffusePdf(iris::Vector(0.0, 0.0, -1.0),
-                                 iris::Vector(0.0, 0.0, 1.0)));
+  EXPECT_EQ(1.0,
+            bxdf.Pdf(iris::Vector(0.0, 0.0, -1.0), iris::Vector(0.0, 0.0, 1.0),
+                     iris::Bxdf::SampleSource::BXDF));
 }
