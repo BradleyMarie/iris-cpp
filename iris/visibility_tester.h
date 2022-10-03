@@ -9,6 +9,7 @@
 
 namespace iris {
 namespace internal {
+class Arena;
 class RayTracer;
 class VisibilityTester;
 }  // namespace internal
@@ -16,10 +17,12 @@ class VisibilityTester;
 class VisibilityTester {
  public:
   VisibilityTester(const Scene& scene, geometric_t minimum_distance,
-                   internal::RayTracer& ray_tracer) noexcept
+                   internal::RayTracer& ray_tracer,
+                   internal::Arena& arena) noexcept
       : scene_(scene),
         minimum_distance_(minimum_distance),
-        ray_tracer_(ray_tracer) {}
+        ray_tracer_(ray_tracer),
+        arena_(arena) {}
 
   bool Visible(const Ray& ray,
                geometric_t maximum_distance =
@@ -32,6 +35,7 @@ class VisibilityTester {
   const Scene& scene_;
   geometric_t minimum_distance_;
   internal::RayTracer& ray_tracer_;
+  internal::Arena& arena_;
 
   friend class internal::VisibilityTester;
 };

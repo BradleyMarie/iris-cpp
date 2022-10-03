@@ -3,6 +3,7 @@
 
 #include "googlemock/include/gmock/gmock.h"
 #include "iris/emissive_material.h"
+#include "iris/spectral_allocator.h"
 #include "iris/texture_coordinates.h"
 
 namespace iris {
@@ -10,7 +11,8 @@ namespace emissive_materials {
 
 class MockEmissiveMaterial final : public EmissiveMaterial {
  public:
-  MOCK_METHOD(const Spectrum*, Compute, (const TextureCoordinates&),
+  MOCK_METHOD(const Spectrum*, Evaluate,
+              (const TextureCoordinates&, SpectralAllocator&),
               (const override));
 };
 

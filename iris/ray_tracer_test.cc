@@ -16,8 +16,9 @@ class TestEmissiveMaterial : public iris::EmissiveMaterial {
   TestEmissiveMaterial(std::array<iris::geometric_t, 2> expected)
       : expected_(expected) {}
 
-  const iris::Spectrum* Compute(
-      const iris::TextureCoordinates& texture_coordinates) const override {
+  const iris::Spectrum* Evaluate(
+      const iris::TextureCoordinates& texture_coordinates,
+      iris::SpectralAllocator& spectral_allocator) const override {
     EXPECT_EQ(expected_, texture_coordinates.uv);
     EXPECT_FALSE(texture_coordinates.derivatives);
     return g_spectrum.get();
@@ -32,8 +33,10 @@ class TestMaterial : public iris::Material {
   TestMaterial(std::array<iris::geometric_t, 2> expected)
       : expected_(expected) {}
 
-  const iris::Bxdf* Compute(const iris::TextureCoordinates& texture_coordinates,
-                            iris::BxdfAllocator& allocator) const override {
+  const iris::Bxdf* Evaluate(
+      const iris::TextureCoordinates& texture_coordinates,
+      iris::SpectralAllocator& spectral_allocator,
+      iris::BxdfAllocator& allocator) const override {
     EXPECT_EQ(expected_, texture_coordinates.uv);
     EXPECT_FALSE(texture_coordinates.derivatives);
     return g_bxdf.get();
@@ -48,8 +51,8 @@ class TestNormalMap : public iris::NormalMap {
   TestNormalMap(std::array<iris::geometric_t, 2> expected)
       : expected_(expected) {}
 
-  iris::Vector Compute(const iris::TextureCoordinates& texture_coordinates,
-                       const iris::Vector& surface_normal) const override {
+  iris::Vector Evaluate(const iris::TextureCoordinates& texture_coordinates,
+                        const iris::Vector& surface_normal) const override {
     EXPECT_EQ(expected_, texture_coordinates.uv);
     EXPECT_FALSE(texture_coordinates.derivatives);
     EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), surface_normal);

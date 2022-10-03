@@ -16,8 +16,9 @@ namespace internal {
 class VisibilityTester final : public iris::VisibilityTester {
  public:
   VisibilityTester(const Scene& scene, geometric_t minimum_distance,
-                   internal::RayTracer& ray_tracer) noexcept
-      : iris::VisibilityTester(scene, minimum_distance, ray_tracer) {}
+                   internal::RayTracer& ray_tracer,
+                   internal::Arena& arena) noexcept
+      : iris::VisibilityTester(scene, minimum_distance, ray_tracer, arena) {}
 
   struct VisibleResult {
     const Spectrum& emission;

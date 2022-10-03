@@ -10,7 +10,7 @@ template <typename T, typename... Args>
 class PointerTexture2D {
  public:
   virtual const T* Evaluate(const TextureCoordinates& coordinates,
-                            const Args&... args) const = 0;
+                            Args&... args) const = 0;
 };
 
 template <typename T>

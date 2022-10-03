@@ -33,8 +33,9 @@ class TestGeometry : public iris::Geometry {
 
 TEST(VisibilityTesterTest, NoGeometry) {
   iris::internal::RayTracer ray_tracer;
+  iris::internal::Arena arena;
   auto scene = iris::scenes::ListScene::Builder::Create()->Build();
-  iris::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
+  iris::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer, arena);
 
   EXPECT_TRUE(visibility_tester.Visible(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0))));
@@ -51,7 +52,8 @@ TEST(VisibilityTesterTest, WithGeometry) {
   auto scene = builder->Build();
 
   iris::internal::RayTracer ray_tracer;
-  iris::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
+  iris::internal::Arena arena;
+  iris::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer, arena);
 
   EXPECT_TRUE(visibility_tester.Visible(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)), 0.5));

@@ -12,7 +12,7 @@ std::optional<iris::Light::SampleResult> LightTester::Sample(
     const Scene& visibility_tester) {
   internal::RayTracer ray_tracer;
   internal::VisibilityTester real_visibility_tester(
-      visibility_tester, static_cast<geometric>(0.0), ray_tracer);
+      visibility_tester, static_cast<geometric>(0.0), ray_tracer, arena_);
   SpectralAllocator allocator(arena_);
   return light.Sample(hit_point, rng, real_visibility_tester, allocator);
 }
@@ -22,7 +22,7 @@ const Spectrum* LightTester::Emission(const Light& light, const Ray& to_light,
                                       visual_t* pdf) {
   internal::RayTracer ray_tracer;
   internal::VisibilityTester real_visibility_tester(
-      visibility_tester, static_cast<geometric>(0.0), ray_tracer);
+      visibility_tester, static_cast<geometric>(0.0), ray_tracer, arena_);
   SpectralAllocator allocator(arena_);
   return light.Emission(to_light, real_visibility_tester, allocator, pdf);
 };

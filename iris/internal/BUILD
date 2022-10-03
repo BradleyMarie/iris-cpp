@@ -81,6 +81,7 @@ cc_library(
         "//iris:geometry",
         "//iris:integer",
         "//iris:matrix",
+        "//iris:spectral_allocator",
         "//iris:spectrum",
         "//iris:visibility_tester",
     ],
@@ -90,6 +91,7 @@ cc_test(
     name = "visibility_tester_test",
     srcs = ["visibility_tester_test.cc"],
     deps = [
+        ":arena",
         ":visibility_tester",
         "//iris/scenes:list_scene",
         "@com_google_googletest//:gtest_main",

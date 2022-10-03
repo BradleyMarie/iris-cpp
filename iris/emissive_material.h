@@ -1,6 +1,7 @@
 #ifndef _IRIS_EMISSIVE_MATERIAL_
 #define _IRIS_EMISSIVE_MATERIAL_
 
+#include "iris/spectral_allocator.h"
 #include "iris/spectrum.h"
 #include "iris/texture_coordinates.h"
 
@@ -8,8 +9,9 @@ namespace iris {
 
 class EmissiveMaterial {
  public:
-  virtual const Spectrum* Compute(
-      const TextureCoordinates& texture_coordinates) const = 0;
+  virtual const Spectrum* Evaluate(
+      const TextureCoordinates& texture_coordinates,
+      SpectralAllocator& spectral_allocator) const = 0;
   virtual ~EmissiveMaterial() {}
 };
 

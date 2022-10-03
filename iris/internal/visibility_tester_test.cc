@@ -3,6 +3,7 @@
 #include <optional>
 
 #include "googletest/include/gtest/gtest.h"
+#include "iris/internal/arena.h"
 #include "iris/internal/ray_tracer.h"
 #include "iris/scenes/list_scene.h"
 
@@ -17,8 +18,9 @@ class TestEmissiveMaterial final : public iris::EmissiveMaterial {
                        const iris::Spectrum* spectrum = nullptr)
       : expected_(expected), spectrum_(spectrum) {}
 
-  const iris::Spectrum* Compute(
-      const iris::TextureCoordinates& texture_coordinates) const override {
+  const iris::Spectrum* Evaluate(
+      const iris::TextureCoordinates& texture_coordinates,
+      iris::SpectralAllocator& spectral_allocator) const override {
     EXPECT_EQ(expected_, texture_coordinates.uv);
     EXPECT_FALSE(texture_coordinates.derivatives);
     return spectrum_;
@@ -106,7 +108,9 @@ TEST(VisibilityTesterTest, MissesGeometry) {
   auto scene = iris::scenes::ListScene::Builder::Create()->Build();
 
   iris::internal::RayTracer ray_tracer;
-  iris::internal::VisibilityTester visibility_tester(*scene, 50.0, ray_tracer);
+  iris::internal::Arena arena;
+  iris::internal::VisibilityTester visibility_tester(*scene, 50.0, ray_tracer,
+                                                     arena);
 
   EXPECT_FALSE(visibility_tester.Visible(world_ray, *geometry, nullptr, 1, 1.0,
                                          nullptr));
@@ -121,7 +125,9 @@ TEST(VisibilityTesterTest, WrongFace) {
   auto scene = iris::scenes::ListScene::Builder::Create()->Build();
 
   iris::internal::RayTracer ray_tracer;
-  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
+  iris::internal::Arena arena;
+  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer,
+                                                     arena);
 
   EXPECT_FALSE(visibility_tester.Visible(world_ray, *geometry, nullptr, 2, 1.0,
                                          nullptr));
@@ -144,7 +150,9 @@ TEST(VisibilityTesterTest, SucceedsSecondHit) {
   auto scene = builder->Build();
 
   iris::internal::RayTracer ray_tracer;
-  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
+  iris::internal::Arena arena;
+  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer,
+                                                     arena);
 
   g_second_hit = true;
   EXPECT_FALSE(visibility_tester.Visible(world_ray, *geometry_ptr, nullptr, 1,
@@ -161,7 +169,9 @@ TEST(VisibilityTesterTest, SceneTraceMisses) {
   auto scene = iris::scenes::ListScene::Builder::Create()->Build();
 
   iris::internal::RayTracer ray_tracer;
-  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
+  iris::internal::Arena arena;
+  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer,
+                                                     arena);
 
   EXPECT_FALSE(visibility_tester.Visible(world_ray, *geometry, nullptr, 1, 1.0,
                                          nullptr));
@@ -180,7 +190,9 @@ TEST(VisibilityTesterTest, SceneTraceWrongGeometry) {
   auto scene = builder->Build();
 
   iris::internal::RayTracer ray_tracer;
-  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
+  iris::internal::Arena arena;
+  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer,
+                                                     arena);
 
   EXPECT_FALSE(visibility_tester.Visible(world_ray, *geometry_ptr, nullptr, 1,
                                          1.0, nullptr));
@@ -199,7 +211,9 @@ TEST(VisibilityTesterTest, SceneTraceWrongMatrix) {
   auto scene = builder->Build();
 
   iris::internal::RayTracer ray_tracer;
-  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
+  iris::internal::Arena arena;
+  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer,
+                                                     arena);
 
   EXPECT_FALSE(visibility_tester.Visible(world_ray, *geometry_ptr, nullptr, 1,
                                          1.0, nullptr));
@@ -218,7 +232,9 @@ TEST(VisibilityTesterTest, SceneTraceWrongFace) {
   auto scene = builder->Build();
 
   iris::internal::RayTracer ray_tracer;
-  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
+  iris::internal::Arena arena;
+  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer,
+                                                     arena);
 
   g_override_face = true;
   EXPECT_FALSE(visibility_tester.Visible(world_ray, *geometry_ptr, nullptr,
@@ -239,7 +255,9 @@ TEST(VisibilityTesterTest, NoEmissiveMaterial) {
   auto scene = builder->Build();
 
   iris::internal::RayTracer ray_tracer;
-  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
+  iris::internal::Arena arena;
+  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer,
+                                                     arena);
 
   EXPECT_FALSE(visibility_tester.Visible(world_ray, *geometry_ptr, nullptr, 1,
                                          1.0, nullptr));
@@ -261,7 +279,9 @@ TEST(VisibilityTesterTest, NoSpectrum) {
   auto scene = builder->Build();
 
   iris::internal::RayTracer ray_tracer;
-  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
+  iris::internal::Arena arena;
+  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer,
+                                                     arena);
 
   EXPECT_FALSE(visibility_tester.Visible(world_ray, *geometry_ptr, nullptr, 1,
                                          1.0, nullptr));
@@ -284,7 +304,9 @@ TEST(VisibilityTesterTest, Succeeds) {
   auto scene = builder->Build();
 
   iris::internal::RayTracer ray_tracer;
-  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
+  iris::internal::Arena arena;
+  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer,
+                                                     arena);
 
   auto result = visibility_tester.Visible(world_ray, *geometry_ptr, nullptr, 1,
                                           1.0, nullptr);
@@ -310,7 +332,9 @@ TEST(VisibilityTesterTest, SucceedsWithPdf) {
   auto scene = builder->Build();
 
   iris::internal::RayTracer ray_tracer;
-  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
+  iris::internal::Arena arena;
+  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer,
+                                                     arena);
 
   iris::visual_t pdf;
   auto result = visibility_tester.Visible(world_ray, *geometry_ptr, nullptr, 1,
@@ -339,7 +363,9 @@ TEST(VisibilityTesterTest, SucceedsWithTransformWithPdf) {
   auto scene = builder->Build();
 
   iris::internal::RayTracer ray_tracer;
-  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
+  iris::internal::Arena arena;
+  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer,
+                                                     arena);
 
   iris::visual_t pdf;
   auto result = visibility_tester.Visible(
@@ -368,7 +394,9 @@ TEST(VisibilityTesterTest, SucceedsWithCoordinates) {
   auto scene = builder->Build();
 
   iris::internal::RayTracer ray_tracer;
-  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer);
+  iris::internal::Arena arena;
+  iris::internal::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer,
+                                                     arena);
 
   auto result = visibility_tester.Visible(world_ray, *geometry_ptr, nullptr, 1,
                                           1.0, nullptr);

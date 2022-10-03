@@ -17,7 +17,7 @@ class ConstantPointerTexture2D final
       : storage_(std::move(storage)), value_(value) {}
 
   const Return* Evaluate(const TextureCoordinates& coordinates,
-                         const Args&... args) const override {
+                         Args&... args) const override {
     return &value_;
   }
 

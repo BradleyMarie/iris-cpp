@@ -9,8 +9,8 @@ namespace iris {
 
 class NormalMap {
  public:
-  virtual Vector Compute(const TextureCoordinates& texture_coordinates,
-                         const Vector& surface_normal) const = 0;
+  virtual Vector Evaluate(const TextureCoordinates& texture_coordinates,
+                          const Vector& surface_normal) const = 0;
   virtual ~NormalMap() {}
 };
 

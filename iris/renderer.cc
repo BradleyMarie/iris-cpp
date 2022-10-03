@@ -43,7 +43,7 @@ void RenderChunk(const Scene& scene, const LightScene& light_scene,
 
   internal::RayTracer internal_tracer;
   internal::VisibilityTester visibility_tester(scene, minimum_distance,
-                                               internal_tracer);
+                                               internal_tracer, arena);
   RayTracer ray_tracer(scene, minimum_distance, internal_tracer, arena);
 
   for (auto chunk_index = chunk_counter.fetch_add(1); chunk_index < num_chunks;

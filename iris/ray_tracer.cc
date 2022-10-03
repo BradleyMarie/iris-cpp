@@ -4,6 +4,7 @@
 
 #include "iris/bxdf_allocator.h"
 #include "iris/internal/ray_tracer.h"
+#include "iris/spectral_allocator.h"
 
 namespace iris {
 namespace {
@@ -26,13 +27,15 @@ std::optional<Bsdf> MakeBsdf(const iris::internal::Hit& hit,
                              const TextureCoordinates& texture_coordinates,
                              const Vector& world_surface_normal,
                              const Vector& world_shading_normal,
+                             SpectralAllocator& spectral_allocator,
                              BxdfAllocator& bxdf_allocator) {
   auto* material = hit.geometry->GetMaterial(hit.front, hit.additional_data);
   if (!material) {
     return std::nullopt;
   }
 
-  auto* bxdf = material->Compute(texture_coordinates, bxdf_allocator);
+  auto* bxdf = material->Evaluate(texture_coordinates, spectral_allocator,
+                                  bxdf_allocator);
   if (!bxdf) {
     return std::nullopt;
   }
@@ -62,10 +65,13 @@ std::optional<RayTracer::Result> RayTracer::Trace(const Ray& ray) {
                                       hit->additional_data)
           .value_or(TextureCoordinates{0.0, 0.0});
 
+  SpectralAllocator spectral_allocator(arena_);
+
   const Spectrum* spectrum = nullptr;
   if (auto* emissive_material = hit->geometry->GetEmissiveMaterial(
           hit->front, hit->additional_data)) {
-    spectrum = emissive_material->Compute(texture_coordinates);
+    spectrum =
+        emissive_material->Evaluate(texture_coordinates, spectral_allocator);
   }
 
   Vector model_surface_normal = hit->geometry->ComputeSurfaceNormal(
@@ -77,7 +83,7 @@ std::optional<RayTracer::Result> RayTracer::Trace(const Ray& ray) {
       std::holds_alternative<const NormalMap*>(shading_normal_variant)
           ? std::get<const NormalMap*>(shading_normal_variant)
                 ? std::get<const NormalMap*>(shading_normal_variant)
-                      ->Compute(texture_coordinates, model_surface_normal)
+                      ->Evaluate(texture_coordinates, model_surface_normal)
                 : model_surface_normal
           : std::get<Vector>(shading_normal_variant);
 
@@ -86,7 +92,7 @@ std::optional<RayTracer::Result> RayTracer::Trace(const Ray& ray) {
 
   BxdfAllocator bxdf_allocator(arena_);
   auto bsdf = MakeBsdf(*hit, texture_coordinates, vectors.first, vectors.second,
-                       bxdf_allocator);
+                       spectral_allocator, bxdf_allocator);
 
   return RayTracer::Result{bsdf, spectrum, world_hit_point, vectors.first,
                            vectors.second};

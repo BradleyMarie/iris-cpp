@@ -131,7 +131,7 @@ TEST(ListSceneTest, AreaLightEmission) {
   iris::testing::LightTester light_tester;
   iris::spectra::MockSpectrum spectrum;
   iris::emissive_materials::MockEmissiveMaterial emissive_material;
-  EXPECT_CALL(emissive_material, Compute(testing::_))
+  EXPECT_CALL(emissive_material, Evaluate(testing::_, testing::_))
       .WillOnce(testing::Return(&spectrum));
 
   auto scene_builder = iris::scenes::ListScene::Builder::Create();
@@ -219,7 +219,7 @@ TEST(ListSceneTest, AreaLightSampleWorld) {
   iris::spectra::MockSpectrum spectrum;
   iris::emissive_materials::MockEmissiveMaterial emissive_material;
 
-  EXPECT_CALL(emissive_material, Compute(testing::_))
+  EXPECT_CALL(emissive_material, Evaluate(testing::_, testing::_))
       .WillOnce(testing::Return(&spectrum));
 
   auto scene_builder = iris::scenes::ListScene::Builder::Create();
@@ -246,7 +246,7 @@ TEST(ListSceneTest, AreaLightSampleWithTransform) {
   iris::spectra::MockSpectrum spectrum;
   iris::emissive_materials::MockEmissiveMaterial emissive_material;
 
-  EXPECT_CALL(emissive_material, Compute(testing::_))
+  EXPECT_CALL(emissive_material, Evaluate(testing::_, testing::_))
       .WillOnce(testing::Return(&spectrum));
 
   auto scene_builder = iris::scenes::ListScene::Builder::Create();

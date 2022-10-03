@@ -5,6 +5,7 @@
 
 #include "iris/internal/ray_tracer.h"
 #include "iris/scene.h"
+#include "iris/spectral_allocator.h"
 
 namespace iris {
 namespace internal {
@@ -92,7 +93,9 @@ std::optional<VisibilityTester::VisibleResult> VisibilityTester::Visible(
     return std::nullopt;
   }
 
-  auto* spectrum = emissive_material->Compute(texture_coordinates);
+  SpectralAllocator spectral_allocator(arena_);
+  auto* spectrum =
+      emissive_material->Evaluate(texture_coordinates, spectral_allocator);
   if (!spectrum) {
     return std::nullopt;
   }

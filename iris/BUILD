@@ -108,6 +108,7 @@ cc_library(
     hdrs = ["emissive_material.h"],
     visibility = ["//visibility:public"],
     deps = [
+        ":spectral_allocator",
         ":spectrum",
         ":texture_coordinates",
     ],
@@ -367,6 +368,7 @@ cc_library(
     deps = [
         ":bxdf",
         ":bxdf_allocator",
+        ":spectral_allocator",
         ":texture_coordinates",
     ],
 )
@@ -474,6 +476,7 @@ cc_library(
         ":float",
         ":ray",
         ":scene",
+        ":spectral_allocator",
         ":spectrum",
         "//iris/internal:ray_tracer",
     ],
@@ -641,6 +644,7 @@ cc_test(
     srcs = ["visibility_tester_test.cc"],
     deps = [
         ":visibility_tester",
+        "//iris/internal:arena",
         "//iris/internal:ray_tracer",
         "//iris/scenes:list_scene",
         "@com_google_googletest//:gtest_main",
