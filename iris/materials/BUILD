@@ -19,6 +19,19 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "matte_material_test",
+    srcs = ["matte_material_test.cc"],
+    deps = [
+        ":matte_material",
+        "//iris/reflectors:mock_reflector",
+        "//iris/testing:bxdf_tester",
+        "//iris/testing:material_tester",
+        "//iris/textures:constant_texture",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "mock_material",
     testonly = True,

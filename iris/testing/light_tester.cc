@@ -25,7 +25,7 @@ const Spectrum* LightTester::Emission(const Light& light, const Ray& to_light,
       visibility_tester, static_cast<geometric>(0.0), ray_tracer, arena_);
   SpectralAllocator allocator(arena_);
   return light.Emission(to_light, real_visibility_tester, allocator, pdf);
-};
+}
 
 }  // namespace testing
 }  // namespace iris

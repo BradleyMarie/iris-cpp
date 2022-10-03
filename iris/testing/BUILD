@@ -53,6 +53,19 @@ cc_library(
 )
 
 cc_library(
+    name = "material_tester",
+    testonly = True,
+    srcs = ["material_tester.cc"],
+    hdrs = ["material_tester.h"],
+    deps = [
+        "//iris:bxdf",
+        "//iris:material",
+        "//iris:texture_coordinates",
+        "//iris/internal:arena",
+    ],
+)
+
+cc_library(
     name = "mock_visibility_tester",
     testonly = True,
     srcs = ["mock_visibility_tester.cc"],
