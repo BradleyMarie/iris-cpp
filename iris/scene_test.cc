@@ -114,6 +114,9 @@ TEST(SceneBuilder, Build) {
   std::unique_ptr<iris::Scene::Builder> builder =
       std::make_unique<TestSceneBuilder>(func);
 
+  builder->Add(std::unique_ptr<iris::Geometry>(), matrix0);
+  builder->Add(nullptr, matrix0);
+
   builder->Add(std::move(geom0), matrix1);
   builder->Add(std::move(geom1), matrix2);
   builder->Add(std::move(geom2), matrix2);

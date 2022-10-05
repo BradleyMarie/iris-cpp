@@ -4,11 +4,23 @@ namespace iris {
 
 void Scene::Builder::Add(std::unique_ptr<Geometry> geometry,
                          const Matrix& matrix) {
-  assert(geometry);
-  auto iter = numbered_matrices_.insert({matrix, numbered_matrices_.size()});
-  size_t geometry_index = geometry_.size();
+  if (!geometry) {
+    return;
+  }
+
+  numbered_geometry_[geometry.get()] = geometry_.size();
   geometry_.push_back(std::move(geometry));
-  indices_.push_back({geometry_index, iter.first->second});
+  Add(geometry_.back().get(), matrix);
+}
+
+void Scene::Builder::Add(const Geometry* geometry, const Matrix& matrix) {
+  if (!geometry) {
+    return;
+  }
+
+  auto iter = numbered_matrices_.insert({matrix, numbered_matrices_.size()});
+  size_t geometry_index = numbered_geometry_.at(geometry);
+  indices_.push_back({geometry, iter.first->second});
 }
 
 std::unique_ptr<Scene> Scene::Builder::Build() {
@@ -35,6 +47,7 @@ std::unique_ptr<Scene> Scene::Builder::Build() {
   indices_.clear();
   geometry_.clear();
   numbered_matrices_.clear();
+  numbered_geometry_.clear();
   numbered_matrices_.insert({Matrix::Identity(), 0});
 
   return result;

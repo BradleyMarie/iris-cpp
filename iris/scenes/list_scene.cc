@@ -1,5 +1,7 @@
 #include "iris/scenes/list_scene.h"
 
+#include <algorithm>
+
 namespace iris {
 namespace scenes {
 
@@ -7,7 +9,13 @@ std::unique_ptr<Scene> ListScene::Builder::Build(
     std::vector<std::pair<size_t, size_t>> geometry_and_matrix,
     std::vector<std::unique_ptr<Geometry>> geometry,
     std::vector<Matrix> matrices) {
-  return std::make_unique<ListScene>(std::move(geometry_and_matrix),
+  std::vector<std::pair<const Geometry*, size_t>> geometry_ptr_and_matrix;
+  for (const auto& entry : geometry_and_matrix) {
+    geometry_ptr_and_matrix.emplace_back(geometry.at(entry.first).get(),
+                                         entry.second);
+  }
+
+  return std::make_unique<ListScene>(std::move(geometry_ptr_and_matrix),
                                      std::move(geometry), std::move(matrices));
 }
 
@@ -23,7 +31,7 @@ Scene::const_iterator ListScene::begin() const {
         size_t current = index++;
         bool has_matrix = geometry_and_matrix_[current].second != 0;
         return std::make_pair(
-            std::cref(*geometry_[geometry_and_matrix_[current].first]),
+            std::cref(*geometry_and_matrix_[current].first),
             has_matrix ? &matrices_[geometry_and_matrix_[current].second]
                        : nullptr);
       });
@@ -32,9 +40,9 @@ Scene::const_iterator ListScene::begin() const {
 void ListScene::Trace(const Ray& ray, Intersector& intersector) const {
   for (const auto& entry : geometry_and_matrix_) {
     if (entry.second != 0) {
-      intersector.Intersect(*geometry_[entry.first], matrices_[entry.second]);
+      intersector.Intersect(*entry.first, matrices_[entry.second]);
     } else {
-      intersector.Intersect(*geometry_[entry.first]);
+      intersector.Intersect(*entry.first);
     }
   }
 }

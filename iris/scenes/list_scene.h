@@ -27,7 +27,7 @@ class ListScene final : public Scene {
         std::vector<Matrix> matrices) override;
   };
 
-  ListScene(std::vector<std::pair<size_t, size_t>> geometry_and_matrix,
+  ListScene(std::vector<std::pair<const Geometry*, size_t>> geometry_and_matrix,
             std::vector<std::unique_ptr<Geometry>> geometry,
             std::vector<Matrix> matrices) noexcept
       : geometry_and_matrix_(std::move(geometry_and_matrix)),
@@ -39,7 +39,7 @@ class ListScene final : public Scene {
   void Trace(const Ray& ray, Intersector& intersector) const override;
 
  private:
-  const std::vector<std::pair<size_t, size_t>> geometry_and_matrix_;
+  const std::vector<std::pair<const Geometry*, size_t>> geometry_and_matrix_;
   const std::vector<std::unique_ptr<Geometry>> geometry_;
   const std::vector<Matrix> matrices_;
 };

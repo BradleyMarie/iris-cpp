@@ -18,6 +18,8 @@ class Scene {
    public:
     void Add(std::unique_ptr<Geometry> geometry,
              const Matrix& matrix = Matrix::Identity());
+    void Add(const Geometry* geometry,
+             const Matrix& matrix = Matrix::Identity());
     std::unique_ptr<Scene> Build();
 
    private:
@@ -28,6 +30,7 @@ class Scene {
 
     std::vector<std::pair<size_t, size_t>> indices_;
     std::vector<std::unique_ptr<Geometry>> geometry_;
+    std::map<const Geometry*, size_t> numbered_geometry_;
     std::map<Matrix, size_t> numbered_matrices_ = {{Matrix::Identity(), 0}};
   };
 
