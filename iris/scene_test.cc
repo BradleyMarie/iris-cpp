@@ -1,5 +1,7 @@
 #include "iris/scene.h"
 
+#include <algorithm>
+
 #include "googletest/include/gtest/gtest.h"
 
 class TestScene : public iris::Scene {

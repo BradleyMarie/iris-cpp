@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <map>
+#include <set>
 #include <utility>
 
 #include "iris/geometry.h"
@@ -28,7 +29,7 @@ class Scene {
         std::vector<std::unique_ptr<Geometry>> geometry,
         std::vector<Matrix> matrices) = 0;
 
-    std::vector<std::pair<size_t, size_t>> indices_;
+    std::set<std::pair<size_t, size_t>> indices_;
     std::vector<std::unique_ptr<Geometry>> geometry_;
     std::map<const Geometry*, size_t> numbered_geometry_;
     std::map<Matrix, size_t> numbered_matrices_ = {{Matrix::Identity(), 0}};
