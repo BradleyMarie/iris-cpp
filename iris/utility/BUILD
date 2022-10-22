@@ -3,25 +3,6 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "memory",
-    srcs = ["memory.cc"],
-    hdrs = ["memory.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "@com_google_absl//absl/log:check",
-    ],
-)
-
-cc_test(
-    name = "memory_test",
-    srcs = ["memory_test.cc"],
-    deps = [
-        ":memory",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "reflector_manager",
     hdrs = ["reflector_manager.h"],
     deps = [

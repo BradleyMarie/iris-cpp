@@ -1,32 +1,15 @@
-#ifndef _IRIS_UTILITY_MEMORY_
-#define _IRIS_UTILITY_MEMORY_
+#ifndef _IRIS_REFERENCE_COUNTED_
+#define _IRIS_REFERENCE_COUNTED_
 
 #include <algorithm>
-#include <atomic>
 #include <concepts>
 #include <functional>
 #include <memory>
 #include <type_traits>
 
+#include "iris/reference_countable.h"
+
 namespace iris {
-namespace utility {
-
-class ReferenceCountable {
- public:
-  ReferenceCountable() noexcept : reference_count_(1) {}
-
- private:
-  typedef uint32_t reference_count_t;
-
-  void Increment() noexcept;
-  bool Decrement() noexcept;
-
-  std::atomic<reference_count_t> reference_count_;
-
-  template <typename T>
-  requires std::derived_from<T, ReferenceCountable>
-  friend class ReferenceCounted;
-};
 
 template <typename T>
 requires std::derived_from<T, ReferenceCountable>
@@ -83,21 +66,20 @@ ReferenceCounted<T> MakeReferenceCounted(Args... args) {
   return ReferenceCounted<T>(std::make_unique<T>(args...));
 }
 
-}  // namespace utility
 }  // namespace iris
 
 namespace std {
 
 template <typename T>
-void swap(iris::utility::ReferenceCounted<T>& lhs,
-          iris::utility::ReferenceCounted<T>& rhs) noexcept {
+void swap(iris::ReferenceCounted<T>& lhs,
+          iris::ReferenceCounted<T>& rhs) noexcept {
   lhs.Swap(rhs);
 }
 
 template <typename T>
-struct hash<iris::utility::ReferenceCounted<T>> {
+struct hash<iris::ReferenceCounted<T>> {
   std::size_t operator()(
-      const iris::utility::ReferenceCounted<T>& value) const noexcept {
+      const iris::ReferenceCounted<T>& value) const noexcept {
     std::hash<const T*> hash;
     return hash(value.Get());
   }
@@ -105,4 +87,4 @@ struct hash<iris::utility::ReferenceCounted<T>> {
 
 }  // namespace std
 
-#endif  // _IRIS_UTILITY_MEMORY_
+#endif  // _IRIS_REFERENCE_COUNTED_

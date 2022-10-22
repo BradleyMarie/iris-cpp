@@ -496,6 +496,34 @@ cc_test(
 )
 
 cc_library(
+    name = "reference_countable",
+    srcs = ["reference_countable.cc"],
+    hdrs = ["reference_countable.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_google_absl//absl/log:check",
+    ],
+)
+
+cc_library(
+    name = "reference_counted",
+    hdrs = ["reference_counted.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":reference_countable",
+    ],
+)
+
+cc_test(
+    name = "reference_counted_test",
+    srcs = ["reference_counted_test.cc"],
+    deps = [
+        ":reference_counted",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "reflector",
     hdrs = ["reflector.h"],
     visibility = ["//visibility:public"],

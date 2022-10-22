@@ -1,11 +1,10 @@
-#include "iris/utility/memory.h"
+#include "iris/reference_countable.h"
 
 #include <limits>
 
 #include "absl/log/check.h"
 
 namespace iris {
-namespace utility {
 
 void ReferenceCountable::Increment() noexcept {
   auto old_value = reference_count_.fetch_add(1u);
@@ -18,5 +17,4 @@ bool ReferenceCountable::Decrement() noexcept {
   return old_value == 1;
 }
 
-}  // namespace utility
 }  // namespace iris
