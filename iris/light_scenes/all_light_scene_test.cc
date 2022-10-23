@@ -10,28 +10,29 @@
 
 TEST(AllLightSceneTest, NoLights) {
   iris::random::MockRandom rng;
-  auto scene = iris::scenes::ListScene::Builder::Create()->Build();
+  auto scene_objects = iris::SceneObjects::Builder().Build();
   auto light_scene =
-      iris::light_scenes::AllLightScene::Builder::Create()->Build(*scene);
+      iris::light_scenes::AllLightScene::Builder::Create()->Build(
+          scene_objects);
   iris::testing::LightSceneTester tester;
   EXPECT_EQ(nullptr,
             tester.Sample(*light_scene, iris::Point(0.0, 0.0, 0.0), rng));
 }
 
 TEST(AllLightSceneTest, TwoLights) {
-  auto light0 = std::make_unique<iris::lights::MockLight>();
-  auto* light0_ptr = light0.get();
+  auto light0 = iris::MakeReferenceCounted<iris::lights::MockLight>();
+  auto* light0_ptr = light0.Get();
 
-  auto light1 = std::make_unique<iris::lights::MockLight>();
-  auto* light1_ptr = light1.get();
+  auto light1 = iris::MakeReferenceCounted<iris::lights::MockLight>();
+  auto* light1_ptr = light1.Get();
 
   iris::random::MockRandom rng;
-  auto scene = iris::scenes::ListScene::Builder::Create()->Build();
-  auto light_scene_builder =
-      iris::light_scenes::AllLightScene::Builder::Create();
-  light_scene_builder->Add(std::move(light0));
-  light_scene_builder->Add(std::move(light1));
-  auto light_scene = light_scene_builder->Build(*scene);
+  auto light_scene_builder = iris::SceneObjects::Builder();
+  light_scene_builder.Add(std::move(light0));
+  light_scene_builder.Add(std::move(light1));
+  auto objects = light_scene_builder.Build();
+  auto light_scene =
+      iris::light_scenes::AllLightScene::Builder::Create()->Build(objects);
 
   iris::testing::LightSceneTester tester;
   auto light_samples =

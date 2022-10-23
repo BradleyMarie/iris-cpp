@@ -2,13 +2,11 @@
 #define _IRIS_SCENES_LIST_SCENE_
 
 #include <memory>
-#include <vector>
 
-#include "iris/geometry.h"
 #include "iris/intersector.h"
-#include "iris/matrix.h"
 #include "iris/ray.h"
 #include "iris/scene.h"
+#include "iris/scene_objects.h"
 
 namespace iris {
 namespace scenes {
@@ -17,34 +15,18 @@ class ListScene final : public Scene {
  public:
   class Builder final : public Scene::Builder {
    public:
-    static std::unique_ptr<Scene::Builder> Create() {
-      return std::make_unique<Builder>();
-    }
-
-   private:
+    static std::unique_ptr<Scene::Builder> Create();
     std::unique_ptr<Scene> Build(
-        std::vector<std::pair<size_t, size_t>> geometry_and_matrix,
-        std::vector<std::unique_ptr<Geometry>> geometry,
-        std::vector<Matrix> matrices) override;
+        const SceneObjects& scene_objects) const override;
   };
 
-  ListScene(std::vector<std::pair<const Geometry*, const Matrix*>>
-                geometry_and_matrix,
-            std::vector<std::unique_ptr<Geometry>> geometry,
-            std::vector<Matrix> matrices) noexcept
-      : geometry_and_matrix_(std::move(geometry_and_matrix)),
-        geometry_(std::move(geometry)),
-        matrices_(std::move(matrices)) {}
-
-  const_iterator begin() const override;
+  ListScene(const SceneObjects& scene_objects) noexcept
+      : scene_objects_(scene_objects) {}
 
   void Trace(const Ray& ray, Intersector& intersector) const override;
 
  private:
-  const std::vector<std::pair<const Geometry*, const Matrix*>>
-      geometry_and_matrix_;
-  const std::vector<std::unique_ptr<Geometry>> geometry_;
-  const std::vector<Matrix> matrices_;
+  const SceneObjects& scene_objects_;
 };
 
 }  // namespace scenes

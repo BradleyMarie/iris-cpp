@@ -17,18 +17,12 @@ class SingleGeometryScene final : public Scene {
                       const Matrix* model_to_world) noexcept
       : geometry_(geometry), model_to_world_(model_to_world) {}
 
-  const_iterator begin() const override;
   void Trace(const Ray& ray, Intersector& intersector) const override;
 
  private:
   const Geometry& geometry_;
   const Matrix* model_to_world_;
 };
-
-Scene::const_iterator SingleGeometryScene::begin() const {
-  assert(false);
-  return end();
-}
 
 void SingleGeometryScene::Trace(const Ray& ray,
                                 Intersector& intersector) const {

@@ -31,7 +31,8 @@ class SceneObjects {
     Builder& operator=(const Builder&) = delete;
     Builder& operator=(Builder&&) = default;
 
-    void Add(ReferenceCounted<Geometry> geometry, const Matrix& matrix);
+    void Add(ReferenceCounted<Geometry> geometry,
+             const Matrix& matrix = iris::Matrix::Identity());
     void Add(ReferenceCounted<Light> light);
     SceneObjects Build();
 

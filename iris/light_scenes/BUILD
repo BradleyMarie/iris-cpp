@@ -7,12 +7,12 @@ cc_library(
     srcs = ["all_light_scene.cc"],
     hdrs = ["all_light_scene.h"],
     deps = [
-        "//iris:light",
         "//iris:light_sample",
         "//iris:light_sample_allocator",
         "//iris:light_scene",
         "//iris:point",
         "//iris:random",
+        "//iris:scene_objects",
     ],
 )
 

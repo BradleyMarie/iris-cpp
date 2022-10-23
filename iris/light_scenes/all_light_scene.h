@@ -3,12 +3,12 @@
 
 #include <memory>
 
-#include "iris/light.h"
 #include "iris/light_sample.h"
 #include "iris/light_sample_allocator.h"
 #include "iris/light_scene.h"
 #include "iris/point.h"
 #include "iris/random.h"
+#include "iris/scene_objects.h"
 
 namespace iris {
 namespace light_scenes {
@@ -17,23 +17,19 @@ class AllLightScene final : public LightScene {
  public:
   class Builder final : public LightScene::Builder {
    public:
-    static std::unique_ptr<LightScene::Builder> Create() {
-      return std::make_unique<Builder>();
-    }
-
-   private:
+    static std::unique_ptr<LightScene::Builder> Create();
     std::unique_ptr<LightScene> Build(
-        std::vector<std::unique_ptr<Light>> lights) override;
+        const SceneObjects& scene_objects) const override;
   };
 
-  AllLightScene(std::vector<std::unique_ptr<Light>> lights) noexcept
-      : lights_(std::move(lights)) {}
+  AllLightScene(const SceneObjects& scene_objects) noexcept
+      : scene_objects_(scene_objects) {}
 
   LightSample* Sample(const Point& hit_point, Random& rng,
                       LightSampleAllocator& allocator) const override;
 
  private:
-  std::vector<std::unique_ptr<Light>> lights_;
+  const SceneObjects& scene_objects_;
 };
 
 }  // namespace light_scenes

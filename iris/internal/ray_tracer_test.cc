@@ -1,6 +1,7 @@
 #include "iris/internal/ray_tracer.h"
 
 #include "googletest/include/gtest/gtest.h"
+#include "iris/scene_objects.h"
 #include "iris/scenes/list_scene.h"
 
 class TestGeometry : public iris::Geometry {
@@ -23,7 +24,6 @@ class TestGeometry : public iris::Geometry {
 
   std::span<const iris::face_t> GetFaces() const override {
     static const iris::face_t faces[] = {1};
-    EXPECT_FALSE(true);
     return faces;
   }
 
@@ -32,7 +32,8 @@ class TestGeometry : public iris::Geometry {
 
 TEST(RayTracerTest, NoGeometry) {
   iris::internal::RayTracer ray_tracer;
-  auto scene = iris::scenes::ListScene::Builder::Create()->Build();
+  auto scene_objects = iris::SceneObjects::Builder().Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(scene_objects);
   EXPECT_EQ(nullptr, ray_tracer.Trace(iris::Ray(iris::Point(0.0, 0.0, 0.0),
                                                 iris::Vector(1.0, 1.0, 1.0)),
                                       0.0, 1.0, *scene));
@@ -40,12 +41,13 @@ TEST(RayTracerTest, NoGeometry) {
 
 TEST(RayTracerTest, WithGeometry) {
   iris::Ray ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0));
-  auto geometry = std::make_unique<TestGeometry>(ray);
-  auto* geometry_ptr = geometry.get();
+  auto geometry = iris::MakeReferenceCounted<TestGeometry>(ray);
+  auto* geometry_ptr = geometry.Get();
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
-  builder->Add(std::move(geometry));
-  auto scene = builder->Build();
+  auto builder = iris::SceneObjects::Builder();
+  builder.Add(std::move(geometry));
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder().Build(objects);
 
   iris::internal::RayTracer ray_tracer;
   auto* hit = ray_tracer.Trace(ray, 0.0, 2.0, *scene);

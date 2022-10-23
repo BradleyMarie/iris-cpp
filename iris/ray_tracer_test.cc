@@ -125,7 +125,6 @@ class TestGeometry : public iris::Geometry {
 
   std::span<const iris::face_t> GetFaces() const override {
     static const iris::face_t faces[] = {1};
-    EXPECT_FALSE(true);
     return faces;
   }
 
@@ -140,7 +139,8 @@ class TestGeometry : public iris::Geometry {
 TEST(RayTracerTest, NoGeometry) {
   iris::internal::RayTracer internal_ray_tracer;
   iris::internal::Arena arena;
-  auto scene = iris::scenes::ListScene::Builder::Create()->Build();
+  auto objects = iris::SceneObjects::Builder().Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
   iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer, arena);
 
   EXPECT_FALSE(ray_tracer.Trace(
@@ -150,9 +150,11 @@ TEST(RayTracerTest, NoGeometry) {
 TEST(RayTracerTest, Minimal) {
   iris::Ray ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0));
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
-  builder->Add(std::make_unique<TestGeometry>(ray, iris::Point(1.0, 1.0, 1.0)));
-  auto scene = builder->Build();
+  auto builder = iris::SceneObjects::Builder();
+  builder.Add(iris::MakeReferenceCounted<TestGeometry>(
+      ray, iris::Point(1.0, 1.0, 1.0)));
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
   iris::internal::RayTracer internal_ray_tracer;
   iris::internal::Arena arena;
@@ -171,10 +173,12 @@ TEST(RayTracerTest, Minimal) {
 TEST(RayTracerTest, WithTransform) {
   iris::Ray ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(-1.0, 1.0, 1.0));
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
-  builder->Add(std::make_unique<TestGeometry>(ray, iris::Point(-1.0, 1.0, 1.0)),
-               iris::Matrix::Scalar(-1.0, 1.0, 1.0).value());
-  auto scene = builder->Build();
+  auto builder = iris::SceneObjects::Builder();
+  builder.Add(iris::MakeReferenceCounted<TestGeometry>(
+                  ray, iris::Point(-1.0, 1.0, 1.0)),
+              iris::Matrix::Scalar(-1.0, 1.0, 1.0).value());
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
   TestGeometry geometry(ray, iris::Point(-1.0, 1.0, 1.0));
 
@@ -196,11 +200,12 @@ TEST(RayTracerTest, WithTextureCoordinates) {
   iris::Ray ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0));
   TestMaterial material({1.0, 1.0});
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
-  builder->Add(std::make_unique<TestGeometry>(
+  auto builder = iris::SceneObjects::Builder();
+  builder.Add(iris::MakeReferenceCounted<TestGeometry>(
       ray, iris::Point(1.0, 1.0, 1.0), &material, nullptr, nullptr,
       iris::TextureCoordinates{{1.0, 1.0}}));
-  auto scene = builder->Build();
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
   iris::internal::RayTracer internal_ray_tracer;
   iris::internal::Arena arena;
@@ -220,10 +225,11 @@ TEST(RayTracerTest, WithMaterial) {
   iris::Ray ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0));
   TestMaterial material({0.0, 0.0});
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
-  builder->Add(std::make_unique<TestGeometry>(ray, iris::Point(1.0, 1.0, 1.0),
-                                              &material));
-  auto scene = builder->Build();
+  auto builder = iris::SceneObjects::Builder();
+  builder.Add(iris::MakeReferenceCounted<TestGeometry>(
+      ray, iris::Point(1.0, 1.0, 1.0), &material));
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
   iris::internal::RayTracer internal_ray_tracer;
   iris::internal::Arena arena;
@@ -243,10 +249,11 @@ TEST(RayTracerTest, WithEmissiveMaterial) {
   iris::Ray ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0));
   TestEmissiveMaterial emissive_material({0.0, 0.0});
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
-  builder->Add(std::make_unique<TestGeometry>(ray, iris::Point(1.0, 1.0, 1.0),
-                                              nullptr, &emissive_material));
-  auto scene = builder->Build();
+  auto builder = iris::SceneObjects::Builder();
+  builder.Add(iris::MakeReferenceCounted<TestGeometry>(
+      ray, iris::Point(1.0, 1.0, 1.0), nullptr, &emissive_material));
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
   iris::internal::RayTracer internal_ray_tracer;
   iris::internal::Arena arena;
@@ -265,11 +272,12 @@ TEST(RayTracerTest, WithEmissiveMaterial) {
 TEST(RayTracerTest, WithNormal) {
   iris::Ray ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0));
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
-  builder->Add(std::make_unique<TestGeometry>(ray, iris::Point(1.0, 1.0, 1.0),
-                                              nullptr, nullptr,
-                                              iris::Vector(0.0, 1.0, 0.0)));
-  auto scene = builder->Build();
+  auto builder = iris::SceneObjects::Builder();
+  builder.Add(iris::MakeReferenceCounted<TestGeometry>(
+      ray, iris::Point(1.0, 1.0, 1.0), nullptr, nullptr,
+      iris::Vector(0.0, 1.0, 0.0)));
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
   iris::internal::RayTracer internal_ray_tracer;
   iris::internal::Arena arena;
@@ -289,10 +297,11 @@ TEST(RayTracerTest, WithNormalMap) {
   iris::Ray ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0));
   TestNormalMap normal_map({0.0, 0.0});
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
-  builder->Add(std::make_unique<TestGeometry>(ray, iris::Point(1.0, 1.0, 1.0),
-                                              nullptr, nullptr, &normal_map));
-  auto scene = builder->Build();
+  auto builder = iris::SceneObjects::Builder();
+  builder.Add(iris::MakeReferenceCounted<TestGeometry>(
+      ray, iris::Point(1.0, 1.0, 1.0), nullptr, nullptr, &normal_map));
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
   iris::internal::RayTracer internal_ray_tracer;
   iris::internal::Arena arena;

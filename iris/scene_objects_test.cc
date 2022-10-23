@@ -1,7 +1,12 @@
 #include "iris/scene_objects.h"
 
 #include "googletest/include/gtest/gtest.h"
+#include "iris/emissive_materials/mock_emissive_material.h"
 #include "iris/lights/mock_light.h"
+#include "iris/random/mock_random.h"
+#include "iris/scenes/list_scene.h"
+#include "iris/spectra/mock_spectrum.h"
+#include "iris/testing/light_tester.h"
 
 class TestGeometry : public iris::Geometry {
  private:
@@ -21,7 +26,6 @@ class TestGeometry : public iris::Geometry {
 
   std::span<const iris::face_t> GetFaces() const override {
     static const iris::face_t faces[] = {1};
-    EXPECT_FALSE(true);
     return faces;
   }
 };
@@ -73,10 +77,10 @@ TEST(SceneObjects, Build) {
   EXPECT_EQ(light1_ptr, &scene_objects.GetLight(1));
 
   // Reuse builder
-  geom0 = std::make_unique<TestGeometry>();
-  geom1 = std::make_unique<TestGeometry>();
-  geom2 = std::make_unique<TestGeometry>();
-  geom3 = std::make_unique<TestGeometry>();
+  geom0 = iris::MakeReferenceCounted<TestGeometry>();
+  geom1 = iris::MakeReferenceCounted<TestGeometry>();
+  geom2 = iris::MakeReferenceCounted<TestGeometry>();
+  geom3 = iris::MakeReferenceCounted<TestGeometry>();
   light0 = iris::MakeReferenceCounted<iris::lights::MockLight>();
   light1 = iris::MakeReferenceCounted<iris::lights::MockLight>();
 
@@ -109,4 +113,199 @@ TEST(SceneObjects, Build) {
   ASSERT_EQ(2u, scene_objects.NumLights());
   EXPECT_EQ(light0_ptr, &scene_objects.GetLight(0));
   EXPECT_EQ(light1_ptr, &scene_objects.GetLight(1));
+}
+
+class TestLightedGeometry : public iris::Geometry {
+ public:
+  TestLightedGeometry(iris::Point location, iris::geometric distance,
+                      const iris::EmissiveMaterial* emissive_material,
+                      bool allow_sampling = true)
+      : location_(location),
+        distance_(distance),
+        emissive_material_(emissive_material),
+        allow_sampling_(allow_sampling) {}
+
+  iris::Hit* Trace(const iris::Ray& ray,
+                   iris::HitAllocator& hit_allocator) const override {
+    return &hit_allocator.Allocate(nullptr, distance_, 1u, 2u);
+  }
+
+  bool IsEmissive(iris::face_t face) const override { return face == 1u; }
+
+  const iris::EmissiveMaterial* GetEmissiveMaterial(
+      iris::face_t face, const void* additional_data) const override {
+    return emissive_material_;
+  }
+
+  std::optional<iris::Point> SampleFace(iris::face_t face,
+                                        iris::Random& rng) const override {
+    if (allow_sampling_) {
+      return location_;
+    }
+    return std::nullopt;
+  }
+
+  iris::Vector ComputeSurfaceNormal(
+      const iris::Point& hit_point, iris::face_t face,
+      const void* additional_data) const override {
+    return iris::Vector(0.0, 0.0, std::copysign(1.0, -location_.z));
+  }
+
+  std::optional<iris::visual_t> ComputeArea(iris::face_t face) const override {
+    return 1.0;
+  }
+
+  std::span<const iris::face_t> GetFaces() const override {
+    static const iris::face_t faces[] = {1u, 2u};
+    return faces;
+  }
+
+  iris::Point location_;
+  iris::geometric distance_;
+  const iris::EmissiveMaterial* emissive_material_;
+  bool allow_sampling_;
+};
+
+TEST(ListSceneTest, BuilderOneAreaLight) {
+  iris::SceneObjects::Builder builder;
+  builder.Add(iris::MakeReferenceCounted<TestLightedGeometry>(
+      iris::Point(0.0, 0.0, 0.0), 1.0, nullptr));
+  auto scene_objects = builder.Build();
+  EXPECT_EQ(1u, scene_objects.NumLights());
+}
+
+TEST(ListSceneTest, AreaLightEmission) {
+  iris::testing::LightTester light_tester;
+  iris::spectra::MockSpectrum spectrum;
+  iris::emissive_materials::MockEmissiveMaterial emissive_material;
+  EXPECT_CALL(emissive_material, Evaluate(testing::_, testing::_))
+      .WillOnce(testing::Return(&spectrum));
+
+  iris::SceneObjects::Builder builder;
+  builder.Add(iris::MakeReferenceCounted<TestLightedGeometry>(
+      iris::Point(0.0, 0.0, 0.0), 1.0, &emissive_material));
+  auto scene_objects = builder.Build();
+
+  EXPECT_EQ(1u, scene_objects.NumLights());
+  const auto& light = scene_objects.GetLight(0);
+
+  EXPECT_EQ(
+      &spectrum,
+      light_tester.Emission(
+          light,
+          iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(0.0, 0.0, 1.0)),
+          *iris::scenes::ListScene::Builder::Create()->Build(scene_objects)));
+}
+
+TEST(ListSceneTest, AreaLightEmissionMisses) {
+  iris::testing::LightTester light_tester;
+  iris::spectra::MockSpectrum spectrum;
+  iris::emissive_materials::MockEmissiveMaterial emissive_material;
+
+  iris::SceneObjects::Builder builder;
+  builder.Add(iris::MakeReferenceCounted<TestLightedGeometry>(
+      iris::Point(0.0, 0.0, 0.0), 1.0, &emissive_material));
+  auto scene_objects = builder.Build();
+
+  EXPECT_EQ(1u, scene_objects.NumLights());
+  const auto& light = scene_objects.GetLight(0);
+
+  EXPECT_EQ(nullptr, light_tester.Emission(
+                         light,
+                         iris::Ray(iris::Point(0.0, 0.0, 0.0),
+                                   iris::Vector(0.0, 0.0, 1.0)),
+                         *iris::scenes::ListScene::Builder::Create()->Build(
+                             iris::SceneObjects::Builder().Build())));
+}
+
+TEST(ListSceneTest, AreaLightSampleRngFails) {
+  iris::testing::LightTester light_tester;
+  iris::spectra::MockSpectrum spectrum;
+  iris::emissive_materials::MockEmissiveMaterial emissive_material;
+
+  iris::SceneObjects::Builder builder;
+  builder.Add(iris::MakeReferenceCounted<TestLightedGeometry>(
+      iris::Point(0.0, 0.0, 0.0), 1.0, &emissive_material, false));
+  auto scene_objects = builder.Build();
+
+  EXPECT_EQ(1u, scene_objects.NumLights());
+  const auto& light = scene_objects.GetLight(0);
+
+  iris::random::MockRandom random;
+  EXPECT_FALSE(light_tester.Sample(
+      light, iris::Point(0.0, 0.0, 0.0), random,
+      *iris::scenes::ListScene::Builder::Create()->Build(scene_objects)));
+}
+
+TEST(ListSceneTest, AreaLightSampleNotVisible) {
+  iris::testing::LightTester light_tester;
+  iris::spectra::MockSpectrum spectrum;
+  iris::emissive_materials::MockEmissiveMaterial emissive_material;
+
+  iris::SceneObjects::Builder builder;
+  builder.Add(iris::MakeReferenceCounted<TestLightedGeometry>(
+      iris::Point(0.0, 0.0, 1.0), 1.0, &emissive_material));
+  auto scene_objects = builder.Build();
+
+  EXPECT_EQ(1u, scene_objects.NumLights());
+  const auto& light = scene_objects.GetLight(0);
+
+  iris::random::MockRandom random;
+  EXPECT_FALSE(
+      light_tester.Sample(light, iris::Point(0.0, 0.0, 0.0), random,
+                          *iris::scenes::ListScene::Builder::Create()->Build(
+                              iris::SceneObjects::Builder().Build())));
+}
+
+TEST(ListSceneTest, AreaLightSampleWorld) {
+  iris::testing::LightTester light_tester;
+  iris::spectra::MockSpectrum spectrum;
+  iris::emissive_materials::MockEmissiveMaterial emissive_material;
+
+  EXPECT_CALL(emissive_material, Evaluate(testing::_, testing::_))
+      .WillOnce(testing::Return(&spectrum));
+
+  iris::SceneObjects::Builder builder;
+  builder.Add(iris::MakeReferenceCounted<TestLightedGeometry>(
+      iris::Point(0.0, 0.0, 1.0), 1.0, &emissive_material));
+  auto scene_objects = builder.Build();
+
+  EXPECT_EQ(1u, scene_objects.NumLights());
+  const auto& light = scene_objects.GetLight(0);
+
+  iris::random::MockRandom random;
+  auto result = light_tester.Sample(
+      light, iris::Point(0.0, 0.0, 0.0), random,
+      *iris::scenes::ListScene::Builder::Create()->Build(scene_objects));
+  EXPECT_TRUE(result);
+  EXPECT_EQ(&spectrum, &result->emission);
+  EXPECT_EQ(1.0, result->pdf);
+  EXPECT_EQ(iris::Vector(0.0, 0.0, 1.0), result->to_light);
+}
+
+TEST(ListSceneTest, AreaLightSampleWithTransform) {
+  iris::testing::LightTester light_tester;
+  iris::spectra::MockSpectrum spectrum;
+  iris::emissive_materials::MockEmissiveMaterial emissive_material;
+
+  EXPECT_CALL(emissive_material, Evaluate(testing::_, testing::_))
+      .WillOnce(testing::Return(&spectrum));
+
+  iris::SceneObjects::Builder builder;
+  builder.Add(iris::MakeReferenceCounted<TestLightedGeometry>(
+                  iris::Point(0.0, 0.0, -1.0), 1.0, &emissive_material),
+              iris::Matrix::Scalar(1.0, 1.0, -1.0).value());
+  auto scene_objects = builder.Build();
+
+  EXPECT_EQ(1u, scene_objects.NumLights());
+  const auto& light = scene_objects.GetLight(0);
+
+  iris::random::MockRandom random;
+  auto result = light_tester.Sample(
+      light, iris::Point(0.0, 0.0, 0.0), random,
+      *iris::scenes::ListScene::Builder::Create()->Build(scene_objects));
+  EXPECT_TRUE(result);
+  EXPECT_EQ(&spectrum, &result->emission);
+  EXPECT_EQ(1.0, result->pdf);
+  EXPECT_EQ(iris::Vector(0.0, 0.0, 1.0), result->to_light);
 }

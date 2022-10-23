@@ -11,15 +11,17 @@
 #include "iris/integrator.h"
 #include "iris/light_scene.h"
 #include "iris/scene.h"
+#include "iris/scene_objects.h"
 
 namespace iris {
 
 class Renderer {
  public:
   Renderer(Scene::Builder& scene_builder,
-           LightScene::Builder& light_scene_builder)
-      : scene_(scene_builder.Build()),
-        light_scene_(light_scene_builder.Build(*scene_)) {}
+           LightScene::Builder& light_scene_builder, SceneObjects scene_objects)
+      : scene_(scene_builder.Build(scene_objects)),
+        light_scene_(light_scene_builder.Build(scene_objects)),
+        scene_objects_(std::move(scene_objects)) {}
 
   Framebuffer Render(const Camera& camera, const ImageSampler& image_sampler,
                      const Integrator& integrator,
@@ -31,6 +33,7 @@ class Renderer {
  private:
   const std::unique_ptr<const Scene> scene_;
   const std::unique_ptr<const LightScene> light_scene_;
+  SceneObjects scene_objects_;
 };
 
 }  // namespace iris

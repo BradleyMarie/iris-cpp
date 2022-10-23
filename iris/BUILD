@@ -335,31 +335,13 @@ cc_test(
 
 cc_library(
     name = "light_scene",
-    srcs = ["light_scene.cc"],
     hdrs = ["light_scene.h"],
     visibility = ["//visibility:public"],
     deps = [
-        ":light",
         ":light_sample",
         ":light_sample_allocator",
         ":point",
         ":random",
-        "//iris/internal:visibility_tester",
-    ],
-)
-
-cc_test(
-    name = "light_scene_test",
-    srcs = ["light_scene_test.cc"],
-    deps = [
-        ":light_scene",
-        "//iris/emissive_materials:mock_emissive_material",
-        "//iris/lights:mock_light",
-        "//iris/random:mock_random",
-        "//iris/scenes:list_scene",
-        "//iris/spectra:mock_spectrum",
-        "//iris/testing:light_tester",
-        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -552,6 +534,7 @@ cc_library(
         ":light_scene",
         ":ray_tracer",
         ":scene",
+        ":scene_objects",
         ":spectral_allocator",
         "//iris/internal:arena",
         "//iris/internal:ray_tracer",
@@ -585,6 +568,7 @@ cc_library(
         ":light",
         ":matrix",
         ":reference_counted",
+        "//iris/internal:visibility_tester",
     ],
 )
 
@@ -593,28 +577,23 @@ cc_test(
     srcs = ["scene_objects_test.cc"],
     deps = [
         ":scene_objects",
+        "//iris/emissive_materials:mock_emissive_material",
         "//iris/lights:mock_light",
+        "//iris/random:mock_random",
+        "//iris/scenes:list_scene",
+        "//iris/spectra:mock_spectrum",
+        "//iris/testing:light_tester",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "scene",
-    srcs = ["scene.cc"],
     hdrs = ["scene.h"],
     visibility = ["//visibility:public"],
     deps = [
         ":intersector",
         ":ray",
-    ],
-)
-
-cc_test(
-    name = "scene_test",
-    srcs = ["scene_test.cc"],
-    deps = [
-        ":scene",
-        "@com_google_googletest//:gtest_main",
     ],
 )
 

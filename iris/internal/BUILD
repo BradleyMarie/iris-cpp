@@ -66,6 +66,7 @@ cc_test(
     srcs = ["ray_tracer_test.cc"],
     deps = [
         ":ray_tracer",
+        "//iris:scene_objects",
         "//iris/scenes:list_scene",
         "@com_google_googletest//:gtest_main",
     ],

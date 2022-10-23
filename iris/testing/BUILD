@@ -105,6 +105,7 @@ cc_library(
         "//iris:matrix",
         "//iris:ray",
         "//iris:scene",
+        "//iris:scene_objects",
         "//iris/internal:hit",
         "//iris/internal:hit_arena",
         "@com_google_googletest//:gtest",

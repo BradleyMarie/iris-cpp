@@ -24,7 +24,6 @@ class TestGeometry : public iris::Geometry {
 
   std::span<const iris::face_t> GetFaces() const override {
     static const iris::face_t faces[] = {1};
-    EXPECT_FALSE(true);
     return faces;
   }
 
@@ -34,7 +33,8 @@ class TestGeometry : public iris::Geometry {
 TEST(VisibilityTesterTest, NoGeometry) {
   iris::internal::RayTracer ray_tracer;
   iris::internal::Arena arena;
-  auto scene = iris::scenes::ListScene::Builder::Create()->Build();
+  auto objects = iris::SceneObjects::Builder().Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
   iris::VisibilityTester visibility_tester(*scene, 0.0, ray_tracer, arena);
 
   EXPECT_TRUE(visibility_tester.Visible(
@@ -45,11 +45,12 @@ TEST(VisibilityTesterTest, NoGeometry) {
 
 TEST(VisibilityTesterTest, WithGeometry) {
   iris::Ray ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0));
-  auto geometry = std::make_unique<TestGeometry>(ray);
+  auto geometry = iris::MakeReferenceCounted<TestGeometry>(ray);
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
-  builder->Add(std::move(geometry));
-  auto scene = builder->Build();
+  auto builder = iris::SceneObjects::Builder();
+  builder.Add(std::move(geometry));
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
   iris::internal::RayTracer ray_tracer;
   iris::internal::Arena arena;

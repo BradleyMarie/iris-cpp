@@ -2,13 +2,15 @@
 
 #include "googletest/include/gtest/gtest.h"
 #include "iris/internal/hit.h"
+#include "iris/scene_objects.h"
 
 namespace iris {
 namespace testing {
 namespace {
 
 void TestEmptyScene(Scene::Builder& scene_builder, SceneTester& tester) {
-  auto scene = scene_builder.Build();
+  SceneObjects scene_objects = SceneObjects::Builder().Build();
+  auto scene = scene_builder.Build(scene_objects);
   tester.Trace(*scene, Ray(Point(0.0, 0.0, 0.0), Vector(0.0, 0.0, 1.0)),
                -std::numeric_limits<geometric>::infinity(),
                std::numeric_limits<geometric>::infinity(),
@@ -39,7 +41,6 @@ void SceneTester::Trace(
 
 void SceneTestSuite(Scene::Builder& scene_builder) {
   SceneTester tester;
-  scene_builder.Build().reset();
 
   TestEmptyScene(scene_builder, tester);
   // TODO: Add More Test Cases

@@ -89,7 +89,6 @@ class TestGeometry final : public iris::Geometry {
 
   std::span<const iris::face_t> GetFaces() const override {
     static const iris::face_t faces[] = {1, 2};
-    EXPECT_FALSE(true);
     return faces;
   }
 
@@ -103,9 +102,10 @@ TEST(VisibilityTesterTest, MissesGeometry) {
   iris::Ray world_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0));
   iris::Ray model_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0));
 
-  auto geometry = std::make_unique<TestGeometry>(model_ray);
+  auto geometry = iris::MakeReferenceCounted<TestGeometry>(model_ray);
 
-  auto scene = iris::scenes::ListScene::Builder::Create()->Build();
+  auto builder = iris::SceneObjects::Builder().Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(builder);
 
   iris::internal::RayTracer ray_tracer;
   iris::internal::Arena arena;
@@ -120,9 +120,10 @@ TEST(VisibilityTesterTest, WrongFace) {
   iris::Ray world_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0));
   iris::Ray model_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0));
 
-  auto geometry = std::make_unique<TestGeometry>(model_ray);
+  auto geometry = iris::MakeReferenceCounted<TestGeometry>(model_ray);
 
-  auto scene = iris::scenes::ListScene::Builder::Create()->Build();
+  auto builder = iris::SceneObjects::Builder().Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(builder);
 
   iris::internal::RayTracer ray_tracer;
   iris::internal::Arena arena;
@@ -140,14 +141,15 @@ TEST(VisibilityTesterTest, SucceedsSecondHit) {
   const iris::Spectrum* spectrum = reinterpret_cast<iris::Spectrum*>(2);
   TestEmissiveMaterial emissive_material({0.0, 0.0}, spectrum);
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
+  auto builder = iris::SceneObjects::Builder();
 
-  auto geometry = std::make_unique<TestGeometry>(
+  auto geometry = iris::MakeReferenceCounted<TestGeometry>(
       model_ray, iris::Point(1.0, 0.0, 0.0), &emissive_material);
-  auto geometry_ptr = geometry.get();
-  builder->Add(std::move(geometry));
+  auto geometry_ptr = geometry.Get();
+  builder.Add(std::move(geometry));
 
-  auto scene = builder->Build();
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
   iris::internal::RayTracer ray_tracer;
   iris::internal::Arena arena;
@@ -164,9 +166,10 @@ TEST(VisibilityTesterTest, SceneTraceMisses) {
   iris::Ray world_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0));
   iris::Ray model_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0));
 
-  auto geometry = std::make_unique<TestGeometry>(model_ray);
+  auto geometry = iris::MakeReferenceCounted<TestGeometry>(model_ray);
 
-  auto scene = iris::scenes::ListScene::Builder::Create()->Build();
+  auto builder = iris::SceneObjects::Builder().Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(builder);
 
   iris::internal::RayTracer ray_tracer;
   iris::internal::Arena arena;
@@ -181,13 +184,14 @@ TEST(VisibilityTesterTest, SceneTraceWrongGeometry) {
   iris::Ray world_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0));
   iris::Ray model_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0));
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
+  auto builder = iris::SceneObjects::Builder();
 
-  auto geometry = std::make_unique<TestGeometry>(model_ray);
-  auto geometry_ptr = geometry.get();
-  builder->Add(std::make_unique<TestGeometry>(model_ray));
+  auto geometry = iris::MakeReferenceCounted<TestGeometry>(model_ray);
+  auto geometry_ptr = geometry.Get();
+  builder.Add(iris::MakeReferenceCounted<TestGeometry>(model_ray));
 
-  auto scene = builder->Build();
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
   iris::internal::RayTracer ray_tracer;
   iris::internal::Arena arena;
@@ -201,14 +205,15 @@ TEST(VisibilityTesterTest, SceneTraceWrongGeometry) {
 TEST(VisibilityTesterTest, SceneTraceWrongMatrix) {
   iris::Ray world_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0));
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
+  auto builder = iris::SceneObjects::Builder();
 
-  auto geometry = std::make_unique<TestGeometry>();
-  auto geometry_ptr = geometry.get();
-  builder->Add(std::move(geometry),
-               iris::Matrix::Translation(1.0, 0.0, 0.0).value());
+  auto geometry = iris::MakeReferenceCounted<TestGeometry>();
+  auto geometry_ptr = geometry.Get();
+  builder.Add(std::move(geometry),
+              iris::Matrix::Translation(1.0, 0.0, 0.0).value());
 
-  auto scene = builder->Build();
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
   iris::internal::RayTracer ray_tracer;
   iris::internal::Arena arena;
@@ -223,13 +228,14 @@ TEST(VisibilityTesterTest, SceneTraceWrongFace) {
   iris::Ray world_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0));
   iris::Ray model_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0));
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
+  auto builder = iris::SceneObjects::Builder();
 
-  auto geometry = std::make_unique<TestGeometry>(model_ray);
-  auto geometry_ptr = geometry.get();
-  builder->Add(std::move(geometry));
+  auto geometry = iris::MakeReferenceCounted<TestGeometry>(model_ray);
+  auto geometry_ptr = geometry.Get();
+  builder.Add(std::move(geometry));
 
-  auto scene = builder->Build();
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
   iris::internal::RayTracer ray_tracer;
   iris::internal::Arena arena;
@@ -246,13 +252,14 @@ TEST(VisibilityTesterTest, NoEmissiveMaterial) {
   iris::Ray world_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0));
   iris::Ray model_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 0.0, 0.0));
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
+  auto builder = iris::SceneObjects::Builder();
 
-  auto geometry = std::make_unique<TestGeometry>(model_ray);
-  auto geometry_ptr = geometry.get();
-  builder->Add(std::move(geometry));
+  auto geometry = iris::MakeReferenceCounted<TestGeometry>(model_ray);
+  auto geometry_ptr = geometry.Get();
+  builder.Add(std::move(geometry));
 
-  auto scene = builder->Build();
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
   iris::internal::RayTracer ray_tracer;
   iris::internal::Arena arena;
@@ -269,14 +276,15 @@ TEST(VisibilityTesterTest, NoSpectrum) {
 
   TestEmissiveMaterial emissive_material({0.0, 0.0});
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
+  auto builder = iris::SceneObjects::Builder();
 
-  auto geometry = std::make_unique<TestGeometry>(
+  auto geometry = iris::MakeReferenceCounted<TestGeometry>(
       model_ray, iris::Point(1.0, 0.0, 0.0), &emissive_material);
-  auto geometry_ptr = geometry.get();
-  builder->Add(std::move(geometry));
+  auto geometry_ptr = geometry.Get();
+  builder.Add(std::move(geometry));
 
-  auto scene = builder->Build();
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
   iris::internal::RayTracer ray_tracer;
   iris::internal::Arena arena;
@@ -294,14 +302,15 @@ TEST(VisibilityTesterTest, Succeeds) {
   const iris::Spectrum* spectrum = reinterpret_cast<iris::Spectrum*>(2);
   TestEmissiveMaterial emissive_material({0.0, 0.0}, spectrum);
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
+  auto builder = iris::SceneObjects::Builder();
 
-  auto geometry = std::make_unique<TestGeometry>(
+  auto geometry = iris::MakeReferenceCounted<TestGeometry>(
       model_ray, iris::Point(1.0, 0.0, 0.0), &emissive_material);
-  auto geometry_ptr = geometry.get();
-  builder->Add(std::move(geometry));
+  auto geometry_ptr = geometry.Get();
+  builder.Add(std::move(geometry));
 
-  auto scene = builder->Build();
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
   iris::internal::RayTracer ray_tracer;
   iris::internal::Arena arena;
@@ -322,14 +331,15 @@ TEST(VisibilityTesterTest, SucceedsWithPdf) {
   const iris::Spectrum* spectrum = reinterpret_cast<iris::Spectrum*>(2);
   TestEmissiveMaterial emissive_material({0.0, 0.0}, spectrum);
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
+  auto builder = iris::SceneObjects::Builder();
 
-  auto geometry = std::make_unique<TestGeometry>(
+  auto geometry = iris::MakeReferenceCounted<TestGeometry>(
       model_ray, iris::Point(1.0, 0.0, 0.0), &emissive_material);
-  auto geometry_ptr = geometry.get();
-  builder->Add(std::move(geometry));
+  auto geometry_ptr = geometry.Get();
+  builder.Add(std::move(geometry));
 
-  auto scene = builder->Build();
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
   iris::internal::RayTracer ray_tracer;
   iris::internal::Arena arena;
@@ -352,15 +362,15 @@ TEST(VisibilityTesterTest, SucceedsWithTransformWithPdf) {
   const iris::Spectrum* spectrum = reinterpret_cast<iris::Spectrum*>(2);
   TestEmissiveMaterial emissive_material({0.0, 0.0}, spectrum);
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
+  auto builder = iris::SceneObjects::Builder();
 
-  auto geometry = std::make_unique<TestGeometry>(
+  auto geometry = iris::MakeReferenceCounted<TestGeometry>(
       model_ray, iris::Point(0.5, 0.0, 0.0), &emissive_material);
-  auto geometry_ptr = geometry.get();
-  builder->Add(std::move(geometry),
-               iris::Matrix::Scalar(2.0, 1.0, 1.0).value());
-
-  auto scene = builder->Build();
+  auto geometry_ptr = geometry.Get();
+  builder.Add(std::move(geometry), iris::Matrix::Scalar(2.0, 1.0, 1.0).value());
+  auto objects = builder.Build();
+  const auto* matrix = objects.GetGeometry(0).second;
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
   iris::internal::RayTracer ray_tracer;
   iris::internal::Arena arena;
@@ -368,8 +378,8 @@ TEST(VisibilityTesterTest, SucceedsWithTransformWithPdf) {
                                                      arena);
 
   iris::visual_t pdf;
-  auto result = visibility_tester.Visible(
-      world_ray, *geometry_ptr, (*scene->begin()).second, 1, 0.5, &pdf);
+  auto result =
+      visibility_tester.Visible(world_ray, *geometry_ptr, matrix, 1, 0.5, &pdf);
   ASSERT_TRUE(result);
   EXPECT_EQ(spectrum, &result->emission);
   EXPECT_EQ(iris::Point(1.0, 0.0, 0.0), result->hit_point);
@@ -383,15 +393,16 @@ TEST(VisibilityTesterTest, SucceedsWithCoordinates) {
   const iris::Spectrum* spectrum = reinterpret_cast<iris::Spectrum*>(2);
   TestEmissiveMaterial emissive_material({0.5, 0.5}, spectrum);
 
-  auto builder = iris::scenes::ListScene::Builder::Create();
+  auto builder = iris::SceneObjects::Builder();
 
-  auto geometry = std::make_unique<TestGeometry>(
+  auto geometry = iris::MakeReferenceCounted<TestGeometry>(
       model_ray, iris::Point(1.0, 0.0, 0.0), &emissive_material,
       iris::TextureCoordinates{{0.5, 0.5}});
-  auto geometry_ptr = geometry.get();
-  builder->Add(std::move(geometry));
+  auto geometry_ptr = geometry.Get();
+  builder.Add(std::move(geometry));
 
-  auto scene = builder->Build();
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
   iris::internal::RayTracer ray_tracer;
   iris::internal::Arena arena;

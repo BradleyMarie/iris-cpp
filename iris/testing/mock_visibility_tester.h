@@ -14,7 +14,6 @@ class MockVisibilityTester final : public Scene {
  public:
   MockVisibilityTester() noexcept : geometry_(0.0) {}
 
-  const_iterator begin() const override { return end(); }
   void Trace(const Ray& ray, Intersector& intersector) const final override;
 
   MOCK_METHOD(bool, Visible, (const Ray&, geometric), (const));

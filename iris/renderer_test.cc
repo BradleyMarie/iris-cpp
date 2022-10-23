@@ -17,7 +17,9 @@ void RunTestBody(unsigned num_threads_requested, unsigned actual_num_threads) {
   auto scene_builder = iris::scenes::ListScene::Builder::Create();
   auto light_scene_builder =
       iris::light_scenes::AllLightScene::Builder::Create();
-  iris::Renderer renderer(*scene_builder, *light_scene_builder);
+  auto scene_objects = iris::SceneObjects::Builder().Build();
+  iris::Renderer renderer(*scene_builder, *light_scene_builder,
+                          std::move(scene_objects));
 
   iris::Ray trace_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(0.0, 0.0, 1.0));
   std::pair<size_t, size_t> image_dimensions = std::make_pair(32, 33);

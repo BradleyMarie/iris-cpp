@@ -7,11 +7,10 @@ cc_library(
     srcs = ["list_scene.cc"],
     hdrs = ["list_scene.h"],
     deps = [
-        "//iris:geometry",
         "//iris:intersector",
-        "//iris:matrix",
         "//iris:ray",
         "//iris:scene",
+        "//iris:scene_objects",
     ],
 )
 
