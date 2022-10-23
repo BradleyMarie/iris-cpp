@@ -154,6 +154,7 @@ cc_library(
         ":point",
         ":random",
         ":ray",
+        ":reference_countable",
         ":texture_coordinates",
         ":vector",
         "//iris/internal:hit_arena",
@@ -268,6 +269,7 @@ cc_library(
         ":point",
         ":random",
         ":ray",
+        ":reference_countable",
         ":spectral_allocator",
         ":spectrum",
         ":vector",
@@ -569,6 +571,29 @@ cc_test(
         "//iris/light_scenes:all_light_scene",
         "//iris/random:mock_random",
         "//iris/scenes:list_scene",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "scene_objects",
+    srcs = ["scene_objects.cc"],
+    hdrs = ["scene_objects.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":geometry",
+        ":light",
+        ":matrix",
+        ":reference_counted",
+    ],
+)
+
+cc_test(
+    name = "scene_objects_test",
+    srcs = ["scene_objects_test.cc"],
+    deps = [
+        ":scene_objects",
+        "//iris/lights:mock_light",
         "@com_google_googletest//:gtest_main",
     ],
 )

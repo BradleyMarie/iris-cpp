@@ -27,6 +27,15 @@ class ReferenceCounted final {
     value.ptr_ = nullptr;
   }
 
+  template <class U>
+  requires std::derived_from<U, T> ReferenceCounted(
+      const ReferenceCounted<U>& value)
+  noexcept : ptr_(value.ptr_) { ptr_->Increment(); }
+
+  template <class U>
+  requires std::derived_from<U, T> ReferenceCounted(ReferenceCounted<U>&& value)
+  noexcept : ptr_(value.ptr_) { value.ptr_ = nullptr; }
+
   ReferenceCounted& operator=(const ReferenceCounted& value) noexcept {
     MaybeDecrement();
     ptr_ = value.ptr_;
@@ -59,6 +68,10 @@ class ReferenceCounted final {
   }
 
   T* ptr_;
+
+  template <class U>
+  requires std::derived_from<U, ReferenceCountable>
+  friend class ReferenceCounted;
 };
 
 template <typename T, typename... Args>

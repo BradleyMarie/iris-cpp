@@ -29,6 +29,18 @@ std::unique_ptr<iris::ReferenceCounted<Sharable>> MakeSharable(
       std::make_unique<Sharable>(allow_deletion, deleted));
 }
 
+class Derived : public Sharable {
+ public:
+  Derived(const bool* allow_deletion, bool* deleted)
+      : Sharable(allow_deletion, deleted) {}
+};
+
+std::unique_ptr<iris::ReferenceCounted<Derived>> MakeDerived(
+    const bool* allow_deletion, bool* deleted) {
+  return std::make_unique<iris::ReferenceCounted<Derived>>(
+      std::make_unique<Derived>(allow_deletion, deleted));
+}
+
 TEST(ReferenceCountedTest, Empty) {
   iris::ReferenceCounted<Sharable> ptr;
   EXPECT_EQ(nullptr, ptr.Get());
@@ -58,6 +70,30 @@ TEST(ReferenceCountedTest, CopyConstruct) {
 TEST(ReferenceCountedTest, MoveConstruct) {
   bool allow_deletion = false, deleted = false;
   auto ptr = MakeSharable(&allow_deletion, &deleted);
+  EXPECT_FALSE(deleted);
+  auto ptr2 =
+      std::make_unique<iris::ReferenceCounted<Sharable>>(std::move(*ptr));
+  allow_deletion = true;
+  ptr2.reset();
+  EXPECT_TRUE(deleted);
+  ptr.reset();
+}
+
+TEST(ReferenceCountedTest, CopyUpcast) {
+  bool allow_deletion = false, deleted = false;
+  auto ptr = MakeDerived(&allow_deletion, &deleted);
+  EXPECT_FALSE(deleted);
+  auto ptr2 = std::make_unique<iris::ReferenceCounted<Sharable>>(*ptr);
+  ptr.reset();
+  EXPECT_FALSE(deleted);
+  allow_deletion = true;
+  ptr2.reset();
+  EXPECT_TRUE(deleted);
+}
+
+TEST(ReferenceCountedTest, MoveUpcast) {
+  bool allow_deletion = false, deleted = false;
+  auto ptr = MakeDerived(&allow_deletion, &deleted);
   EXPECT_FALSE(deleted);
   auto ptr2 =
       std::make_unique<iris::ReferenceCounted<Sharable>>(std::move(*ptr));

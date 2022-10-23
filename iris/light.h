@@ -7,6 +7,7 @@
 #include "iris/point.h"
 #include "iris/random.h"
 #include "iris/ray.h"
+#include "iris/reference_countable.h"
 #include "iris/spectral_allocator.h"
 #include "iris/spectrum.h"
 #include "iris/vector.h"
@@ -14,7 +15,7 @@
 
 namespace iris {
 
-class Light {
+class Light : public ReferenceCountable {
  public:
   struct SampleResult {
     const Spectrum& emission;

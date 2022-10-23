@@ -13,12 +13,13 @@
 #include "iris/point.h"
 #include "iris/random.h"
 #include "iris/ray.h"
+#include "iris/reference_countable.h"
 #include "iris/texture_coordinates.h"
 #include "iris/vector.h"
 
 namespace iris {
 
-class Geometry {
+class Geometry : public ReferenceCountable {
  public:
   Hit* Trace(HitAllocator& hit_allocator) const;
 
@@ -44,6 +45,8 @@ class Geometry {
   virtual std::optional<visual_t> ComputeArea(face_t face) const;
 
   virtual std::span<const face_t> GetFaces() const = 0;
+
+  virtual ~Geometry() = default;
 
  private:
   virtual Hit* Trace(const Ray& ray, HitAllocator& hit_allocator) const = 0;
