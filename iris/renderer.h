@@ -17,8 +17,9 @@ namespace iris {
 
 class Renderer {
  public:
-  Renderer(Scene::Builder& scene_builder,
-           LightScene::Builder& light_scene_builder, SceneObjects scene_objects)
+  Renderer(const Scene::Builder& scene_builder,
+           const LightScene::Builder& light_scene_builder,
+           SceneObjects scene_objects)
       : scene_(scene_builder.Build(scene_objects)),
         light_scene_(light_scene_builder.Build(scene_objects)),
         scene_objects_(std::move(scene_objects)) {}
@@ -33,7 +34,7 @@ class Renderer {
  private:
   const std::unique_ptr<const Scene> scene_;
   const std::unique_ptr<const LightScene> light_scene_;
-  SceneObjects scene_objects_;
+  const SceneObjects scene_objects_;
 };
 
 }  // namespace iris
