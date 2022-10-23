@@ -28,10 +28,11 @@ cc_library(
         "//iris:point",
         "//iris:random",
         "//iris:ray",
+        "//iris:reference_counted",
         "//iris:spectral_allocator",
         "//iris:spectrum",
         "//iris:visibility_tester",
-        "//iris/utility:spectrum_manager",
+        "//iris/spectra:reference_countable_spectrum",
     ],
 )
 
@@ -42,9 +43,9 @@ cc_test(
         ":point_light",
         "//iris/random:mock_random",
         "//iris/spectra:mock_spectrum",
+        "//iris/spectra:reference_countable_spectrum",
         "//iris/testing:light_tester",
         "//iris/testing:mock_visibility_tester",
-        "//iris/utility:spectrum_manager",
         "@com_google_googletest//:gtest_main",
     ],
 )

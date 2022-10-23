@@ -3,12 +3,13 @@
 
 #include "googlemock/include/gmock/gmock.h"
 #include "iris/float.h"
+#include "iris/spectra/reference_countable_spectrum.h"
 #include "iris/spectrum.h"
 
 namespace iris {
 namespace spectra {
 
-class MockSpectrum final : public Spectrum {
+class MockSpectrum final : public ReferenceCountableSpectrum {
  public:
   MOCK_METHOD(visual_t, Intensity, (visual_t), (const override));
 };

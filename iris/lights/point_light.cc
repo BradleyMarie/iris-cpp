@@ -13,7 +13,7 @@ std::optional<Light::SampleResult> PointLight::Sample(
     return std::nullopt;
   }
 
-  return Light::SampleResult{spectrum_, Normalize(to_light), std::nullopt};
+  return Light::SampleResult{*spectrum_, Normalize(to_light), std::nullopt};
 }
 
 const Spectrum* PointLight::Emission(const Ray& to_light,

@@ -12,17 +12,18 @@
 #include "iris/textures/constant_texture.h"
 
 TEST(MatteMaterialTest, Evaluate) {
-  auto reflector = std::make_shared<iris::reflectors::MockReflector>();
+  auto reflector =
+      iris::MakeReferenceCounted<iris::reflectors::MockReflector>();
   EXPECT_CALL(*reflector, Reflectance(testing::_))
       .Times(1)
       .WillOnce(testing::Return(1.0));
 
-  auto reflectance = std::make_shared<iris::textures::ConstantPointerTexture2D<
-      std::shared_ptr<iris::Reflector>, iris::Reflector,
-      iris::SpectralAllocator>>(reflector, *reflector);
-  auto sigma =
-      std::make_shared<iris::textures::ConstantValueTexture2D<iris::visual>>(
-          1.0);
+  auto reflectance =
+      iris::MakeReferenceCounted<iris::textures::ConstantPointerTexture2D<
+          iris::reflectors::ReferenceCountableReflector,
+          iris::SpectralAllocator>>(reflector);
+  auto sigma = iris::MakeReferenceCounted<
+      iris::textures::ConstantValueTexture2D<iris::visual>>(1.0);
   iris::materials::MatteMaterial material(std::move(reflectance),
                                           std::move(sigma));
 

@@ -11,10 +11,12 @@ cc_library(
         "//iris:bxdf_allocator",
         "//iris:float",
         "//iris:material",
+        "//iris:reference_counted",
         "//iris:reflector",
         "//iris:spectral_allocator",
         "//iris:texture_coordinates",
         "//iris/bxdfs:lambertian_brdf",
+        "//iris/reflectors:reference_countable_reflector",
         "//iris/textures:texture2d",
     ],
 )

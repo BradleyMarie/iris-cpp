@@ -8,9 +8,10 @@ cc_library(
     hdrs = ["constant_emissive_material.h"],
     deps = [
         "//iris:emissive_material",
+        "//iris:reference_counted",
         "//iris:spectral_allocator",
         "//iris:texture_coordinates",
-        "//iris/utility:spectrum_manager",
+        "//iris/spectra:reference_countable_spectrum",
     ],
 )
 

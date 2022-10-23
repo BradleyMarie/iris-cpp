@@ -6,11 +6,10 @@
 #include "iris/testing/emissive_material_tester.h"
 
 TEST(ConstantEmissiveMaterialTest, Evaluate) {
-  auto manager = std::make_shared<iris::utility::SpectrumManager>();
-  auto index = manager->Add(std::make_unique<iris::spectra::MockSpectrum>());
-  iris::emissive_materials::ConstantEmissiveMaterial material(manager, index);
+  auto spectrum = iris::MakeReferenceCounted<iris::spectra::MockSpectrum>();
+  iris::emissive_materials::ConstantEmissiveMaterial material(spectrum);
 
   iris::testing::EmissiveMaterialTester tester;
-  EXPECT_EQ(manager->Get(index),
+  EXPECT_EQ(spectrum.Get(),
             tester.Evaluate(material, iris::TextureCoordinates{}));
 }
