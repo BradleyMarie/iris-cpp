@@ -7,19 +7,8 @@ cc_library(
     testonly = True,
     hdrs = ["mock_spectrum.h"],
     deps = [
-        ":reference_countable_spectrum",
         "//iris:float",
         "//iris:spectrum",
         "@com_google_googletest//:gtest",
-    ],
-)
-
-cc_library(
-    name = "reference_countable_spectrum",
-    hdrs = ["reference_countable_spectrum.h"],
-    deps = [
-        "//iris:float",
-        "//iris:reference_countable",
-        "//iris:spectrum",
     ],
 )

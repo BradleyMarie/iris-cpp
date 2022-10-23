@@ -10,7 +10,6 @@
 #include "iris/random.h"
 #include "iris/ray.h"
 #include "iris/reference_counted.h"
-#include "iris/spectra/reference_countable_spectrum.h"
 #include "iris/spectral_allocator.h"
 #include "iris/spectrum.h"
 #include "iris/visibility_tester.h"
@@ -20,9 +19,7 @@ namespace lights {
 
 class PointLight final : public Light {
  public:
-  PointLight(Point location,
-             iris::ReferenceCounted<iris::spectra::ReferenceCountableSpectrum>
-                 spectrum) noexcept
+  PointLight(Point location, iris::ReferenceCounted<Spectrum> spectrum) noexcept
       : spectrum_(std::move(spectrum)), location_(location) {
     assert(spectrum_);
   }
@@ -36,8 +33,7 @@ class PointLight final : public Light {
                            visual_t* pdf) const override;
 
  private:
-  const iris::ReferenceCounted<iris::spectra::ReferenceCountableSpectrum>
-      spectrum_;
+  const iris::ReferenceCounted<Spectrum> spectrum_;
   const Point location_;
 };
 

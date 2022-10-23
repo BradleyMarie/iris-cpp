@@ -7,19 +7,8 @@ cc_library(
     testonly = True,
     hdrs = ["mock_reflector.h"],
     deps = [
-        ":reference_countable_reflector",
         "//iris:float",
         "//iris:reflector",
         "@com_google_googletest//:gtest",
-    ],
-)
-
-cc_library(
-    name = "reference_countable_reflector",
-    hdrs = ["reference_countable_reflector.h"],
-    deps = [
-        "//iris:float",
-        "//iris:reference_countable",
-        "//iris:reflector",
     ],
 )

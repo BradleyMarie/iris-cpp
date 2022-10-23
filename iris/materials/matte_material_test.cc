@@ -20,8 +20,7 @@ TEST(MatteMaterialTest, Evaluate) {
 
   auto reflectance =
       iris::MakeReferenceCounted<iris::textures::ConstantPointerTexture2D<
-          iris::reflectors::ReferenceCountableReflector,
-          iris::SpectralAllocator>>(reflector);
+          iris::Reflector, iris::SpectralAllocator>>(reflector);
   auto sigma = iris::MakeReferenceCounted<
       iris::textures::ConstantValueTexture2D<iris::visual>>(1.0);
   iris::materials::MatteMaterial material(std::move(reflectance),

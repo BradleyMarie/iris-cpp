@@ -2,10 +2,11 @@
 #define _IRIS_REFLECTOR_
 
 #include "iris/float.h"
+#include "iris/reference_countable.h"
 
 namespace iris {
 
-class Reflector {
+class Reflector : public ReferenceCountable {
  public:
   virtual visual_t Reflectance(visual_t wavelength) const = 0;
   virtual ~Reflector() {}

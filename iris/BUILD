@@ -513,6 +513,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":float",
+        ":reference_countable",
     ],
 )
 
@@ -603,6 +604,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":float",
+        ":reference_countable",
     ],
 )
 

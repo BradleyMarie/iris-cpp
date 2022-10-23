@@ -16,7 +16,6 @@ cc_library(
         "//iris:spectral_allocator",
         "//iris:texture_coordinates",
         "//iris/bxdfs:lambertian_brdf",
-        "//iris/reflectors:reference_countable_reflector",
         "//iris/textures:texture2d",
     ],
 )

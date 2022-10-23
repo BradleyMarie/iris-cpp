@@ -10,8 +10,6 @@ TEST(ConstantValueTexture2DTest, Test) {
 
 TEST(PointerValueTexture2DTest, Test) {
   auto value = iris::MakeReferenceCounted<iris::spectra::MockSpectrum>();
-  iris::textures::ConstantPointerTexture2D<
-      iris::spectra::ReferenceCountableSpectrum>
-      texture(value);
+  iris::textures::ConstantPointerTexture2D<iris::Spectrum> texture(value);
   EXPECT_EQ(value.Get(), texture.Evaluate(iris::TextureCoordinates{}));
 }

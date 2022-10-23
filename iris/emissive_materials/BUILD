@@ -11,7 +11,6 @@ cc_library(
         "//iris:reference_counted",
         "//iris:spectral_allocator",
         "//iris:texture_coordinates",
-        "//iris/spectra:reference_countable_spectrum",
     ],
 )
 

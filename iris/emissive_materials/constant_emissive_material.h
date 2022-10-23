@@ -5,7 +5,6 @@
 
 #include "iris/emissive_material.h"
 #include "iris/reference_counted.h"
-#include "iris/spectra/reference_countable_spectrum.h"
 #include "iris/spectral_allocator.h"
 #include "iris/texture_coordinates.h"
 
@@ -14,9 +13,7 @@ namespace emissive_materials {
 
 class ConstantEmissiveMaterial final : public EmissiveMaterial {
  public:
-  ConstantEmissiveMaterial(
-      iris::ReferenceCounted<iris::spectra::ReferenceCountableSpectrum>
-          spectrum) noexcept
+  ConstantEmissiveMaterial(iris::ReferenceCounted<Spectrum> spectrum) noexcept
       : spectrum_(std::move(spectrum)) {
     assert(spectrum_);
   }
@@ -26,8 +23,7 @@ class ConstantEmissiveMaterial final : public EmissiveMaterial {
       SpectralAllocator& spectral_allocator) const override;
 
  private:
-  const iris::ReferenceCounted<iris::spectra::ReferenceCountableSpectrum>
-      spectrum_;
+  const iris::ReferenceCounted<Spectrum> spectrum_;
 };
 
 }  // namespace emissive_materials
