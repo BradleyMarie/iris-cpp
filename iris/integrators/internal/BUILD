@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 
 package(default_visibility = ["//iris/integrators:__subpackages__"])
 
@@ -14,5 +14,14 @@ cc_library(
         "//iris:spectral_allocator",
         "//iris:spectrum",
         "//iris:visibility_tester",
+    ],
+)
+
+cc_test(
+    name = "sample_direct_lighting_test",
+    srcs = ["sample_direct_lighting_test.cc"],
+    deps = [
+        ":sample_direct_lighting",
+        "@com_google_googletest//:gtest_main",
     ],
 )
