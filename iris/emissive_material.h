@@ -1,13 +1,14 @@
 #ifndef _IRIS_EMISSIVE_MATERIAL_
 #define _IRIS_EMISSIVE_MATERIAL_
 
+#include "iris/reference_countable.h"
 #include "iris/spectral_allocator.h"
 #include "iris/spectrum.h"
 #include "iris/texture_coordinates.h"
 
 namespace iris {
 
-class EmissiveMaterial {
+class EmissiveMaterial : public ReferenceCountable {
  public:
   virtual const Spectrum* Evaluate(
       const TextureCoordinates& texture_coordinates,

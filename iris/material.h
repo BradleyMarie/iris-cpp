@@ -3,12 +3,13 @@
 
 #include "iris/bxdf.h"
 #include "iris/bxdf_allocator.h"
+#include "iris/reference_countable.h"
 #include "iris/spectral_allocator.h"
 #include "iris/texture_coordinates.h"
 
 namespace iris {
 
-class Material {
+class Material : public ReferenceCountable {
  public:
   virtual const Bxdf* Evaluate(const TextureCoordinates& texture_coordinates,
                                SpectralAllocator& spectral_allocator,

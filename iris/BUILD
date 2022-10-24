@@ -108,6 +108,7 @@ cc_library(
     hdrs = ["emissive_material.h"],
     visibility = ["//visibility:public"],
     deps = [
+        ":reference_countable",
         ":spectral_allocator",
         ":spectrum",
         ":texture_coordinates",
@@ -352,6 +353,7 @@ cc_library(
     deps = [
         ":bxdf",
         ":bxdf_allocator",
+        ":reference_countable",
         ":spectral_allocator",
         ":texture_coordinates",
     ],
