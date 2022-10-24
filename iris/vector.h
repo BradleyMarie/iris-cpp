@@ -85,6 +85,10 @@ geometric_t DotProduct(const Vector& operand0, const Vector& operand1) {
          operand0.z * operand1.z;
 }
 
+geometric_t AbsDotProduct(const Vector& operand0, const Vector& operand1) {
+  return std::abs(DotProduct(operand0, operand1));
+}
+
 geometric_t PositiveDotProduct(const Vector& operand0, const Vector& operand1) {
   return std::max(static_cast<geometric_t>(0.0),
                   DotProduct(operand0, operand1));

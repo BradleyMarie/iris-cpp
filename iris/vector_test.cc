@@ -61,6 +61,14 @@ TEST(VectorTest, DotProduct) {
   auto operand0 = iris::Vector(1.0, 2.0, 3.0);
   auto operand1 = iris::Vector(3.0, 4.0, 5.0);
   EXPECT_EQ(26.0, iris::DotProduct(operand0, operand1));
+  EXPECT_EQ(-26.0, iris::DotProduct(operand0, -operand1));
+}
+
+TEST(VectorTest, AbsDotProduct) {
+  auto operand0 = iris::Vector(1.0, 2.0, 3.0);
+  auto operand1 = iris::Vector(3.0, 4.0, 5.0);
+  EXPECT_EQ(26.0, iris::AbsDotProduct(operand0, operand1));
+  EXPECT_EQ(26.0, iris::AbsDotProduct(operand0, -operand1));
 }
 
 TEST(VectorTest, PositiveDotProduct) {
