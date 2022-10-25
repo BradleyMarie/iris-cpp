@@ -9,6 +9,7 @@ namespace iris {
 class Reflector : public ReferenceCountable {
  public:
   virtual visual_t Reflectance(visual_t wavelength) const = 0;
+  virtual visual_t Albedo() const = 0;
   virtual ~Reflector() {}
 };
 

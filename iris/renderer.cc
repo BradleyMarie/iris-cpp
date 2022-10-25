@@ -68,7 +68,7 @@ void RenderChunk(const Scene& scene, const LightScene& light_scene,
 
         LightSampler light_sampler(light_scene, *chunk.rng,
                                    light_sample_allocator);
-        auto* spectrum = integrator->Integrate(ray, light_sampler, ray_tracer,
+        auto* spectrum = integrator->Integrate(ray, ray_tracer, light_sampler,
                                                visibility_tester,
                                                spectral_allocator, *chunk.rng);
 

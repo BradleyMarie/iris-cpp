@@ -18,3 +18,20 @@ cc_library(
         "@com_google_googletest//:gtest",
     ],
 )
+
+cc_library(
+    name = "path_integrator",
+    srcs = ["path_integrator.cc"],
+    hdrs = ["path_integrator.h"],
+    deps = [
+        "//iris:integrator",
+        "//iris:light_sampler",
+        "//iris:random",
+        "//iris:ray",
+        "//iris:ray_tracer",
+        "//iris:spectral_allocator",
+        "//iris:spectrum",
+        "//iris:visibility_tester",
+        "//iris/integrators/internal:sample_direct_lighting",
+    ],
+)

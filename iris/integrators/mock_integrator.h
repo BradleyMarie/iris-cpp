@@ -19,7 +19,7 @@ namespace integrators {
 class MockIntegrator final : public Integrator {
  public:
   MOCK_METHOD(const Spectrum*, Integrate,
-              (const Ray&, const LightSampler&, RayTracer&, VisibilityTester&,
+              (const Ray&, RayTracer&, LightSampler&, VisibilityTester&,
                SpectralAllocator&, Random&),
               (override));
   MOCK_METHOD(std::unique_ptr<Integrator>, Duplicate, (), (const override));

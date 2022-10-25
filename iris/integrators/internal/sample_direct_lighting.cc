@@ -34,7 +34,7 @@ const Spectrum* DeltaLight(const Light::SampleResult& sample,
 
 const Spectrum* FromLightSample(const Light::SampleResult& sample,
                                 const Ray& traced_ray,
-                                const RayTracer::Result hit, Random& rng,
+                                const RayTracer::Result hit,
                                 VisibilityTester& visibility_tester,
                                 SpectralAllocator& allocator) {
   auto diffuse =
@@ -52,7 +52,7 @@ const Spectrum* FromLightSample(const Light::SampleResult& sample,
 
 const Spectrum* FromBsdfSample(const Bsdf::SampleResult& sample,
                                const Light& light, const Ray& traced_ray,
-                               const RayTracer::Result hit, Random& rng,
+                               const RayTracer::Result hit,
                                VisibilityTester& visibility_tester,
                                SpectralAllocator& allocator) {
   assert(sample.pdf);  // Perfectly specular BSDFs should not use this path
@@ -90,15 +90,14 @@ const Spectrum* SampleDirectLighting(const Light& light, const Ray& traced_ray,
 
   const Spectrum* light_spectrum = nullptr;
   if (light_sample) {
-    light_spectrum = internal::FromLightSample(
-        *light_sample, traced_ray, hit, rng, visibility_tester, allocator);
+    light_spectrum = internal::FromLightSample(*light_sample, traced_ray, hit,
+                                               visibility_tester, allocator);
   }
 
   const Spectrum* bsdf_spectrum = nullptr;
   if (bsdf_sample) {
-    bsdf_spectrum =
-        internal::FromBsdfSample(*bsdf_sample, light, traced_ray, hit, rng,
-                                 visibility_tester, allocator);
+    bsdf_spectrum = internal::FromBsdfSample(*bsdf_sample, light, traced_ray,
+                                             hit, visibility_tester, allocator);
   }
 
   return allocator.Add(light_spectrum, bsdf_spectrum);

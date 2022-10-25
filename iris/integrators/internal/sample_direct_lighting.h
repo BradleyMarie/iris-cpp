@@ -22,13 +22,13 @@ const Spectrum* DeltaLight(const Light::SampleResult& sample,
 
 const Spectrum* FromLightSample(const Light::SampleResult& sample,
                                 const Ray& traced_ray,
-                                const RayTracer::Result hit, Random& rng,
+                                const RayTracer::Result hit,
                                 VisibilityTester& visibility_tester,
                                 SpectralAllocator& allocator);
 
 const Spectrum* FromBsdfSample(const Bsdf::SampleResult& sample,
                                const Light& light, const Ray& traced_ray,
-                               const RayTracer::Result hit, Random& rng,
+                               const RayTracer::Result hit,
                                VisibilityTester& visibility_tester,
                                SpectralAllocator& allocator);
 

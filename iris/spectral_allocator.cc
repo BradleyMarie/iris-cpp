@@ -63,6 +63,11 @@ class SumReflector final : public Reflector {
     return std::min(static_cast<visual_t>(1.0), sum);
   }
 
+  visual_t Albedo() const {
+    visual_t sum = addend0_.Albedo() + addend1_.Albedo();
+    return std::min(static_cast<visual_t>(1.0), sum);
+  }
+
  private:
   const Reflector& addend0_;
   const Reflector& addend1_;
@@ -78,6 +83,8 @@ class ScaledReflector final : public Reflector {
   visual_t Reflectance(visual_t wavelength) const {
     return spectrum_.Reflectance(wavelength) * scalar_;
   }
+
+  visual_t Albedo() const { return spectrum_.Albedo() * scalar_; }
 
  private:
   const Reflector& spectrum_;
