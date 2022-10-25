@@ -29,7 +29,7 @@ struct Chunk {
 };
 
 void RenderChunk(const Scene& scene, const LightScene& light_scene,
-                 const Camera& camera, const Integrator& integrator,
+                 const Camera& camera, std::unique_ptr<Integrator> integrator,
                  const ColorMatcher& color_matcher,
                  std::vector<std::vector<Chunk>>& chunks,
                  std::atomic<size_t>& chunk_counter, size_t num_chunks,
@@ -68,9 +68,9 @@ void RenderChunk(const Scene& scene, const LightScene& light_scene,
 
         LightSampler light_sampler(light_scene, *chunk.rng,
                                    light_sample_allocator);
-        auto* spectrum = integrator.Integrate(ray, light_sampler, ray_tracer,
-                                              visibility_tester,
-                                              spectral_allocator, *chunk.rng);
+        auto* spectrum = integrator->Integrate(ray, light_sampler, ray_tracer,
+                                               visibility_tester,
+                                               spectral_allocator, *chunk.rng);
 
         if (spectrum) {
           auto sample_components = color_matcher.Match(*spectrum);
@@ -131,13 +131,14 @@ Framebuffer Renderer::Render(const Camera& camera,
   for (unsigned i = 1; i < num_threads; i++) {
     threads.push_back(std::thread(
         RenderChunk, std::cref(*scene_), std::cref(*light_scene_),
-        std::cref(camera), std::cref(integrator), std::cref(color_matcher),
+        std::cref(camera), integrator.Duplicate(), std::cref(color_matcher),
         std::ref(chunks), std::ref(chunk_counter), num_chunks, minimum_distance,
         std::ref(result)));
   }
 
-  RenderChunk(*scene_, *light_scene_, camera, integrator, color_matcher, chunks,
-              chunk_counter, num_chunks, minimum_distance, result);
+  RenderChunk(*scene_, *light_scene_, camera, integrator.Duplicate(),
+              color_matcher, chunks, chunk_counter, num_chunks,
+              minimum_distance, result);
 
   for (auto& thread : threads) {
     thread.join();

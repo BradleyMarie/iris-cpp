@@ -1,6 +1,8 @@
 #ifndef _IRIS_INTEGRATOR_
 #define _IRIS_INTEGRATOR_
 
+#include <memory>
+
 #include "iris/light_sampler.h"
 #include "iris/random.h"
 #include "iris/ray.h"
@@ -18,7 +20,10 @@ class Integrator {
                                     RayTracer& ray_tracer,
                                     VisibilityTester& visibility_tester,
                                     SpectralAllocator& spectral_allocator,
-                                    Random& rng) const = 0;
+                                    Random& rng) = 0;
+
+  virtual std::unique_ptr<Integrator> Duplicate() const = 0;
+
   virtual ~Integrator() {}
 };
 

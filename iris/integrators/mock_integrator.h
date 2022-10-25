@@ -1,6 +1,8 @@
 #ifndef _IRIS_INTEGRATORS_MOCK_INTEGRATOR_
 #define _IRIS_INTEGRATORS_MOCK_INTEGRATOR_
 
+#include <memory>
+
 #include "googlemock/include/gmock/gmock.h"
 #include "iris/integrator.h"
 #include "iris/light_sampler.h"
@@ -19,7 +21,8 @@ class MockIntegrator final : public Integrator {
   MOCK_METHOD(const Spectrum*, Integrate,
               (const Ray&, const LightSampler&, RayTracer&, VisibilityTester&,
                SpectralAllocator&, Random&),
-              (const override));
+              (override));
+  MOCK_METHOD(std::unique_ptr<Integrator>, Duplicate, (), (const override));
 };
 
 }  // namespace integrators

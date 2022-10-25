@@ -62,10 +62,15 @@ void RunTestBody(unsigned num_threads_requested, unsigned actual_num_threads) {
       .WillRepeatedly(testing::Return(trace_ray));
 
   iris::integrators::MockIntegrator integrator;
-  EXPECT_CALL(integrator, Integrate(trace_ray, testing::_, testing::_,
-                                    testing::_, testing::_, testing::_))
-      .Times(samples)
-      .WillRepeatedly(testing::Return(spectrum));
+  EXPECT_CALL(integrator, Duplicate())
+      .Times(actual_num_threads)
+      .WillRepeatedly(testing::Invoke([&]() {
+        auto result = std::make_unique<iris::integrators::MockIntegrator>();
+        EXPECT_CALL(*result, Integrate(trace_ray, testing::_, testing::_,
+                                       testing::_, testing::_, testing::_))
+            .WillRepeatedly(testing::Return(spectrum));
+        return result;
+      }));
 
   iris::Color color(1.0, 1.0, 1.0, iris::Color::LINEAR_SRGB);
   iris::color_matchers::MockColorMatcher color_matcher;
