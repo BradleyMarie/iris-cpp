@@ -12,15 +12,15 @@ namespace internal {
 
 class RussianRoulette {
  public:
-  RussianRoulette(visual maximum_success_probability,
-                  visual success_probability_cutoff) noexcept;
+  RussianRoulette(visual maximum_continue_probability,
+                  visual always_continue_threshold) noexcept;
 
   std::optional<visual_t> Evaluate(Random& rng,
-                                   visual_t desired_success_probability) const;
+                                   visual_t desired_continue_probability) const;
 
  private:
-  visual maximum_success_probability_;
-  visual success_probability_cutoff_;
+  visual maximum_continue_probability_;
+  visual always_continue_probability_;
 };
 
 }  // namespace internal

@@ -7,7 +7,7 @@ using iris::Random;
 using iris::integrators::internal::RussianRoulette;
 using iris::random::MockRandom;
 
-TEST(RussianRoulette, AboveCutoff) {
+TEST(RussianRoulette, AboveThreshold) {
   MockRandom rng;
   EXPECT_CALL(rng, DiscardVisual(1)).Times(2);
 
