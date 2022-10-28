@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cmath>
 
+#include "iris/integrators/internal/path_builder.h"
 #include "iris/integrators/internal/russian_roulette.h"
 #include "iris/integrators/internal/sample_direct_lighting.h"
 
@@ -35,58 +36,50 @@ const Spectrum* PathIntegrator::Integrate(const Ray& ray, RayTracer& ray_tracer,
                                           Random& rng) {
   internal::RussianRoulette russian_roulette(maximum_path_continue_probability_,
                                              path_continue_probability_cutoff_);
+  internal::PathBuilder path_builder(reflectors_, spectra_, attenuations_);
 
   visual_t path_throughput = 1.0;
   bool add_light_emissions = true;
   Ray trace_ray = ray;
-  uint8_t bounces = 0u;
-  for (;;) {
+  for (uint8_t bounces = 0;; bounces++) {
     auto trace_result = ray_tracer.Trace(trace_ray);
     if (!trace_result) {
       break;
     }
 
     if (add_light_emissions) {
-      spectra_.push_back(trace_result->emission);
+      path_builder.Add(trace_result->emission, spectral_allocator);
       add_light_emissions = false;
-    } else {
-      spectra_.push_back(nullptr);
     }
 
     if (!trace_result->bsdf) {
       break;
     }
 
-    auto bsdf_sample = trace_result->bsdf->Sample(trace_ray.direction, rng,
-                                                  spectral_allocator);
-
-    // Only evaluate direct lighting if BSDF is not perfectly specular
-    if (!bsdf_sample || bsdf_sample->pdf) {
-      for (auto* light_samples = light_sampler.Sample(trace_result->hit_point);
-           light_samples; light_samples = light_samples->next) {
-        if (light_samples->pdf && *light_samples->pdf <= 0.0) {
-          continue;
-        }
-
-        auto* direct_light = internal::SampleDirectLighting(
-            light_samples->light, trace_ray, *trace_result, rng,
-            visibility_tester, spectral_allocator);
-
-        if (light_samples->pdf) {
-          direct_light =
-              spectral_allocator.Scale(direct_light, 1.0 / *light_samples->pdf);
-        }
-
-        spectra_[bounces] =
-            spectral_allocator.Add(spectra_[bounces], direct_light);
+    for (auto* light_samples = light_sampler.Sample(trace_result->hit_point);
+         light_samples; light_samples = light_samples->next) {
+      if (light_samples->pdf && *light_samples->pdf <= 0.0) {
+        continue;
       }
-    } else {
-      add_light_emissions = true;
+
+      auto* direct_light = internal::SampleDirectLighting(
+          light_samples->light, trace_ray, *trace_result, rng,
+          visibility_tester, spectral_allocator);
+
+      if (light_samples->pdf) {
+        direct_light =
+            spectral_allocator.Scale(direct_light, 1.0 / *light_samples->pdf);
+      }
+
+      path_builder.Add(direct_light, spectral_allocator);
     }
 
     if (bounces == max_bounces_) {
       break;
     }
+
+    auto bsdf_sample = trace_result->bsdf->Sample(trace_ray.direction, rng,
+                                                  spectral_allocator);
 
     if (!bsdf_sample) {
       break;
@@ -94,12 +87,15 @@ const Spectrum* PathIntegrator::Integrate(const Ray& ray, RayTracer& ray_tracer,
 
     path_throughput *= bsdf_sample->reflector.Albedo();
 
-    visual_t attenuation = 1.0;
+    visual_t attenuation;
     if (bsdf_sample->pdf) {
       attenuation =
           AbsDotProduct(trace_result->shading_normal, bsdf_sample->direction) /
           *bsdf_sample->pdf;
       path_throughput *= attenuation;
+    } else {
+      attenuation = 1.0;
+      add_light_emissions = true;
     }
 
     if (min_bounces_ < bounces) {
@@ -108,33 +104,16 @@ const Spectrum* PathIntegrator::Integrate(const Ray& ray, RayTracer& ray_tracer,
         break;
       }
 
-      attenuation /= *roulette_pdf;
-      path_throughput /= *roulette_pdf;
+      visual_t inverse_roulette_pdf = 1.0 / *roulette_pdf;
+      attenuation *= inverse_roulette_pdf;
+      path_throughput *= inverse_roulette_pdf;
     }
 
-    attenuations_.push_back(attenuation);
-    reflectors_.push_back(&bsdf_sample->reflector);
-
+    path_builder.Bounce(&bsdf_sample->reflector, attenuation);
     new (&trace_ray) Ray(trace_result->hit_point, bsdf_sample->direction);
-    bounces += 1;
   }
 
-  while (!reflectors_.empty()) {
-    auto* spectra = spectra_.back();
-    spectra_.pop_back();
-
-    auto* reflector = reflectors_.back();
-    reflectors_.pop_back();
-
-    auto attenuation = attenuations_.back();
-    attenuations_.pop_back();
-
-    spectra = spectral_allocator.Scale(spectra, attenuation);
-    spectra = spectral_allocator.Reflect(spectra, reflector);
-    spectra_.back() = spectral_allocator.Add(spectra, spectra_.back());
-  }
-
-  return spectra_.back();
+  return path_builder.Build(spectral_allocator);
 }
 
 std::unique_ptr<Integrator> PathIntegrator::Duplicate() const {

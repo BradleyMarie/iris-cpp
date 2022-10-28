@@ -23,7 +23,7 @@ TEST(RussianRoulette, AboveMaximumSuccess) {
   RussianRoulette roulette(0.75, 1.0);
   auto result = roulette.Evaluate(rng, 0.99);
   ASSERT_TRUE(result.has_value());
-  EXPECT_NEAR(1.0 / 0.75, result.value(), 0.0001);
+  EXPECT_NEAR(0.75, result.value(), 0.0001);
 }
 
 TEST(RussianRoulette, AboveMaximumFails) {
@@ -42,7 +42,7 @@ TEST(RussianRoulette, BelowMaximumSuccess) {
   RussianRoulette roulette(0.75, 1.0);
   auto result = roulette.Evaluate(rng, 0.5);
   ASSERT_TRUE(result.has_value());
-  EXPECT_NEAR(2.0, result.value(), 0.0001);
+  EXPECT_NEAR(0.5, result.value(), 0.0001);
 }
 
 TEST(RussianRoulette, BelowMaximumFails) {

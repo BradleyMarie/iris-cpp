@@ -11,8 +11,10 @@ RussianRoulette::RussianRoulette(visual maximum_continue_probability,
                                  visual always_continue_probability) noexcept
     : maximum_continue_probability_(maximum_continue_probability),
       always_continue_probability_(always_continue_probability) {
-  assert(0.0 <= maximum_continue_probability <= 1.0);
-  assert(0.0 <= always_continue_probability <= 1.0);
+  assert(0.0 <= maximum_continue_probability &&
+         maximum_continue_probability <= 1.0);
+  assert(0.0 <= always_continue_probability &&
+         always_continue_probability <= 1.0);
 }
 
 std::optional<visual_t> RussianRoulette::Evaluate(
@@ -34,7 +36,7 @@ std::optional<visual_t> RussianRoulette::Evaluate(
     return std::nullopt;
   }
 
-  return 1.0 / termination_cutoff;
+  return termination_cutoff;
 }
 
 }  // namespace internal

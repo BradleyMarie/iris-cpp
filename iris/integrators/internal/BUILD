@@ -3,6 +3,26 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 package(default_visibility = ["//iris/integrators:__subpackages__"])
 
 cc_library(
+    name = "path_builder",
+    srcs = ["path_builder.cc"],
+    hdrs = ["path_builder.h"],
+    deps = [
+        "//iris:reflector",
+        "//iris:spectral_allocator",
+        "//iris:spectrum",
+    ],
+)
+
+cc_test(
+    name = "path_builder_test",
+    srcs = ["path_builder_test.cc"],
+    deps = [
+        ":path_builder",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "russian_roulette",
     srcs = ["russian_roulette.cc"],
     hdrs = ["russian_roulette.h"],
