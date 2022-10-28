@@ -3,6 +3,26 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 package(default_visibility = ["//iris/integrators:__subpackages__"])
 
 cc_library(
+    name = "russian_roulette",
+    srcs = ["russian_roulette.cc"],
+    hdrs = ["russian_roulette.h"],
+    deps = [
+        "//iris:float",
+        "//iris:random",
+    ],
+)
+
+cc_test(
+    name = "russian_roulette_test",
+    srcs = ["russian_roulette_test.cc"],
+    deps = [
+        ":russian_roulette",
+        "//iris/random:mock_random",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "sample_direct_lighting",
     srcs = ["sample_direct_lighting.cc"],
     hdrs = ["sample_direct_lighting.h"],

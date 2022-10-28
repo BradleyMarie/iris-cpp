@@ -3,20 +3,24 @@
 #include <cassert>
 #include <cmath>
 
+#include "iris/integrators/internal/russian_roulette.h"
 #include "iris/integrators/internal/sample_direct_lighting.h"
 
 namespace iris {
 namespace integrators {
 
-PathIntegrator::PathIntegrator(visual min_termination_probability,
-                               visual roulette_threshold, uint8_t min_bounces,
+PathIntegrator::PathIntegrator(visual maximum_path_continue_probability,
+                               visual path_continue_probability_cutoff,
+                               uint8_t min_bounces,
                                uint8_t max_bounces) noexcept
-    : min_termination_probability_(std::max(
-          static_cast<visual>(0.0),
-          std::min(static_cast<visual>(1.0), min_termination_probability))),
-      roulette_threshold_(
+    : maximum_path_continue_probability_(
           std::max(static_cast<visual>(0.0),
-                   std::min(static_cast<visual>(1.0), roulette_threshold))),
+                   std::min(static_cast<visual>(1.0),
+                            maximum_path_continue_probability))),
+      path_continue_probability_cutoff_(
+          std::max(static_cast<visual>(0.0),
+                   std::min(static_cast<visual>(1.0),
+                            path_continue_probability_cutoff))),
       min_bounces_(min_bounces),
       max_bounces_(max_bounces) {
   reflectors_.reserve(max_bounces);
@@ -29,6 +33,9 @@ const Spectrum* PathIntegrator::Integrate(const Ray& ray, RayTracer& ray_tracer,
                                           VisibilityTester& visibility_tester,
                                           SpectralAllocator& spectral_allocator,
                                           Random& rng) {
+  internal::RussianRoulette russian_roulette(maximum_path_continue_probability_,
+                                             path_continue_probability_cutoff_);
+
   visual_t path_throughput = 1.0;
   bool add_light_emissions = true;
   Ray trace_ray = ray;
@@ -96,23 +103,13 @@ const Spectrum* PathIntegrator::Integrate(const Ray& ray, RayTracer& ray_tracer,
     }
 
     if (min_bounces_ < bounces) {
-      if (path_throughput < roulette_threshold_) {
-        auto roulette_sample = rng.NextVisual();
-
-        visual_t termination_cutoff =
-            std::max(min_termination_probability_,
-                     static_cast<visual_t>(1.0) - path_throughput);
-
-        if (roulette_sample < termination_cutoff) {
-          break;
-        }
-
-        visual_t roulette_pdf = 1.0 - termination_cutoff;
-        attenuation /= roulette_pdf;
-        path_throughput /= roulette_pdf;
-      } else {
-        rng.DiscardVisual(1);
+      auto roulette_pdf = russian_roulette.Evaluate(rng, path_throughput);
+      if (!roulette_pdf) {
+        break;
       }
+
+      attenuation /= *roulette_pdf;
+      path_throughput /= *roulette_pdf;
     }
 
     attenuations_.push_back(attenuation);
@@ -141,9 +138,9 @@ const Spectrum* PathIntegrator::Integrate(const Ray& ray, RayTracer& ray_tracer,
 }
 
 std::unique_ptr<Integrator> PathIntegrator::Duplicate() const {
-  return std::make_unique<PathIntegrator>(min_termination_probability_,
-                                          roulette_threshold_, min_bounces_,
-                                          max_bounces_);
+  return std::make_unique<PathIntegrator>(maximum_path_continue_probability_,
+                                          path_continue_probability_cutoff_,
+                                          min_bounces_, max_bounces_);
 }
 
 }  // namespace integrators

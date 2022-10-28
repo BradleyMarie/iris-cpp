@@ -32,6 +32,7 @@ cc_library(
         "//iris:spectral_allocator",
         "//iris:spectrum",
         "//iris:visibility_tester",
+        "//iris/integrators/internal:russian_roulette",
         "//iris/integrators/internal:sample_direct_lighting",
     ],
 )
