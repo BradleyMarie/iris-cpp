@@ -1,5 +1,5 @@
-#ifndef _IRIS_TESTING_SCENE_
-#define _IRIS_TESTING_SCENE_
+#ifndef _IRIS_TESTING_VISIBILITY_TESTER_
+#define _IRIS_TESTING_VISIBILITY_TESTER_
 
 #include "iris/visibility_tester.h"
 
@@ -12,4 +12,4 @@ VisibilityTester& GetNeverVisibleVisibilityTester();
 }  // namespace testing
 }  // namespace iris
 
-#endif  // _IRIS_TESTING_SCENE_
+#endif  // _IRIS_TESTING_VISIBILITY_TESTER_
