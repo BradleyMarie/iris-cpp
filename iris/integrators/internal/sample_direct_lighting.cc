@@ -60,7 +60,7 @@ const Spectrum* FromBsdfSample(const Bsdf::SampleResult& sample,
   visual_t light_pdf;
   auto emissions = light.Emission(Ray(hit.hit_point, sample.direction),
                                   visibility_tester, allocator, &light_pdf);
-  if (light_pdf <= 0.0) {
+  if (!emissions || light_pdf <= 0.0) {
     return nullptr;
   }
 

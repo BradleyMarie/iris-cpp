@@ -8,25 +8,18 @@
 #include "iris/float.h"
 #include "iris/random/mock_random.h"
 #include "iris/spectra/mock_spectrum.h"
-#include "iris/testing/light_tester.h"
-#include "iris/testing/mock_visibility_tester.h"
+#include "iris/testing/spectral_allocator.h"
+#include "iris/testing/visibility_tester.h"
 
 TEST(PointLightTest, SampleHits) {
-  iris::testing::LightTester light_tester;
-  iris::testing::MockVisibilityTester visibility_tester;
   iris::random::MockRandom random;
 
   auto spectrum = iris::MakeReferenceCounted<iris::spectra::MockSpectrum>();
 
-  EXPECT_CALL(visibility_tester,
-              Visible(testing::Eq(iris::Ray(iris::Point(0.0, 0.0, -1.0),
-                                            iris::Vector(0.0, 0.0, 1.0))),
-                      testing::_))
-      .WillOnce(testing::Return(true));
-
   iris::lights::PointLight light(iris::Point(0.0, 0.0, 0.0), spectrum);
-  auto result = light_tester.Sample(light, iris::Point(0.0, 0.0, -1.0), random,
-                                    visibility_tester);
+  auto result = light.Sample(iris::Point(0.0, 0.0, -1.0), random,
+                             iris::testing::GetAlwaysVisibleVisibilityTester(),
+                             iris::testing::GetSpectralAllocator());
   EXPECT_TRUE(result);
   EXPECT_EQ(spectrum.Get(), &result->emission);
   EXPECT_FALSE(result->pdf);
@@ -34,33 +27,25 @@ TEST(PointLightTest, SampleHits) {
 }
 
 TEST(PointLightTest, SampleMisses) {
-  iris::testing::LightTester light_tester;
-  iris::testing::MockVisibilityTester visibility_tester;
   iris::random::MockRandom random;
 
   auto spectrum = iris::MakeReferenceCounted<iris::spectra::MockSpectrum>();
 
-  EXPECT_CALL(visibility_tester,
-              Visible(testing::Eq(iris::Ray(iris::Point(0.0, 0.0, -1.0),
-                                            iris::Vector(0.0, 0.0, 1.0))),
-                      testing::_))
-      .WillOnce(testing::Return(false));
-
   iris::lights::PointLight light(iris::Point(0.0, 0.0, 0.0), spectrum);
-  EXPECT_FALSE(light_tester.Sample(light, iris::Point(0.0, 0.0, -1.0), random,
-                                   visibility_tester));
+  EXPECT_FALSE(light.Sample(iris::Point(0.0, 0.0, -1.0), random,
+                            iris::testing::GetNeverVisibleVisibilityTester(),
+                            iris::testing::GetSpectralAllocator()));
 }
 
 TEST(PointLightTest, Emission) {
-  iris::testing::LightTester light_tester;
-  iris::testing::MockVisibilityTester visibility_tester;
-
   auto spectrum = iris::MakeReferenceCounted<iris::spectra::MockSpectrum>();
 
   iris::lights::PointLight light(iris::Point(0.0, 0.0, 0.0), spectrum);
+
+  iris::visual_t pdf;
   EXPECT_EQ(nullptr,
-            light_tester.Emission(light,
-                                  iris::Ray(iris::Point(0.0, 0.0, 0.0),
-                                            iris::Vector(0.0, 0.0, 1.0)),
-                                  visibility_tester));
+            light.Emission(iris::Ray(iris::Point(0.0, 0.0, 0.0),
+                                     iris::Vector(0.0, 0.0, 1.0)),
+                           iris::testing::GetAlwaysVisibleVisibilityTester(),
+                           iris::testing::GetSpectralAllocator(), &pdf));
 }

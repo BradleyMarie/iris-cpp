@@ -67,20 +67,6 @@ cc_library(
 )
 
 cc_library(
-    name = "mock_visibility_tester",
-    testonly = True,
-    srcs = ["mock_visibility_tester.cc"],
-    hdrs = ["mock_visibility_tester.h"],
-    deps = [
-        "//iris:float",
-        "//iris:intersector",
-        "//iris:ray",
-        "//iris:scene",
-        "@com_google_googletest//:gtest",
-    ],
-)
-
-cc_library(
     name = "scene",
     testonly = True,
     srcs = ["scene.cc"],
@@ -107,5 +93,18 @@ cc_library(
     deps = [
         "//iris:spectral_allocator",
         "//iris/internal:arena",
+    ],
+)
+
+cc_library(
+    name = "visibility_tester",
+    testonly = True,
+    srcs = ["visibility_tester.cc"],
+    hdrs = ["visibility_tester.h"],
+    deps = [
+        "//iris:visibility_tester",
+        "//iris/internal:arena",
+        "//iris/internal:ray_tracer",
+        "//iris/internal:visibility_tester",
     ],
 )
