@@ -7,7 +7,7 @@
 #include "googlemock/include/gmock/gmock.h"
 #include "googletest/include/gtest/gtest.h"
 #include "iris/reflectors/mock_reflector.h"
-#include "iris/testing/material_tester.h"
+#include "iris/testing/bxdf_allocator.h"
 #include "iris/testing/spectral_allocator.h"
 #include "iris/textures/constant_texture.h"
 
@@ -26,8 +26,9 @@ TEST(MatteMaterialTest, Evaluate) {
   iris::materials::MatteMaterial material(std::move(reflectance),
                                           std::move(sigma));
 
-  iris::testing::MaterialTester material_tester;
-  auto* result = material_tester.Evaluate(material, iris::TextureCoordinates{});
+  auto* result = material.Evaluate(iris::TextureCoordinates{},
+                                   iris::testing::GetSpectralAllocator(),
+                                   iris::testing::GetBxdfAllocator());
   ASSERT_TRUE(result);
 
   auto* returned_reflector = result->Reflectance(

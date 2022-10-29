@@ -5,6 +5,17 @@ package(default_visibility = [
 ])
 
 cc_library(
+    name = "bxdf_allocator",
+    testonly = True,
+    srcs = ["bxdf_allocator.cc"],
+    hdrs = ["bxdf_allocator.h"],
+    deps = [
+        "//iris:bxdf_allocator",
+        "//iris/internal:arena",
+    ],
+)
+
+cc_library(
     name = "emissive_material_tester",
     testonly = True,
     srcs = ["emissive_material_tester.cc"],
@@ -50,19 +61,6 @@ cc_library(
         "//iris/internal:arena",
         "//iris/internal:ray_tracer",
         "//iris/internal:visibility_tester",
-    ],
-)
-
-cc_library(
-    name = "material_tester",
-    testonly = True,
-    srcs = ["material_tester.cc"],
-    hdrs = ["material_tester.h"],
-    deps = [
-        "//iris:bxdf",
-        "//iris:material",
-        "//iris:texture_coordinates",
-        "//iris/internal:arena",
     ],
 )
 
