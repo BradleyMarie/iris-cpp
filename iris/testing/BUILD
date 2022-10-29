@@ -111,3 +111,14 @@ cc_library(
         "@com_google_googletest//:gtest",
     ],
 )
+
+cc_library(
+    name = "spectral_allocator",
+    testonly = True,
+    srcs = ["spectral_allocator.cc"],
+    hdrs = ["spectral_allocator.h"],
+    deps = [
+        "//iris:spectral_allocator",
+        "//iris/internal:arena",
+    ],
+)
