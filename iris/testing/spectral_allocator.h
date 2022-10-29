@@ -1,5 +1,5 @@
-#ifndef _IRIS_TESTING_SCENE_
-#define _IRIS_TESTING_SCENE_
+#ifndef _IRIS_TESTING_SPECTRAL_ALLOCATOR_
+#define _IRIS_TESTING_SPECTRAL_ALLOCATOR_
 
 #include "iris/spectral_allocator.h"
 
@@ -11,4 +11,4 @@ SpectralAllocator& GetSpectralAllocator();
 }  // namespace testing
 }  // namespace iris
 
-#endif  // _IRIS_TESTING_SCENE_
+#endif  // _IRIS_TESTING_SPECTRAL_ALLOCATOR_
