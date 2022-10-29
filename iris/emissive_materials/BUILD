@@ -20,7 +20,7 @@ cc_test(
     deps = [
         ":constant_emissive_material",
         "//iris/spectra:mock_spectrum",
-        "//iris/testing:emissive_material_tester",
+        "//iris/testing:spectral_allocator",
         "@com_google_googletest//:gtest_main",
     ],
 )

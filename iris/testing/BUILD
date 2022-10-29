@@ -16,20 +16,6 @@ cc_library(
 )
 
 cc_library(
-    name = "emissive_material_tester",
-    testonly = True,
-    srcs = ["emissive_material_tester.cc"],
-    hdrs = ["emissive_material_tester.h"],
-    deps = [
-        "//iris:emissive_material",
-        "//iris:spectral_allocator",
-        "//iris:spectrum",
-        "//iris:texture_coordinates",
-        "//iris/internal:arena",
-    ],
-)
-
-cc_library(
     name = "light_scene_tester",
     testonly = True,
     srcs = ["light_scene_tester.cc"],
