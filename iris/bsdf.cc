@@ -61,7 +61,7 @@ std::optional<Bsdf::SampleResult> Bsdf::Sample(
 
   auto pdf =
       bxdf_.Pdf(local_incoming, local_outgoing, Bxdf::SampleSource::BXDF);
-  if (pdf.has_value() && *pdf == 0.0) {
+  if (pdf.has_value() && *pdf <= 0.0) {
     return std::nullopt;
   }
 
@@ -85,7 +85,7 @@ std::optional<Bsdf::ReflectanceResult> Bsdf::Reflectance(
   auto local_outgoing = ToLocal(outgoing);
   auto pdf =
       bxdf_.Pdf(local_incoming, local_outgoing, Bxdf::SampleSource::LIGHT);
-  if (pdf.value_or(0.0) == 0.0) {
+  if (pdf.value_or(0.0) <= 0.0) {
     return std::nullopt;
   }
 

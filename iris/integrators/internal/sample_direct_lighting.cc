@@ -39,7 +39,7 @@ const Spectrum* FromLightSample(const Light::SampleResult& sample,
                                 SpectralAllocator& allocator) {
   auto diffuse =
       hit.bsdf->Reflectance(traced_ray.direction, sample.to_light, allocator);
-  if (!diffuse || diffuse->pdf <= 0.0) {
+  if (!diffuse) {
     return nullptr;
   }
 

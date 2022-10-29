@@ -69,6 +69,7 @@ cc_test(
         "//iris/reflectors:mock_reflector",
         "//iris/spectra:mock_spectrum",
         "//iris/testing:spectral_allocator",
+        "//iris/testing:visibility_tester",
         "@com_google_googletest//:gtest_main",
     ],
 )
