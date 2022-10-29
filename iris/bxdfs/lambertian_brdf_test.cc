@@ -6,7 +6,7 @@
 #include "googletest/include/gtest/gtest.h"
 #include "iris/random/mock_random.h"
 #include "iris/reflectors/mock_reflector.h"
-#include "iris/testing/bxdf_tester.h"
+#include "iris/testing/spectral_allocator.h"
 
 TEST(LambertianBrdfTest, Sample) {
   iris::reflectors::MockReflector reflector;
@@ -37,44 +37,41 @@ TEST(LambertianBrdfTest, DiffusePdfReflected) {
 }
 
 TEST(LambertianBrdfTest, ReflectanceBtdf) {
-  iris::testing::BxdfTester tester;
-
   iris::reflectors::MockReflector reflector;
   EXPECT_CALL(reflector, Reflectance(testing::_))
       .WillRepeatedly(testing::Return(1.0));
 
   iris::bxdfs::LambertianBrdf bxdf(reflector);
-  auto* result = tester.Reflectance(
-      bxdf, iris::Vector(0.0, 0.0, 1.0), iris::Vector(0.0, 0.0, -1.0),
-      iris::Bxdf::SampleSource::BXDF, iris::Bxdf::Hemisphere::BTDF);
+  auto* result = bxdf.Reflectance(
+      iris::Vector(0.0, 0.0, 1.0), iris::Vector(0.0, 0.0, -1.0),
+      iris::Bxdf::SampleSource::BXDF, iris::Bxdf::Hemisphere::BTDF,
+      iris::testing::GetSpectralAllocator());
   ASSERT_FALSE(result);
 }
 
 TEST(LambertianBrdfTest, ReflectanceTransmitted) {
-  iris::testing::BxdfTester tester;
-
   iris::reflectors::MockReflector reflector;
   EXPECT_CALL(reflector, Reflectance(testing::_))
       .WillRepeatedly(testing::Return(1.0));
 
   iris::bxdfs::LambertianBrdf bxdf(reflector);
-  auto* result = tester.Reflectance(
-      bxdf, iris::Vector(0.0, 0.0, 1.0), iris::Vector(0.0, 0.0, 1.0),
-      iris::Bxdf::SampleSource::BXDF, iris::Bxdf::Hemisphere::BRDF);
+  auto* result = bxdf.Reflectance(
+      iris::Vector(0.0, 0.0, 1.0), iris::Vector(0.0, 0.0, 1.0),
+      iris::Bxdf::SampleSource::BXDF, iris::Bxdf::Hemisphere::BRDF,
+      iris::testing::GetSpectralAllocator());
   ASSERT_FALSE(result);
 }
 
 TEST(LambertianBrdfTest, Reflectance) {
-  iris::testing::BxdfTester tester;
-
   iris::reflectors::MockReflector reflector;
   EXPECT_CALL(reflector, Reflectance(testing::_))
       .WillRepeatedly(testing::Return(1.0));
 
   iris::bxdfs::LambertianBrdf bxdf(reflector);
-  auto* result = tester.Reflectance(
-      bxdf, iris::Vector(0.0, 0.0, 1.0), iris::Vector(0.0, 0.0, -1.0),
-      iris::Bxdf::SampleSource::BXDF, iris::Bxdf::Hemisphere::BRDF);
+  auto* result = bxdf.Reflectance(
+      iris::Vector(0.0, 0.0, 1.0), iris::Vector(0.0, 0.0, -1.0),
+      iris::Bxdf::SampleSource::BXDF, iris::Bxdf::Hemisphere::BRDF,
+      iris::testing::GetSpectralAllocator());
   ASSERT_TRUE(result);
   EXPECT_NEAR(M_1_PI, result->Reflectance(1.0), 0.0001);
 }

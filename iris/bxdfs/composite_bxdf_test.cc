@@ -7,7 +7,7 @@
 #include "iris/bxdfs/mock_bxdf.h"
 #include "iris/random/mock_random.h"
 #include "iris/reflectors/mock_reflector.h"
-#include "iris/testing/bxdf_tester.h"
+#include "iris/testing/spectral_allocator.h"
 
 TEST(CompositeBxdfTest, Sample) {
   iris::random::MockRandom rng;
@@ -122,8 +122,6 @@ TEST(CompositeBxdfTest, LightPdfTwoBxdfsMissingBoth) {
 }
 
 TEST(CompositeBxdfTest, Reflectance) {
-  iris::testing::BxdfTester tester;
-
   iris::reflectors::MockReflector reflector0;
   EXPECT_CALL(reflector0, Reflectance(1.0)).WillOnce(testing::Return(0.25));
   iris::bxdfs::MockBxdf bxdf0;
@@ -142,8 +140,9 @@ TEST(CompositeBxdfTest, Reflectance) {
       .WillOnce(testing::Return(&reflector1));
 
   auto composite = iris::bxdfs::MakeComposite(bxdf0, bxdf1);
-  auto* result = tester.Reflectance(
-      composite, iris::Vector(1.0, 0.0, 0.0), iris::Vector(-1.0, 0.0, 0.0),
-      iris::Bxdf::SampleSource::LIGHT, iris::Bxdf::Hemisphere::BRDF);
+  auto* result = composite.Reflectance(
+      iris::Vector(1.0, 0.0, 0.0), iris::Vector(-1.0, 0.0, 0.0),
+      iris::Bxdf::SampleSource::LIGHT, iris::Bxdf::Hemisphere::BRDF,
+      iris::testing::GetSpectralAllocator());
   EXPECT_EQ(0.75, result->Reflectance(1.0));
 }

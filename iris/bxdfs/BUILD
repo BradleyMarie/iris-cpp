@@ -23,7 +23,7 @@ cc_test(
         ":mock_bxdf",
         "//iris/random:mock_random",
         "//iris/reflectors:mock_reflector",
-        "//iris/testing:bxdf_tester",
+        "//iris/testing:spectral_allocator",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -49,7 +49,7 @@ cc_test(
         ":lambertian_brdf",
         "//iris/random:mock_random",
         "//iris/reflectors:mock_reflector",
-        "//iris/testing:bxdf_tester",
+        "//iris/testing:spectral_allocator",
         "@com_google_googletest//:gtest_main",
     ],
 )

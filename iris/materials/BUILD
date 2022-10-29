@@ -26,8 +26,8 @@ cc_test(
     deps = [
         ":matte_material",
         "//iris/reflectors:mock_reflector",
-        "//iris/testing:bxdf_tester",
         "//iris/testing:material_tester",
+        "//iris/testing:spectral_allocator",
         "//iris/textures:constant_texture",
         "@com_google_googletest//:gtest_main",
     ],

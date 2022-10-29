@@ -7,8 +7,8 @@
 #include "googlemock/include/gmock/gmock.h"
 #include "googletest/include/gtest/gtest.h"
 #include "iris/reflectors/mock_reflector.h"
-#include "iris/testing/bxdf_tester.h"
 #include "iris/testing/material_tester.h"
+#include "iris/testing/spectral_allocator.h"
 #include "iris/textures/constant_texture.h"
 
 TEST(MatteMaterialTest, Evaluate) {
@@ -30,10 +30,10 @@ TEST(MatteMaterialTest, Evaluate) {
   auto* result = material_tester.Evaluate(material, iris::TextureCoordinates{});
   ASSERT_TRUE(result);
 
-  iris::testing::BxdfTester bxdf_tester;
-  auto* returned_reflector = bxdf_tester.Reflectance(
-      *result, iris::Vector(0.0, 0.0, -1.0), iris::Vector(0.0, 0.0, 1.0),
-      iris::Bxdf::SampleSource::BXDF, iris::Bxdf::Hemisphere::BRDF);
+  auto* returned_reflector = result->Reflectance(
+      iris::Vector(0.0, 0.0, -1.0), iris::Vector(0.0, 0.0, 1.0),
+      iris::Bxdf::SampleSource::BXDF, iris::Bxdf::Hemisphere::BRDF,
+      iris::testing::GetSpectralAllocator());
   ASSERT_TRUE(returned_reflector);
   EXPECT_NEAR(M_1_PI, returned_reflector->Reflectance(1.0), 0.0001);
 }
