@@ -65,6 +65,10 @@ cc_test(
     srcs = ["sample_direct_lighting_test.cc"],
     deps = [
         ":sample_direct_lighting",
+        "//iris/bxdfs:mock_bxdf",
+        "//iris/reflectors:mock_reflector",
+        "//iris/spectra:mock_spectrum",
+        "//iris/testing:spectral_allocator",
         "@com_google_googletest//:gtest_main",
     ],
 )
