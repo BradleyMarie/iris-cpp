@@ -70,5 +70,12 @@ VisibilityTester& GetNeverVisibleVisibilityTester() {
   return visibility_tester;
 }
 
+std::unique_ptr<VisibilityTester> GetVisibilityTester(const Scene& scene) {
+  thread_local internal::RayTracer ray_tracer;
+  thread_local internal::Arena arena;
+  return std::make_unique<internal::VisibilityTester>(scene, 0.0, ray_tracer,
+                                                      arena);
+}
+
 }  // namespace testing
 }  // namespace iris

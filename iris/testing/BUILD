@@ -31,26 +31,6 @@ cc_library(
 )
 
 cc_library(
-    name = "light_tester",
-    testonly = True,
-    srcs = ["light_tester.cc"],
-    hdrs = ["light_tester.h"],
-    deps = [
-        "//iris:float",
-        "//iris:light",
-        "//iris:point",
-        "//iris:random",
-        "//iris:scene",
-        "//iris:spectral_allocator",
-        "//iris:spectrum",
-        "//iris:visibility_tester",
-        "//iris/internal:arena",
-        "//iris/internal:ray_tracer",
-        "//iris/internal:visibility_tester",
-    ],
-)
-
-cc_library(
     name = "scene",
     testonly = True,
     srcs = ["scene.cc"],

@@ -585,7 +585,8 @@ cc_test(
         "//iris/random:mock_random",
         "//iris/scenes:list_scene",
         "//iris/spectra:mock_spectrum",
-        "//iris/testing:light_tester",
+        "//iris/testing:spectral_allocator",
+        "//iris/testing:visibility_tester",
         "@com_google_googletest//:gtest_main",
     ],
 )

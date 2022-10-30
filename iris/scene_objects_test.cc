@@ -6,7 +6,8 @@
 #include "iris/random/mock_random.h"
 #include "iris/scenes/list_scene.h"
 #include "iris/spectra/mock_spectrum.h"
-#include "iris/testing/light_tester.h"
+#include "iris/testing/spectral_allocator.h"
+#include "iris/testing/visibility_tester.h"
 
 class TestGeometry : public iris::Geometry {
  private:
@@ -175,7 +176,6 @@ TEST(ListSceneTest, BuilderOneAreaLight) {
 }
 
 TEST(ListSceneTest, AreaLightEmission) {
-  iris::testing::LightTester light_tester;
   iris::spectra::MockSpectrum spectrum;
   iris::emissive_materials::MockEmissiveMaterial emissive_material;
   EXPECT_CALL(emissive_material, Evaluate(testing::_, testing::_))
@@ -189,16 +189,16 @@ TEST(ListSceneTest, AreaLightEmission) {
   EXPECT_EQ(1u, scene_objects.NumLights());
   const auto& light = scene_objects.GetLight(0);
 
-  EXPECT_EQ(
-      &spectrum,
-      light_tester.Emission(
-          light,
-          iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(0.0, 0.0, 1.0)),
-          *iris::scenes::ListScene::Builder::Create()->Build(scene_objects)));
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(scene_objects);
+  auto visibility_tester = iris::testing::GetVisibilityTester(*scene);
+
+  EXPECT_EQ(&spectrum, light.Emission(iris::Ray(iris::Point(0.0, 0.0, 0.0),
+                                                iris::Vector(0.0, 0.0, 1.0)),
+                                      *visibility_tester,
+                                      iris::testing::GetSpectralAllocator()));
 }
 
 TEST(ListSceneTest, AreaLightEmissionMisses) {
-  iris::testing::LightTester light_tester;
   iris::spectra::MockSpectrum spectrum;
   iris::emissive_materials::MockEmissiveMaterial emissive_material;
 
@@ -210,16 +210,16 @@ TEST(ListSceneTest, AreaLightEmissionMisses) {
   EXPECT_EQ(1u, scene_objects.NumLights());
   const auto& light = scene_objects.GetLight(0);
 
-  EXPECT_EQ(nullptr, light_tester.Emission(
-                         light,
-                         iris::Ray(iris::Point(0.0, 0.0, 0.0),
-                                   iris::Vector(0.0, 0.0, 1.0)),
-                         *iris::scenes::ListScene::Builder::Create()->Build(
-                             iris::SceneObjects::Builder().Build())));
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(scene_objects);
+  auto visibility_tester = iris::testing::GetVisibilityTester(*scene);
+
+  EXPECT_EQ(nullptr, light.Emission(iris::Ray(iris::Point(0.0, 0.0, 0.0),
+                                              iris::Vector(0.0, 0.0, 1.0)),
+                                    *visibility_tester,
+                                    iris::testing::GetSpectralAllocator()));
 }
 
 TEST(ListSceneTest, AreaLightSampleRngFails) {
-  iris::testing::LightTester light_tester;
   iris::spectra::MockSpectrum spectrum;
   iris::emissive_materials::MockEmissiveMaterial emissive_material;
 
@@ -231,14 +231,16 @@ TEST(ListSceneTest, AreaLightSampleRngFails) {
   EXPECT_EQ(1u, scene_objects.NumLights());
   const auto& light = scene_objects.GetLight(0);
 
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(scene_objects);
+  auto visibility_tester = iris::testing::GetVisibilityTester(*scene);
+
   iris::random::MockRandom random;
-  EXPECT_FALSE(light_tester.Sample(
-      light, iris::Point(0.0, 0.0, 0.0), random,
-      *iris::scenes::ListScene::Builder::Create()->Build(scene_objects)));
+  EXPECT_FALSE(light.Sample(iris::Point(0.0, 0.0, 0.0), random,
+                            *visibility_tester,
+                            iris::testing::GetSpectralAllocator()));
 }
 
 TEST(ListSceneTest, AreaLightSampleNotVisible) {
-  iris::testing::LightTester light_tester;
   iris::spectra::MockSpectrum spectrum;
   iris::emissive_materials::MockEmissiveMaterial emissive_material;
 
@@ -250,15 +252,16 @@ TEST(ListSceneTest, AreaLightSampleNotVisible) {
   EXPECT_EQ(1u, scene_objects.NumLights());
   const auto& light = scene_objects.GetLight(0);
 
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(scene_objects);
+  auto visibility_tester = iris::testing::GetVisibilityTester(*scene);
+
   iris::random::MockRandom random;
-  EXPECT_FALSE(
-      light_tester.Sample(light, iris::Point(0.0, 0.0, 0.0), random,
-                          *iris::scenes::ListScene::Builder::Create()->Build(
-                              iris::SceneObjects::Builder().Build())));
+  EXPECT_FALSE(light.Sample(iris::Point(0.0, 0.0, 0.0), random,
+                            *visibility_tester,
+                            iris::testing::GetSpectralAllocator()));
 }
 
 TEST(ListSceneTest, AreaLightSampleWorld) {
-  iris::testing::LightTester light_tester;
   iris::spectra::MockSpectrum spectrum;
   iris::emissive_materials::MockEmissiveMaterial emissive_material;
 
@@ -273,10 +276,13 @@ TEST(ListSceneTest, AreaLightSampleWorld) {
   EXPECT_EQ(1u, scene_objects.NumLights());
   const auto& light = scene_objects.GetLight(0);
 
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(scene_objects);
+  auto visibility_tester = iris::testing::GetVisibilityTester(*scene);
+
   iris::random::MockRandom random;
-  auto result = light_tester.Sample(
-      light, iris::Point(0.0, 0.0, 0.0), random,
-      *iris::scenes::ListScene::Builder::Create()->Build(scene_objects));
+  auto result =
+      light.Sample(iris::Point(0.0, 0.0, 0.0), random, *visibility_tester,
+                   iris::testing::GetSpectralAllocator());
   EXPECT_TRUE(result);
   EXPECT_EQ(&spectrum, &result->emission);
   EXPECT_EQ(1.0, result->pdf);
@@ -284,7 +290,6 @@ TEST(ListSceneTest, AreaLightSampleWorld) {
 }
 
 TEST(ListSceneTest, AreaLightSampleWithTransform) {
-  iris::testing::LightTester light_tester;
   iris::spectra::MockSpectrum spectrum;
   iris::emissive_materials::MockEmissiveMaterial emissive_material;
 
@@ -300,10 +305,13 @@ TEST(ListSceneTest, AreaLightSampleWithTransform) {
   EXPECT_EQ(1u, scene_objects.NumLights());
   const auto& light = scene_objects.GetLight(0);
 
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(scene_objects);
+  auto visibility_tester = iris::testing::GetVisibilityTester(*scene);
+
   iris::random::MockRandom random;
-  auto result = light_tester.Sample(
-      light, iris::Point(0.0, 0.0, 0.0), random,
-      *iris::scenes::ListScene::Builder::Create()->Build(scene_objects));
+  auto result =
+      light.Sample(iris::Point(0.0, 0.0, 0.0), random, *visibility_tester,
+                   iris::testing::GetSpectralAllocator());
   EXPECT_TRUE(result);
   EXPECT_EQ(&spectrum, &result->emission);
   EXPECT_EQ(1.0, result->pdf);
