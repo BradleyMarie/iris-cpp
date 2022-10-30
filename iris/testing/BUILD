@@ -16,16 +16,12 @@ cc_library(
 )
 
 cc_library(
-    name = "light_scene_tester",
+    name = "light_sample_allocator",
     testonly = True,
-    srcs = ["light_scene_tester.cc"],
-    hdrs = ["light_scene_tester.h"],
+    srcs = ["light_sample_allocator.cc"],
+    hdrs = ["light_sample_allocator.h"],
     deps = [
-        "//iris:light_sample",
         "//iris:light_sample_allocator",
-        "//iris:light_scene",
-        "//iris:point",
-        "//iris:random",
         "//iris/internal:arena",
     ],
 )

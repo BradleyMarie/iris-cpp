@@ -6,7 +6,7 @@
 #include "iris/lights/mock_light.h"
 #include "iris/random/mock_random.h"
 #include "iris/scenes/list_scene.h"
-#include "iris/testing/light_scene_tester.h"
+#include "iris/testing/light_sample_allocator.h"
 
 TEST(AllLightSceneTest, NoLights) {
   iris::random::MockRandom rng;
@@ -14,9 +14,9 @@ TEST(AllLightSceneTest, NoLights) {
   auto light_scene =
       iris::light_scenes::AllLightScene::Builder::Create()->Build(
           scene_objects);
-  iris::testing::LightSceneTester tester;
   EXPECT_EQ(nullptr,
-            tester.Sample(*light_scene, iris::Point(0.0, 0.0, 0.0), rng));
+            light_scene->Sample(iris::Point(0.0, 0.0, 0.0), rng,
+                                iris::testing::GetLightSampleAllocator()));
 }
 
 TEST(AllLightSceneTest, TwoLights) {
@@ -34,9 +34,9 @@ TEST(AllLightSceneTest, TwoLights) {
   auto light_scene =
       iris::light_scenes::AllLightScene::Builder::Create()->Build(objects);
 
-  iris::testing::LightSceneTester tester;
   auto light_samples =
-      tester.Sample(*light_scene, iris::Point(0.0, 0.0, 0.0), rng);
+      light_scene->Sample(iris::Point(0.0, 0.0, 0.0), rng,
+                          iris::testing::GetLightSampleAllocator());
   ASSERT_NE(nullptr, light_samples);
 
   auto* light1_sample = light_samples;

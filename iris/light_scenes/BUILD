@@ -24,7 +24,7 @@ cc_test(
         "//iris/lights:mock_light",
         "//iris/random:mock_random",
         "//iris/scenes:list_scene",
-        "//iris/testing:light_scene_tester",
+        "//iris/testing:light_sample_allocator",
         "@com_google_googletest//:gtest_main",
     ],
 )
