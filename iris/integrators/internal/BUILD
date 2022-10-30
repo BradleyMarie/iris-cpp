@@ -67,6 +67,7 @@ cc_test(
         ":sample_direct_lighting",
         "//iris/bxdfs:mock_bxdf",
         "//iris/lights:mock_light",
+        "//iris/random:mock_random",
         "//iris/reflectors:mock_reflector",
         "//iris/spectra:mock_spectrum",
         "//iris/testing:spectral_allocator",
