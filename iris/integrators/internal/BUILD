@@ -66,6 +66,7 @@ cc_test(
     deps = [
         ":sample_direct_lighting",
         "//iris/bxdfs:mock_bxdf",
+        "//iris/lights:mock_light",
         "//iris/reflectors:mock_reflector",
         "//iris/spectra:mock_spectrum",
         "//iris/testing:spectral_allocator",
