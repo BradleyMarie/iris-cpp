@@ -6,8 +6,8 @@
 
 #include "iris/bxdf.h"
 #include "iris/float.h"
-#include "iris/random.h"
 #include "iris/reflector.h"
+#include "iris/sampler.h"
 #include "iris/spectral_allocator.h"
 #include "iris/vector.h"
 
@@ -22,9 +22,9 @@ class CompositeBxdf final : public Bxdf {
     (void(bxdfs_[i++] = &bxdfs), ...);
   }
 
-  Vector Sample(const Vector& incoming, Random& rng) const override {
-    size_t index = rng.NextIndex(sizeof...(Bxdfs));
-    return bxdfs_[index]->Sample(incoming, rng);
+  Vector Sample(const Vector& incoming, Sampler& sampler) const override {
+    size_t index = sampler.NextIndex(sizeof...(Bxdfs));
+    return bxdfs_[index]->Sample(incoming, sampler);
   }
 
   std::optional<visual_t> Pdf(const Vector& incoming, const Vector& outgoing,

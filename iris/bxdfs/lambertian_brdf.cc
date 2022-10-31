@@ -7,11 +7,11 @@
 namespace iris {
 namespace bxdfs {
 
-Vector LambertianBrdf::Sample(const Vector& incoming, Random& rng) const {
-  auto radius_squared = rng.NextGeometric();
+Vector LambertianBrdf::Sample(const Vector& incoming, Sampler& sampler) const {
+  auto radius_squared = sampler.Next();
   auto radius = std::sqrt(radius_squared);
 
-  auto theta = rng.NextGeometric() * static_cast<geometric>(2.0 * M_PI);
+  auto theta = sampler.Next() * static_cast<geometric>(2.0 * M_PI);
   auto sin_theta = std::sin(theta);
   auto cos_theta = std::cos(theta);
 

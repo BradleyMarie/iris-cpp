@@ -8,8 +8,8 @@ cc_library(
     deps = [
         "//iris:bxdf",
         "//iris:float",
-        "//iris:random",
         "//iris:reflector",
+        "//iris:sampler",
         "//iris:spectral_allocator",
         "//iris:vector",
     ],
@@ -35,8 +35,8 @@ cc_library(
     deps = [
         "//iris:bxdf",
         "//iris:float",
-        "//iris:random",
         "//iris:reflector",
+        "//iris:sampler",
         "//iris:spectral_allocator",
         "//iris:vector",
     ],
@@ -60,8 +60,8 @@ cc_library(
     deps = [
         "//iris:bxdf",
         "//iris:float",
-        "//iris:random",
         "//iris:reflector",
+        "//iris:sampler",
         "//iris:spectral_allocator",
         "//iris:vector",
         "@com_google_googletest//:gtest",

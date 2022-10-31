@@ -10,8 +10,8 @@ cc_library(
     deps = [
         ":bxdf",
         ":float",
-        ":random",
         ":reflector",
+        ":sampler",
         ":spectral_allocator",
         ":vector",
     ],
@@ -58,8 +58,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":float",
-        ":random",
         ":reflector",
+        ":sampler",
         ":spectral_allocator",
         ":vector",
     ],

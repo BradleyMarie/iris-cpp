@@ -14,9 +14,10 @@ TEST(LambertianBrdfTest, Sample) {
   EXPECT_CALL(rng, NextGeometric())
       .Times(2)
       .WillRepeatedly(testing::Return(0.0));
+  iris::Sampler sampler(rng);
 
   iris::bxdfs::LambertianBrdf bxdf(reflector);
-  auto result = bxdf.Sample(iris::Vector(0.0, 0.0, -1.0), rng);
+  auto result = bxdf.Sample(iris::Vector(0.0, 0.0, -1.0), sampler);
   EXPECT_EQ(iris::Vector(0.0, 0.0, 1.0), result);
 }
 

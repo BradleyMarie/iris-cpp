@@ -3,8 +3,8 @@
 
 #include "iris/bxdf.h"
 #include "iris/float.h"
-#include "iris/random.h"
 #include "iris/reflector.h"
+#include "iris/sampler.h"
 #include "iris/spectral_allocator.h"
 #include "iris/vector.h"
 
@@ -15,7 +15,7 @@ class LambertianBrdf final : public Bxdf {
  public:
   LambertianBrdf(const Reflector& reflector) noexcept : reflector_(reflector) {}
 
-  Vector Sample(const Vector& incoming, Random& rng) const override;
+  Vector Sample(const Vector& incoming, Sampler& sampler) const override;
 
   std::optional<visual_t> Pdf(const Vector& incoming, const Vector& outgoing,
                               SampleSource sample_source) const override;

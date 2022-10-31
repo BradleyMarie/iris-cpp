@@ -11,7 +11,8 @@
 
 TEST(CompositeBxdfTest, Sample) {
   iris::random::MockRandom rng;
-  EXPECT_CALL(rng, NextIndex(2)).Times(1).WillOnce(testing::Return(1));
+  EXPECT_CALL(rng, NextGeometric()).WillOnce(testing::Return(0.75));
+  iris::Sampler sampler(rng);
 
   iris::bxdfs::MockBxdf bxdf0;
   iris::bxdfs::MockBxdf bxdf1;
@@ -20,7 +21,7 @@ TEST(CompositeBxdfTest, Sample) {
 
   auto composite = iris::bxdfs::MakeComposite(bxdf0, bxdf1);
   EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
-            composite.Sample(iris::Vector(1.0, 0.0, 0.0), rng));
+            composite.Sample(iris::Vector(1.0, 0.0, 0.0), sampler));
 }
 
 TEST(CompositeBxdfTest, PdfOneBxdf) {

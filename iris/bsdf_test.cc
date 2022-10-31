@@ -6,7 +6,6 @@
 #include "iris/random/mock_random.h"
 #include "iris/reflectors/mock_reflector.h"
 
-iris::random::MockRandom g_rng;
 iris::reflectors::MockReflector g_reflector;
 
 TEST(BsdfTest, SampleZeroPdf) {
@@ -21,9 +20,12 @@ TEST(BsdfTest, SampleZeroPdf) {
                   iris::Bxdf::SampleSource::BXDF))
       .WillOnce(testing::Return(std::optional<iris::visual_t>(0.0)));
 
+  iris::random::MockRandom rng;
+  EXPECT_CALL(rng, DiscardGeometric(2));
+
   iris::Bsdf bsdf(bxdf, iris::Vector(0.0, 0.0, 1.0),
                   iris::Vector(0.0, 0.0, 1.0));
-  auto result = bsdf.Sample(iris::Vector(1.0, 0.0, 0.0), g_rng, allocator);
+  auto result = bsdf.Sample(iris::Vector(1.0, 0.0, 0.0), rng, allocator);
   EXPECT_FALSE(result);
 }
 
@@ -39,9 +41,12 @@ TEST(BsdfTest, SampleNegativePdf) {
                   iris::Bxdf::SampleSource::BXDF))
       .WillOnce(testing::Return(std::optional<iris::visual_t>(-1.0)));
 
+  iris::random::MockRandom rng;
+  EXPECT_CALL(rng, DiscardGeometric(2));
+
   iris::Bsdf bsdf(bxdf, iris::Vector(0.0, 0.0, 1.0),
                   iris::Vector(0.0, 0.0, 1.0));
-  auto result = bsdf.Sample(iris::Vector(1.0, 0.0, 0.0), g_rng, allocator);
+  auto result = bsdf.Sample(iris::Vector(1.0, 0.0, 0.0), rng, allocator);
   EXPECT_FALSE(result);
 }
 
@@ -62,9 +67,12 @@ TEST(BsdfTest, SampleNoReflector) {
                                 iris::Bxdf::Hemisphere::BTDF, testing::_))
       .WillOnce(testing::Return(nullptr));
 
+  iris::random::MockRandom rng;
+  EXPECT_CALL(rng, DiscardGeometric(2));
+
   iris::Bsdf bsdf(bxdf, iris::Vector(0.0, 0.0, 1.0),
                   iris::Vector(0.0, 0.0, 1.0));
-  auto result = bsdf.Sample(iris::Vector(1.0, 0.0, 0.0), g_rng, allocator);
+  auto result = bsdf.Sample(iris::Vector(1.0, 0.0, 0.0), rng, allocator);
   EXPECT_FALSE(result);
 }
 
@@ -85,9 +93,12 @@ TEST(BsdfTest, SampleBtdf) {
                                 iris::Bxdf::Hemisphere::BTDF, testing::_))
       .WillOnce(testing::Return(&g_reflector));
 
+  iris::random::MockRandom rng;
+  EXPECT_CALL(rng, DiscardGeometric(2));
+
   iris::Bsdf bsdf(bxdf, iris::Vector(0.0, 0.0, 1.0),
                   iris::Vector(0.0, 0.0, 1.0), true);
-  auto result = bsdf.Sample(iris::Vector(1.0, 0.0, 0.0), g_rng, allocator);
+  auto result = bsdf.Sample(iris::Vector(1.0, 0.0, 0.0), rng, allocator);
   EXPECT_TRUE(result);
   EXPECT_EQ(&g_reflector, &result->reflector);
   EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), result->direction);
@@ -111,9 +122,12 @@ TEST(BsdfTest, SampleBrdf) {
                                 iris::Bxdf::Hemisphere::BRDF, testing::_))
       .WillOnce(testing::Return(&g_reflector));
 
+  iris::random::MockRandom rng;
+  EXPECT_CALL(rng, DiscardGeometric(2));
+
   iris::Bsdf bsdf(bxdf, iris::Vector(0.0, 0.0, 1.0),
                   iris::Vector(0.0, 0.0, 1.0), true);
-  auto result = bsdf.Sample(iris::Vector(0.0, 0.0, 1.0), g_rng, allocator);
+  auto result = bsdf.Sample(iris::Vector(0.0, 0.0, 1.0), rng, allocator);
   EXPECT_TRUE(result);
   EXPECT_EQ(&g_reflector, &result->reflector);
   EXPECT_EQ(iris::Vector(0.0, 0.0, -1.0), result->direction);
@@ -137,9 +151,12 @@ TEST(BsdfTest, SampleNoPdf) {
                                 iris::Bxdf::Hemisphere::BTDF, testing::_))
       .WillOnce(testing::Return(&g_reflector));
 
+  iris::random::MockRandom rng;
+  EXPECT_CALL(rng, DiscardGeometric(2));
+
   iris::Bsdf bsdf(bxdf, iris::Vector(0.0, 0.0, 1.0),
                   iris::Vector(0.0, 0.0, 1.0), true);
-  auto result = bsdf.Sample(iris::Vector(1.0, 0.0, 0.0), g_rng, allocator);
+  auto result = bsdf.Sample(iris::Vector(1.0, 0.0, 0.0), rng, allocator);
   EXPECT_TRUE(result);
   EXPECT_EQ(&g_reflector, &result->reflector);
   EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), result->direction);
@@ -284,9 +301,12 @@ TEST(BsdfTest, Normalize) {
                                 iris::Bxdf::Hemisphere::BTDF, testing::_))
       .WillOnce(testing::Return(&g_reflector));
 
+  iris::random::MockRandom rng;
+  EXPECT_CALL(rng, DiscardGeometric(2));
+
   iris::Bsdf bsdf(bxdf, iris::Vector(0.0, 0.0, 2.0),
                   iris::Vector(0.0, 0.0, 2.0), true);
-  auto result = bsdf.Sample(iris::Vector(1.0, 0.0, 0.0), g_rng, allocator);
+  auto result = bsdf.Sample(iris::Vector(1.0, 0.0, 0.0), rng, allocator);
   EXPECT_TRUE(result);
   EXPECT_EQ(&g_reflector, &result->reflector);
   EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), result->direction);

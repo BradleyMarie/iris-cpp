@@ -4,8 +4,8 @@
 #include <optional>
 
 #include "iris/float.h"
-#include "iris/random.h"
 #include "iris/reflector.h"
+#include "iris/sampler.h"
 #include "iris/spectral_allocator.h"
 #include "iris/vector.h"
 
@@ -13,7 +13,7 @@ namespace iris {
 
 class Bxdf {
  public:
-  virtual Vector Sample(const Vector& incoming, Random& rng) const = 0;
+  virtual Vector Sample(const Vector& incoming, Sampler& sampler) const = 0;
 
   enum class SampleSource {
     BXDF,
