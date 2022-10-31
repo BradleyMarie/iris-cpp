@@ -276,6 +276,8 @@ TEST(SampleDirectLighting, NoSamples) {
       .WillOnce(testing::Return(std::nullopt));
 
   iris::random::MockRandom rng;
+  EXPECT_CALL(rng, DiscardGeometric(2)).Times(2);
+
   auto* result =
       SampleDirectLighting(light, trace_ray, trace_result, rng,
                            iris::testing::GetAlwaysVisibleVisibilityTester(),
@@ -312,6 +314,8 @@ TEST(SampleDirectLighting, DeltaLight) {
       .WillOnce(testing::Return(light_sample));
 
   iris::random::MockRandom rng;
+  EXPECT_CALL(rng, DiscardGeometric(2)).Times(2);
+
   auto* result =
       SampleDirectLighting(light, trace_ray, trace_result, rng,
                            iris::testing::GetAlwaysVisibleVisibilityTester(),

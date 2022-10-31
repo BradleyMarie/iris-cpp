@@ -139,7 +139,7 @@ class TestLightedGeometry : public iris::Geometry {
   }
 
   std::optional<iris::Point> SampleFace(iris::face_t face,
-                                        iris::Random& rng) const override {
+                                        iris::Sampler& sampler) const override {
     if (allow_sampling_) {
       return location_;
     }
@@ -235,7 +235,10 @@ TEST(ListSceneTest, AreaLightSampleRngFails) {
   auto visibility_tester = iris::testing::GetVisibilityTester(*scene);
 
   iris::random::MockRandom random;
-  EXPECT_FALSE(light.Sample(iris::Point(0.0, 0.0, 0.0), random,
+  EXPECT_CALL(random, DiscardGeometric(2));
+  iris::Sampler sampler(random);
+
+  EXPECT_FALSE(light.Sample(iris::Point(0.0, 0.0, 0.0), sampler,
                             *visibility_tester,
                             iris::testing::GetSpectralAllocator()));
 }
@@ -256,7 +259,10 @@ TEST(ListSceneTest, AreaLightSampleNotVisible) {
   auto visibility_tester = iris::testing::GetVisibilityTester(*scene);
 
   iris::random::MockRandom random;
-  EXPECT_FALSE(light.Sample(iris::Point(0.0, 0.0, 0.0), random,
+  EXPECT_CALL(random, DiscardGeometric(2));
+  iris::Sampler sampler(random);
+
+  EXPECT_FALSE(light.Sample(iris::Point(0.0, 0.0, 0.0), sampler,
                             *visibility_tester,
                             iris::testing::GetSpectralAllocator()));
 }
@@ -280,8 +286,11 @@ TEST(ListSceneTest, AreaLightSampleWorld) {
   auto visibility_tester = iris::testing::GetVisibilityTester(*scene);
 
   iris::random::MockRandom random;
+  EXPECT_CALL(random, DiscardGeometric(2));
+  iris::Sampler sampler(random);
+
   auto result =
-      light.Sample(iris::Point(0.0, 0.0, 0.0), random, *visibility_tester,
+      light.Sample(iris::Point(0.0, 0.0, 0.0), sampler, *visibility_tester,
                    iris::testing::GetSpectralAllocator());
   EXPECT_TRUE(result);
   EXPECT_EQ(&spectrum, &result->emission);
@@ -309,8 +318,11 @@ TEST(ListSceneTest, AreaLightSampleWithTransform) {
   auto visibility_tester = iris::testing::GetVisibilityTester(*scene);
 
   iris::random::MockRandom random;
+  EXPECT_CALL(random, DiscardGeometric(2));
+  iris::Sampler sampler(random);
+
   auto result =
-      light.Sample(iris::Point(0.0, 0.0, 0.0), random, *visibility_tester,
+      light.Sample(iris::Point(0.0, 0.0, 0.0), sampler, *visibility_tester,
                    iris::testing::GetSpectralAllocator());
   EXPECT_TRUE(result);
   EXPECT_EQ(&spectrum, &result->emission);

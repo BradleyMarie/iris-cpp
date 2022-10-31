@@ -11,9 +11,9 @@
 #include "iris/material.h"
 #include "iris/normal_map.h"
 #include "iris/point.h"
-#include "iris/random.h"
 #include "iris/ray.h"
 #include "iris/reference_countable.h"
+#include "iris/sampler.h"
 #include "iris/texture_coordinates.h"
 #include "iris/vector.h"
 
@@ -40,7 +40,7 @@ class Geometry : public ReferenceCountable {
   virtual const EmissiveMaterial* GetEmissiveMaterial(
       face_t face, const void* additional_data) const;
 
-  virtual std::optional<Point> SampleFace(face_t face, Random& rng) const;
+  virtual std::optional<Point> SampleFace(face_t face, Sampler& sampler) const;
 
   virtual std::optional<visual_t> ComputeArea(face_t face) const;
 

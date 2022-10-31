@@ -39,7 +39,7 @@ const EmissiveMaterial* Geometry::GetEmissiveMaterial(
 
 bool Geometry::IsEmissive(face_t face) const { return false; }
 
-std::optional<Point> Geometry::SampleFace(face_t face, Random& rng) const {
+std::optional<Point> Geometry::SampleFace(face_t face, Sampler& sampler) const {
   return std::nullopt;
 }
 

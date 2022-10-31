@@ -107,7 +107,9 @@ TEST(GeometryTest, SampleFace) {
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)),
       nullptr);
   iris::random::MockRandom rng;
-  EXPECT_FALSE(geom.SampleFace(0, rng));
+  EXPECT_CALL(rng, DiscardGeometric(2));
+  iris::Sampler sampler(rng);
+  EXPECT_FALSE(geom.SampleFace(0, sampler));
 }
 
 TEST(GeometryTest, ComputeArea) {

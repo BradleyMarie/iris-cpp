@@ -19,7 +19,7 @@ class AreaLight final : public Light {
         surface_area_(surface_area) {}
 
   std::optional<SampleResult> Sample(
-      const Point& hit_point, Random& rng, VisibilityTester& tester,
+      const Point& hit_point, Sampler& sampler, VisibilityTester& tester,
       SpectralAllocator& allocator) const override;
 
   const Spectrum* Emission(const Ray& to_light, VisibilityTester& tester,
@@ -34,9 +34,9 @@ class AreaLight final : public Light {
 };
 
 std::optional<Light::SampleResult> AreaLight::Sample(
-    const Point& hit_point, Random& rng, VisibilityTester& tester,
+    const Point& hit_point, Sampler& sampler, VisibilityTester& tester,
     SpectralAllocator& allocator) const {
-  auto sampled_point = geometry_.SampleFace(face_, rng);
+  auto sampled_point = geometry_.SampleFace(face_, sampler);
   if (!sampled_point) {
     return std::nullopt;
   }
