@@ -9,7 +9,7 @@
 #include "iris/testing/spectral_allocator.h"
 #include "iris/testing/visibility_tester.h"
 
-using iris::integrators::internal::SampleDirectLighting;
+using iris::integrators::internal::EstimateDirectLighting;
 using iris::integrators::internal::internal::DeltaLight;
 using iris::integrators::internal::internal::FromBsdfSample;
 using iris::integrators::internal::internal::FromLightSample;
@@ -255,7 +255,7 @@ TEST(FromBsdfSample, WithEmission) {
   EXPECT_NEAR(0.05, result->Intensity(1.0), 0.001);
 }
 
-TEST(SampleDirectLighting, NoSamples) {
+TEST(EstimateDirectLighting, NoSamples) {
   iris::Ray trace_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(0.0, 0.0, 1.0));
   auto hit_point = trace_ray.Endpoint(1.0);
   iris::Vector surface_normal(0.0, 0.0, 1.0);
@@ -279,13 +279,13 @@ TEST(SampleDirectLighting, NoSamples) {
   EXPECT_CALL(rng, DiscardGeometric(2)).Times(2);
 
   auto* result =
-      SampleDirectLighting(light, trace_ray, trace_result, rng,
-                           iris::testing::GetAlwaysVisibleVisibilityTester(),
-                           iris::testing::GetSpectralAllocator());
+      EstimateDirectLighting(light, trace_ray, trace_result, rng,
+                             iris::testing::GetAlwaysVisibleVisibilityTester(),
+                             iris::testing::GetSpectralAllocator());
   ASSERT_EQ(nullptr, result);
 }
 
-TEST(SampleDirectLighting, DeltaLight) {
+TEST(EstimateDirectLighting, DeltaLight) {
   iris::Ray trace_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(0.0, 0.0, 1.0));
   auto hit_point = trace_ray.Endpoint(1.0);
   iris::Vector surface_normal(0.0, 0.0, 1.0);
@@ -317,9 +317,9 @@ TEST(SampleDirectLighting, DeltaLight) {
   EXPECT_CALL(rng, DiscardGeometric(2)).Times(2);
 
   auto* result =
-      SampleDirectLighting(light, trace_ray, trace_result, rng,
-                           iris::testing::GetAlwaysVisibleVisibilityTester(),
-                           iris::testing::GetSpectralAllocator());
+      EstimateDirectLighting(light, trace_ray, trace_result, rng,
+                             iris::testing::GetAlwaysVisibleVisibilityTester(),
+                             iris::testing::GetSpectralAllocator());
   ASSERT_NE(nullptr, result);
 
   EXPECT_CALL(reflector, Reflectance(1.0)).WillOnce(testing::Return(0.25));

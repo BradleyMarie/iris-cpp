@@ -56,23 +56,10 @@ const Spectrum* PathIntegrator::Integrate(const Ray& ray, RayTracer& ray_tracer,
       break;
     }
 
-    for (auto* light_samples = light_sampler.Sample(trace_result->hit_point);
-         light_samples; light_samples = light_samples->next) {
-      if (light_samples->pdf && *light_samples->pdf <= 0.0) {
-        continue;
-      }
-
-      auto* direct_light = internal::SampleDirectLighting(
-          light_samples->light, trace_ray, *trace_result, rng,
-          visibility_tester, spectral_allocator);
-
-      if (light_samples->pdf) {
-        direct_light =
-            spectral_allocator.Scale(direct_light, 1.0 / *light_samples->pdf);
-      }
-
-      path_builder.Add(direct_light, spectral_allocator);
-    }
+    auto* direct_lighting = internal::SampleDirectLighting(
+        light_sampler, trace_ray, *trace_result, rng, visibility_tester,
+        spectral_allocator);
+    path_builder.Add(direct_lighting, spectral_allocator);
 
     if (bounces == max_bounces_) {
       break;

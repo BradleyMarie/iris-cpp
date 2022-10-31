@@ -2,6 +2,7 @@
 #define _IRIS_INTEGRATORS_INTERNAL_SAMPLE_DIRECT_LIGHTING_
 
 #include "iris/light.h"
+#include "iris/light_sampler.h"
 #include "iris/random.h"
 #include "iris/ray.h"
 #include "iris/ray_tracer.h"
@@ -34,7 +35,14 @@ const Spectrum* FromBsdfSample(const Bsdf::SampleResult& sample,
 
 }  // namespace internal
 
-const Spectrum* SampleDirectLighting(const Light& light, const Ray& traced_ray,
+const Spectrum* EstimateDirectLighting(const Light& light,
+                                       const Ray& traced_ray,
+                                       const RayTracer::Result hit, Random& rng,
+                                       VisibilityTester& visibility_tester,
+                                       SpectralAllocator& allocator);
+
+const Spectrum* SampleDirectLighting(LightSampler& light_sampler,
+                                     const Ray& traced_ray,
                                      const RayTracer::Result hit, Random& rng,
                                      VisibilityTester& visibility_tester,
                                      SpectralAllocator& allocator);

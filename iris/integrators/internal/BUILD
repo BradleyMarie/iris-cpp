@@ -51,6 +51,7 @@ cc_library(
     hdrs = ["sample_direct_lighting.h"],
     deps = [
         "//iris:light",
+        "//iris:light_sampler",
         "//iris:random",
         "//iris:ray",
         "//iris:ray_tracer",
