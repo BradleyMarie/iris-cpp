@@ -54,9 +54,8 @@ Vector Bsdf::ToWorld(const Vector& vector) const {
 }
 
 std::optional<Bsdf::SampleResult> Bsdf::Sample(
-    const Vector& incoming, Random& rng, SpectralAllocator& allocator) const {
-  Sampler sampler(rng);
-
+    const Vector& incoming, Sampler sampler,
+    SpectralAllocator& allocator) const {
   auto local_incoming = ToLocal(incoming);
   auto local_outgoing = bxdf_.Sample(local_incoming, sampler);
   auto world_outgoing = ToWorld(local_outgoing);

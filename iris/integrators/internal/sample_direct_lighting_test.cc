@@ -278,10 +278,10 @@ TEST(EstimateDirectLighting, NoSamples) {
   iris::random::MockRandom rng;
   EXPECT_CALL(rng, DiscardGeometric(2)).Times(2);
 
-  auto* result =
-      EstimateDirectLighting(light, trace_ray, trace_result, rng,
-                             iris::testing::GetAlwaysVisibleVisibilityTester(),
-                             iris::testing::GetSpectralAllocator());
+  auto* result = EstimateDirectLighting(
+      light, trace_ray, trace_result, iris::Sampler(rng), iris::Sampler(rng),
+      iris::testing::GetAlwaysVisibleVisibilityTester(),
+      iris::testing::GetSpectralAllocator());
   ASSERT_EQ(nullptr, result);
 }
 
@@ -316,10 +316,10 @@ TEST(EstimateDirectLighting, DeltaLight) {
   iris::random::MockRandom rng;
   EXPECT_CALL(rng, DiscardGeometric(2)).Times(2);
 
-  auto* result =
-      EstimateDirectLighting(light, trace_ray, trace_result, rng,
-                             iris::testing::GetAlwaysVisibleVisibilityTester(),
-                             iris::testing::GetSpectralAllocator());
+  auto* result = EstimateDirectLighting(
+      light, trace_ray, trace_result, iris::Sampler(rng), iris::Sampler(rng),
+      iris::testing::GetAlwaysVisibleVisibilityTester(),
+      iris::testing::GetSpectralAllocator());
   ASSERT_NE(nullptr, result);
 
   EXPECT_CALL(reflector, Reflectance(1.0)).WillOnce(testing::Return(0.25));

@@ -73,16 +73,16 @@ const Spectrum* FromBsdfSample(const Bsdf::SampleResult& sample,
 
 }  // namespace internal
 
-const Spectrum* EstimateDirectLighting(const Light& light,
-                                       const Ray& traced_ray,
-                                       const RayTracer::Result hit, Random& rng,
-                                       VisibilityTester& visibility_tester,
-                                       SpectralAllocator& allocator) {
+const Spectrum* EstimateDirectLighting(
+    const Light& light, const Ray& traced_ray, const RayTracer::Result hit,
+    Sampler bsdf_sampler, Sampler light_sampler,
+    VisibilityTester& visibility_tester, SpectralAllocator& allocator) {
   assert(hit.bsdf);  // Caller must check that hit contained a BSDF
 
-  auto bsdf_sample = hit.bsdf->Sample(traced_ray.direction, rng, allocator);
+  auto bsdf_sample = hit.bsdf->Sample(traced_ray.direction,
+                                      std::move(bsdf_sampler), allocator);
 
-  auto light_sample = light.Sample(hit.hit_point, iris::Sampler(rng),
+  auto light_sample = light.Sample(hit.hit_point, std::move(light_sampler),
                                    visibility_tester, allocator);
 
   if (light_sample && !light_sample->pdf) {
@@ -114,15 +114,16 @@ const Spectrum* SampleDirectLighting(LightSampler& light_sampler,
   const Spectrum* result = nullptr;
   for (auto* light_samples = light_sampler.Sample(hit.hit_point); light_samples;
        light_samples = light_samples->next) {
+    Sampler bsdf_sampler(rng);
+    Sampler light_sampler(rng);
+
     if (light_samples->pdf && *light_samples->pdf <= 0.0) {
-      Sampler light_sampler(rng);
-      Sampler bsdf_sampler(rng);
       continue;
     }
 
-    auto* direct_light =
-        EstimateDirectLighting(light_samples->light, traced_ray, hit, rng,
-                               visibility_tester, allocator);
+    auto* direct_light = EstimateDirectLighting(
+        light_samples->light, traced_ray, hit, std::move(bsdf_sampler),
+        std::move(light_sampler), visibility_tester, allocator);
 
     if (light_samples->pdf) {
       direct_light = allocator.Scale(direct_light, 1.0 / *light_samples->pdf);

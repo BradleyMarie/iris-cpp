@@ -6,8 +6,8 @@
 
 #include "iris/bxdf.h"
 #include "iris/float.h"
-#include "iris/random.h"
 #include "iris/reflector.h"
+#include "iris/sampler.h"
 #include "iris/spectral_allocator.h"
 #include "iris/vector.h"
 
@@ -24,7 +24,7 @@ class Bsdf final {
     const std::optional<visual_t> pdf;
   };
 
-  std::optional<SampleResult> Sample(const Vector& incoming, Random& rng,
+  std::optional<SampleResult> Sample(const Vector& incoming, Sampler sampler,
                                      SpectralAllocator& allocator) const;
 
   struct ReflectanceResult {

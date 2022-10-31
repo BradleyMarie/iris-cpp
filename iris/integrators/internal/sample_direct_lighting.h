@@ -35,11 +35,10 @@ const Spectrum* FromBsdfSample(const Bsdf::SampleResult& sample,
 
 }  // namespace internal
 
-const Spectrum* EstimateDirectLighting(const Light& light,
-                                       const Ray& traced_ray,
-                                       const RayTracer::Result hit, Random& rng,
-                                       VisibilityTester& visibility_tester,
-                                       SpectralAllocator& allocator);
+const Spectrum* EstimateDirectLighting(
+    const Light& light, const Ray& traced_ray, const RayTracer::Result hit,
+    Sampler bsdf_sampler, Sampler light_sampler,
+    VisibilityTester& visibility_tester, SpectralAllocator& allocator);
 
 const Spectrum* SampleDirectLighting(LightSampler& light_sampler,
                                      const Ray& traced_ray,

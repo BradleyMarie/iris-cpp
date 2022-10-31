@@ -65,8 +65,8 @@ const Spectrum* PathIntegrator::Integrate(const Ray& ray, RayTracer& ray_tracer,
       break;
     }
 
-    auto bsdf_sample = trace_result->bsdf->Sample(trace_ray.direction, rng,
-                                                  spectral_allocator);
+    auto bsdf_sample = trace_result->bsdf->Sample(
+        trace_ray.direction, iris::Sampler(rng), spectral_allocator);
 
     if (!bsdf_sample) {
       break;
