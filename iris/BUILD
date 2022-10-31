@@ -562,6 +562,28 @@ cc_test(
 )
 
 cc_library(
+    name = "sampler",
+    srcs = ["sampler.cc"],
+    hdrs = ["sampler.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":float",
+        ":random",
+        "@com_google_absl//absl/log:check",
+    ],
+)
+
+cc_test(
+    name = "sampler_test",
+    srcs = ["sampler_test.cc"],
+    deps = [
+        ":sampler",
+        "//iris/random:mock_random",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "scene_objects",
     srcs = ["scene_objects.cc"],
     hdrs = ["scene_objects.h"],
