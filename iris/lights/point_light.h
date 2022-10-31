@@ -25,7 +25,7 @@ class PointLight final : public Light {
   }
 
   std::optional<SampleResult> Sample(
-      const Point& hit_point, Sampler& sampler, VisibilityTester& tester,
+      const Point& hit_point, Sampler sampler, VisibilityTester& tester,
       SpectralAllocator& allocator) const override;
 
   const Spectrum* Emission(const Ray& to_light, VisibilityTester& tester,

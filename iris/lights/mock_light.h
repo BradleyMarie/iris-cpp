@@ -19,7 +19,7 @@ namespace lights {
 class MockLight final : public Light {
  public:
   MOCK_METHOD((std::optional<SampleResult>), Sample,
-              (const Point&, Sampler&, VisibilityTester&, SpectralAllocator&),
+              (const Point&, Sampler, VisibilityTester&, SpectralAllocator&),
               (const override));
 
   MOCK_METHOD(const Spectrum*, Emission,

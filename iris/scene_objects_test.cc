@@ -236,9 +236,8 @@ TEST(ListSceneTest, AreaLightSampleRngFails) {
 
   iris::random::MockRandom random;
   EXPECT_CALL(random, DiscardGeometric(2));
-  iris::Sampler sampler(random);
 
-  EXPECT_FALSE(light.Sample(iris::Point(0.0, 0.0, 0.0), sampler,
+  EXPECT_FALSE(light.Sample(iris::Point(0.0, 0.0, 0.0), iris::Sampler(random),
                             *visibility_tester,
                             iris::testing::GetSpectralAllocator()));
 }
@@ -260,9 +259,8 @@ TEST(ListSceneTest, AreaLightSampleNotVisible) {
 
   iris::random::MockRandom random;
   EXPECT_CALL(random, DiscardGeometric(2));
-  iris::Sampler sampler(random);
 
-  EXPECT_FALSE(light.Sample(iris::Point(0.0, 0.0, 0.0), sampler,
+  EXPECT_FALSE(light.Sample(iris::Point(0.0, 0.0, 0.0), iris::Sampler(random),
                             *visibility_tester,
                             iris::testing::GetSpectralAllocator()));
 }
@@ -287,11 +285,10 @@ TEST(ListSceneTest, AreaLightSampleWorld) {
 
   iris::random::MockRandom random;
   EXPECT_CALL(random, DiscardGeometric(2));
-  iris::Sampler sampler(random);
 
   auto result =
-      light.Sample(iris::Point(0.0, 0.0, 0.0), sampler, *visibility_tester,
-                   iris::testing::GetSpectralAllocator());
+      light.Sample(iris::Point(0.0, 0.0, 0.0), iris::Sampler(random),
+                   *visibility_tester, iris::testing::GetSpectralAllocator());
   EXPECT_TRUE(result);
   EXPECT_EQ(&spectrum, &result->emission);
   EXPECT_EQ(1.0, result->pdf);
@@ -319,11 +316,10 @@ TEST(ListSceneTest, AreaLightSampleWithTransform) {
 
   iris::random::MockRandom random;
   EXPECT_CALL(random, DiscardGeometric(2));
-  iris::Sampler sampler(random);
 
   auto result =
-      light.Sample(iris::Point(0.0, 0.0, 0.0), sampler, *visibility_tester,
-                   iris::testing::GetSpectralAllocator());
+      light.Sample(iris::Point(0.0, 0.0, 0.0), iris::Sampler(random),
+                   *visibility_tester, iris::testing::GetSpectralAllocator());
   EXPECT_TRUE(result);
   EXPECT_EQ(&spectrum, &result->emission);
   EXPECT_EQ(1.0, result->pdf);

@@ -3,6 +3,13 @@
 #include "googletest/include/gtest/gtest.h"
 #include "iris/random/mock_random.h"
 
+TEST(Sampler, MoveConstruct) {
+  iris::random::MockRandom random;
+  EXPECT_CALL(random, DiscardGeometric(2));
+  iris::Sampler sampler(random);
+  { iris::Sampler sampler2(std::move(sampler)); }
+}
+
 TEST(Sampler, NoSamples) {
   iris::random::MockRandom random;
   EXPECT_CALL(random, DiscardGeometric(2));
@@ -22,7 +29,6 @@ TEST(Sampler, OneSample) {
 TEST(Sampler, TwoSamples) {
   iris::random::MockRandom random;
   EXPECT_CALL(random, NextGeometric()).Times(2);
-  EXPECT_CALL(random, DiscardGeometric(0));
   {
     iris::Sampler sampler(random);
     sampler.Next();
@@ -33,7 +39,6 @@ TEST(Sampler, TwoSamples) {
 TEST(Sampler, TwoSamplesWithIndex) {
   iris::random::MockRandom random;
   EXPECT_CALL(random, NextGeometric()).Times(2);
-  EXPECT_CALL(random, DiscardGeometric(0));
   {
     iris::Sampler sampler(random);
     sampler.NextIndex(2);

@@ -82,9 +82,8 @@ const Spectrum* EstimateDirectLighting(const Light& light,
 
   auto bsdf_sample = hit.bsdf->Sample(traced_ray.direction, rng, allocator);
 
-  iris::Sampler light_sampler(rng);
-  auto light_sample =
-      light.Sample(hit.hit_point, light_sampler, visibility_tester, allocator);
+  auto light_sample = light.Sample(hit.hit_point, iris::Sampler(rng),
+                                   visibility_tester, allocator);
 
   if (light_sample && !light_sample->pdf) {
     return internal::DeltaLight(*light_sample, traced_ray, hit, allocator);
