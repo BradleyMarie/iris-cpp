@@ -50,6 +50,21 @@ class AlwaysVisibleScene final : public Scene {
   void Trace(const Ray& ray, Intersector& intersector) const override {}
 };
 
+class SingleGeometryScene final : public Scene {
+ public:
+  SingleGeometryScene(const Geometry& geometry,
+                      const Matrix* model_to_world) noexcept
+      : geometry_(geometry), model_to_world_(model_to_world) {}
+
+  void Trace(const Ray& ray, Intersector& intersector) const override {
+    intersector.Intersect(geometry_, model_to_world_);
+  }
+
+ private:
+  const Geometry& geometry_;
+  const Matrix* model_to_world_;
+};
+
 }  // namespace
 
 VisibilityTester& GetAlwaysVisibleVisibilityTester() {
@@ -70,11 +85,14 @@ VisibilityTester& GetNeverVisibleVisibilityTester() {
   return visibility_tester;
 }
 
-std::unique_ptr<VisibilityTester> GetVisibilityTester(const Scene& scene) {
-  thread_local internal::RayTracer ray_tracer;
-  thread_local internal::Arena arena;
-  return std::make_unique<internal::VisibilityTester>(scene, 0.0, ray_tracer,
-                                                      arena);
+void ScopedSingleGeometryVisibilityTester(
+    const Geometry& geometry, const Matrix* matrix,
+    std::function<void(VisibilityTester&)> callback) {
+  internal::RayTracer ray_tracer;
+  internal::Arena arena;
+  SingleGeometryScene scene(geometry, matrix);
+  internal::VisibilityTester visibility_tester(scene, 0.0, ray_tracer, arena);
+  callback(visibility_tester);
 }
 
 }  // namespace testing

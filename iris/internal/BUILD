@@ -6,6 +6,37 @@ package(default_visibility = [
 ])
 
 cc_library(
+    name = "area_light",
+    srcs = ["area_light.cc"],
+    hdrs = ["area_light.h"],
+    deps = [
+        ":visibility_tester",
+        "//iris:float",
+        "//iris:geometry",
+        "//iris:integer",
+        "//iris:light",
+        "//iris:matrix",
+        "//iris:ray",
+        "//iris:spectral_allocator",
+        "//iris:spectrum",
+    ],
+)
+
+cc_test(
+    name = "area_light_test",
+    srcs = ["area_light_test.cc"],
+    deps = [
+        ":area_light",
+        "//iris/emissive_materials:mock_emissive_material",
+        "//iris/random:mock_random",
+        "//iris/spectra:mock_spectrum",
+        "//iris/testing:spectral_allocator",
+        "//iris/testing:visibility_tester",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "arena",
     srcs = ["arena.cc"],
     hdrs = ["arena.h"],

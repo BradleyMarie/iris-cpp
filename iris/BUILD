@@ -593,7 +593,7 @@ cc_library(
         ":light",
         ":matrix",
         ":reference_counted",
-        "//iris/internal:visibility_tester",
+        "//iris/internal:area_light",
     ],
 )
 
@@ -602,13 +602,7 @@ cc_test(
     srcs = ["scene_objects_test.cc"],
     deps = [
         ":scene_objects",
-        "//iris/emissive_materials:mock_emissive_material",
         "//iris/lights:mock_light",
-        "//iris/random:mock_random",
-        "//iris/scenes:list_scene",
-        "//iris/spectra:mock_spectrum",
-        "//iris/testing:spectral_allocator",
-        "//iris/testing:visibility_tester",
         "@com_google_googletest//:gtest_main",
     ],
 )

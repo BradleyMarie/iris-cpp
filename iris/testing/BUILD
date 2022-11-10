@@ -62,6 +62,9 @@ cc_library(
     srcs = ["visibility_tester.cc"],
     hdrs = ["visibility_tester.h"],
     deps = [
+        "//iris:geometry",
+        "//iris:matrix",
+        "//iris:scene",
         "//iris:visibility_tester",
         "//iris/internal:arena",
         "//iris/internal:ray_tracer",
