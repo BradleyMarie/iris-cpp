@@ -18,33 +18,32 @@ namespace internal {
 visual_t PowerHeuristic(visual_t sampled_pdf, visual_t computed_pdf);
 
 const Spectrum* DeltaLight(const Light::SampleResult& sample,
-                           const Ray& traced_ray, const RayTracer::Result hit,
+                           const Ray& traced_ray,
+                           const RayTracer::SurfaceIntersection intersection,
                            SpectralAllocator& allocator);
 
-const Spectrum* FromLightSample(const Light::SampleResult& sample,
-                                const Ray& traced_ray,
-                                const RayTracer::Result hit,
-                                VisibilityTester& visibility_tester,
-                                SpectralAllocator& allocator);
+const Spectrum* FromLightSample(
+    const Light::SampleResult& sample, const Ray& traced_ray,
+    const RayTracer::SurfaceIntersection intersection,
+    VisibilityTester& visibility_tester, SpectralAllocator& allocator);
 
-const Spectrum* FromBsdfSample(const Bsdf::SampleResult& sample,
-                               const Light& light, const Ray& traced_ray,
-                               const RayTracer::Result hit,
-                               VisibilityTester& visibility_tester,
-                               SpectralAllocator& allocator);
+const Spectrum* FromBsdfSample(
+    const Bsdf::SampleResult& sample, const Light& light, const Ray& traced_ray,
+    const RayTracer::SurfaceIntersection intersection,
+    VisibilityTester& visibility_tester, SpectralAllocator& allocator);
 
 }  // namespace internal
 
 const Spectrum* EstimateDirectLighting(
-    const Light& light, const Ray& traced_ray, const RayTracer::Result hit,
-    Sampler bsdf_sampler, Sampler light_sampler,
-    VisibilityTester& visibility_tester, SpectralAllocator& allocator);
+    const Light& light, const Ray& traced_ray,
+    const RayTracer::SurfaceIntersection intersection, Sampler bsdf_sampler,
+    Sampler light_sampler, VisibilityTester& visibility_tester,
+    SpectralAllocator& allocator);
 
-const Spectrum* SampleDirectLighting(LightSampler& light_sampler,
-                                     const Ray& traced_ray,
-                                     const RayTracer::Result hit, Random& rng,
-                                     VisibilityTester& visibility_tester,
-                                     SpectralAllocator& allocator);
+const Spectrum* SampleDirectLighting(
+    LightSampler& light_sampler, const Ray& traced_ray,
+    const RayTracer::SurfaceIntersection intersection, Random& rng,
+    VisibilityTester& visibility_tester, SpectralAllocator& allocator);
 
 }  // namespace internal
 }  // namespace integrators

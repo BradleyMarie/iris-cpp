@@ -30,14 +30,14 @@ TEST(DeltaLight, NoReflectance) {
   EXPECT_CALL(bxdf, Pdf(testing::_, testing::_, testing::_))
       .WillOnce(testing::Return(std::nullopt));
 
-  iris::RayTracer::RayTracer::Result trace_result{
-      iris::Bsdf(bxdf, to_light, to_light), &spectrum,
-      iris::Point(0.0, 0.0, 0.0), to_light, to_light};
+  iris::RayTracer::RayTracer::SurfaceIntersection intersection{
+      iris::Bsdf(bxdf, to_light, to_light), iris::Point(0.0, 0.0, 0.0),
+      to_light, to_light};
 
   EXPECT_EQ(
       nullptr,
       DeltaLight(light_sample, iris::Ray(iris::Point(0.0, 0.0, 0.0), to_light),
-                 trace_result, iris::testing::GetSpectralAllocator()));
+                 intersection, iris::testing::GetSpectralAllocator()));
 }
 
 TEST(DeltaLight, WithReflectance) {
@@ -63,11 +63,11 @@ TEST(DeltaLight, WithReflectance) {
       .WillOnce(testing::Return(&reflector));
 
   iris::Vector surface_normal(0.0, 0.0, 1.0);
-  iris::RayTracer::RayTracer::Result trace_result{
-      iris::Bsdf(bxdf, surface_normal, surface_normal), nullptr,
-      trace_ray.Endpoint(1.0), surface_normal, surface_normal};
+  iris::RayTracer::RayTracer::SurfaceIntersection intersection{
+      iris::Bsdf(bxdf, surface_normal, surface_normal), trace_ray.Endpoint(1.0),
+      surface_normal, surface_normal};
 
-  auto* result = DeltaLight(light_sample, trace_ray, trace_result,
+  auto* result = DeltaLight(light_sample, trace_ray, intersection,
                             iris::testing::GetSpectralAllocator());
   ASSERT_NE(nullptr, result);
   EXPECT_NEAR(0.125, result->Intensity(1.0), 0.001);
@@ -92,12 +92,12 @@ TEST(FromLightSample, NoReflectance) {
       .WillOnce(testing::Return(nullptr));
 
   iris::Vector surface_normal(0.0, 0.0, 1.0);
-  iris::RayTracer::RayTracer::Result trace_result{
-      iris::Bsdf(bxdf, surface_normal, surface_normal), nullptr,
-      trace_ray.Endpoint(1.0), surface_normal, surface_normal};
+  iris::RayTracer::RayTracer::SurfaceIntersection intersection{
+      iris::Bsdf(bxdf, surface_normal, surface_normal), trace_ray.Endpoint(1.0),
+      surface_normal, surface_normal};
 
   auto* result =
-      FromLightSample(light_sample, trace_ray, trace_result,
+      FromLightSample(light_sample, trace_ray, intersection,
                       iris::testing::GetAlwaysVisibleVisibilityTester(),
                       iris::testing::GetSpectralAllocator());
   EXPECT_EQ(nullptr, result);
@@ -126,12 +126,12 @@ TEST(FromLightSample, WithReflectance) {
       .WillOnce(testing::Return(&reflector));
 
   iris::Vector surface_normal(0.0, 0.0, 1.0);
-  iris::RayTracer::RayTracer::Result trace_result{
-      iris::Bsdf(bxdf, surface_normal, surface_normal), nullptr,
-      trace_ray.Endpoint(1.0), surface_normal, surface_normal};
+  iris::RayTracer::RayTracer::SurfaceIntersection intersection{
+      iris::Bsdf(bxdf, surface_normal, surface_normal), trace_ray.Endpoint(1.0),
+      surface_normal, surface_normal};
 
   auto* result =
-      FromLightSample(light_sample, trace_ray, trace_result,
+      FromLightSample(light_sample, trace_ray, intersection,
                       iris::testing::GetAlwaysVisibleVisibilityTester(),
                       iris::testing::GetSpectralAllocator());
   ASSERT_NE(nullptr, result);
@@ -150,16 +150,16 @@ TEST(FromBsdfSample, NoEmission) {
   iris::bxdfs::MockBxdf bxdf;
 
   iris::Vector surface_normal(0.0, 0.0, 1.0);
-  iris::RayTracer::RayTracer::Result trace_result{
-      iris::Bsdf(bxdf, surface_normal, surface_normal), nullptr,
-      trace_ray.Endpoint(1.0), surface_normal, surface_normal};
+  iris::RayTracer::RayTracer::SurfaceIntersection intersection{
+      iris::Bsdf(bxdf, surface_normal, surface_normal), trace_ray.Endpoint(1.0),
+      surface_normal, surface_normal};
 
   iris::lights::MockLight light;
   EXPECT_CALL(light, Emission(testing::_, testing::_, testing::_, testing::_))
       .WillOnce(testing::Return(nullptr));
 
   auto* result =
-      FromBsdfSample(bsdf_sample, light, trace_ray, trace_result,
+      FromBsdfSample(bsdf_sample, light, trace_ray, intersection,
                      iris::testing::GetAlwaysVisibleVisibilityTester(),
                      iris::testing::GetSpectralAllocator());
   EXPECT_EQ(nullptr, result);
@@ -177,9 +177,9 @@ TEST(FromBsdfSample, ZeroPdf) {
   iris::bxdfs::MockBxdf bxdf;
 
   iris::Vector surface_normal(0.0, 0.0, 1.0);
-  iris::RayTracer::RayTracer::Result trace_result{
-      iris::Bsdf(bxdf, surface_normal, surface_normal), nullptr,
-      trace_ray.Endpoint(1.0), surface_normal, surface_normal};
+  iris::RayTracer::RayTracer::SurfaceIntersection intersection{
+      iris::Bsdf(bxdf, surface_normal, surface_normal), trace_ray.Endpoint(1.0),
+      surface_normal, surface_normal};
 
   iris::lights::MockLight light;
   EXPECT_CALL(light, Emission(testing::_, testing::_, testing::_, testing::_))
@@ -187,7 +187,7 @@ TEST(FromBsdfSample, ZeroPdf) {
                                testing::Return(nullptr)));
 
   auto* result =
-      FromBsdfSample(bsdf_sample, light, trace_ray, trace_result,
+      FromBsdfSample(bsdf_sample, light, trace_ray, intersection,
                      iris::testing::GetAlwaysVisibleVisibilityTester(),
                      iris::testing::GetSpectralAllocator());
   EXPECT_EQ(nullptr, result);
@@ -205,9 +205,9 @@ TEST(FromBsdfSample, NegativePdf) {
   iris::bxdfs::MockBxdf bxdf;
 
   iris::Vector surface_normal(0.0, 0.0, 1.0);
-  iris::RayTracer::RayTracer::Result trace_result{
-      iris::Bsdf(bxdf, surface_normal, surface_normal), nullptr,
-      trace_ray.Endpoint(1.0), surface_normal, surface_normal};
+  iris::RayTracer::RayTracer::SurfaceIntersection intersection{
+      iris::Bsdf(bxdf, surface_normal, surface_normal), trace_ray.Endpoint(1.0),
+      surface_normal, surface_normal};
 
   iris::lights::MockLight light;
   EXPECT_CALL(light, Emission(testing::_, testing::_, testing::_, testing::_))
@@ -215,7 +215,7 @@ TEST(FromBsdfSample, NegativePdf) {
                                testing::Return(nullptr)));
 
   auto* result =
-      FromBsdfSample(bsdf_sample, light, trace_ray, trace_result,
+      FromBsdfSample(bsdf_sample, light, trace_ray, intersection,
                      iris::testing::GetAlwaysVisibleVisibilityTester(),
                      iris::testing::GetSpectralAllocator());
   EXPECT_EQ(nullptr, result);
@@ -234,9 +234,9 @@ TEST(FromBsdfSample, WithEmission) {
   iris::bxdfs::MockBxdf bxdf;
 
   iris::Vector surface_normal(0.0, 0.0, 1.0);
-  iris::RayTracer::RayTracer::Result trace_result{
-      iris::Bsdf(bxdf, surface_normal, surface_normal), nullptr,
-      trace_ray.Endpoint(1.0), surface_normal, surface_normal};
+  iris::RayTracer::RayTracer::SurfaceIntersection intersection{
+      iris::Bsdf(bxdf, surface_normal, surface_normal), trace_ray.Endpoint(1.0),
+      surface_normal, surface_normal};
 
   iris::spectra::MockSpectrum spectrum;
   EXPECT_CALL(spectrum, Intensity(testing::_)).WillOnce(testing::Return(1.0));
@@ -248,7 +248,7 @@ TEST(FromBsdfSample, WithEmission) {
                                testing::Return(&spectrum)));
 
   auto* result =
-      FromBsdfSample(bsdf_sample, light, trace_ray, trace_result,
+      FromBsdfSample(bsdf_sample, light, trace_ray, intersection,
                      iris::testing::GetAlwaysVisibleVisibilityTester(),
                      iris::testing::GetSpectralAllocator());
   ASSERT_NE(nullptr, result);
@@ -260,8 +260,8 @@ TEST(EstimateDirectLighting, NoSamples) {
   auto hit_point = trace_ray.Endpoint(1.0);
   iris::Vector surface_normal(0.0, 0.0, 1.0);
   iris::bxdfs::MockBxdf bxdf;
-  iris::RayTracer::RayTracer::Result trace_result{
-      iris::Bsdf(bxdf, surface_normal, surface_normal), nullptr, hit_point,
+  iris::RayTracer::RayTracer::SurfaceIntersection intersection{
+      iris::Bsdf(bxdf, surface_normal, surface_normal), hit_point,
       surface_normal, surface_normal};
 
   iris::Vector to_light(0.0, 0.866025, 0.5);
@@ -279,7 +279,7 @@ TEST(EstimateDirectLighting, NoSamples) {
   EXPECT_CALL(rng, DiscardGeometric(2)).Times(2);
 
   auto* result = EstimateDirectLighting(
-      light, trace_ray, trace_result, iris::Sampler(rng), iris::Sampler(rng),
+      light, trace_ray, intersection, iris::Sampler(rng), iris::Sampler(rng),
       iris::testing::GetAlwaysVisibleVisibilityTester(),
       iris::testing::GetSpectralAllocator());
   ASSERT_EQ(nullptr, result);
@@ -290,8 +290,8 @@ TEST(EstimateDirectLighting, DeltaLight) {
   auto hit_point = trace_ray.Endpoint(1.0);
   iris::Vector surface_normal(0.0, 0.0, 1.0);
   iris::bxdfs::MockBxdf bxdf;
-  iris::RayTracer::RayTracer::Result trace_result{
-      iris::Bsdf(bxdf, surface_normal, surface_normal), nullptr, hit_point,
+  iris::RayTracer::RayTracer::SurfaceIntersection intersection{
+      iris::Bsdf(bxdf, surface_normal, surface_normal), hit_point,
       surface_normal, surface_normal};
 
   iris::Vector to_light(0.0, 0.866025, 0.5);
@@ -317,7 +317,7 @@ TEST(EstimateDirectLighting, DeltaLight) {
   EXPECT_CALL(rng, DiscardGeometric(2)).Times(2);
 
   auto* result = EstimateDirectLighting(
-      light, trace_ray, trace_result, iris::Sampler(rng), iris::Sampler(rng),
+      light, trace_ray, intersection, iris::Sampler(rng), iris::Sampler(rng),
       iris::testing::GetAlwaysVisibleVisibilityTester(),
       iris::testing::GetSpectralAllocator());
   ASSERT_NE(nullptr, result);

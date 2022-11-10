@@ -28,8 +28,10 @@ struct Chunk {
   size_t chunk_start_x, chunk_end_x;
 };
 
-void RenderChunk(const Scene& scene, const LightScene& light_scene,
-                 const Camera& camera, std::unique_ptr<Integrator> integrator,
+void RenderChunk(const Scene& scene,
+                 const EnvironmentalLight* environmental_light,
+                 const LightScene& light_scene, const Camera& camera,
+                 std::unique_ptr<Integrator> integrator,
                  const ColorMatcher& color_matcher,
                  std::vector<std::vector<Chunk>>& chunks,
                  std::atomic<size_t>& chunk_counter, size_t num_chunks,
@@ -44,7 +46,8 @@ void RenderChunk(const Scene& scene, const LightScene& light_scene,
   internal::RayTracer internal_tracer;
   internal::VisibilityTester visibility_tester(scene, minimum_distance,
                                                internal_tracer, arena);
-  RayTracer ray_tracer(scene, minimum_distance, internal_tracer, arena);
+  RayTracer ray_tracer(scene, environmental_light, minimum_distance,
+                       internal_tracer, arena);
 
   for (auto chunk_index = chunk_counter.fetch_add(1); chunk_index < num_chunks;
        chunk_index = chunk_counter.fetch_add(1)) {
@@ -130,15 +133,15 @@ Framebuffer Renderer::Render(const Camera& camera,
   std::atomic<size_t> chunk_counter = 0;
   for (unsigned i = 1; i < num_threads; i++) {
     threads.push_back(std::thread(
-        RenderChunk, std::cref(*scene_), std::cref(*light_scene_),
-        std::cref(camera), integrator.Duplicate(), std::cref(color_matcher),
-        std::ref(chunks), std::ref(chunk_counter), num_chunks, minimum_distance,
-        std::ref(result)));
+        RenderChunk, std::cref(*scene_), scene_objects_.GetEnvironmentalLight(),
+        std::cref(*light_scene_), std::cref(camera), integrator.Duplicate(),
+        std::cref(color_matcher), std::ref(chunks), std::ref(chunk_counter),
+        num_chunks, minimum_distance, std::ref(result)));
   }
 
-  RenderChunk(*scene_, *light_scene_, camera, integrator.Duplicate(),
-              color_matcher, chunks, chunk_counter, num_chunks,
-              minimum_distance, result);
+  RenderChunk(*scene_, scene_objects_.GetEnvironmentalLight(), *light_scene_,
+              camera, integrator.Duplicate(), color_matcher, chunks,
+              chunk_counter, num_chunks, minimum_distance, result);
 
   for (auto& thread : threads) {
     thread.join();

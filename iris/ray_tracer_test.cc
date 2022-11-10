@@ -2,6 +2,7 @@
 
 #include "googletest/include/gtest/gtest.h"
 #include "iris/bxdfs/mock_bxdf.h"
+#include "iris/environmental_lights/mock_environmental_light.h"
 #include "iris/internal/arena.h"
 #include "iris/internal/ray_tracer.h"
 #include "iris/scenes/list_scene.h"
@@ -141,10 +142,32 @@ TEST(RayTracerTest, NoGeometry) {
   iris::internal::Arena arena;
   auto objects = iris::SceneObjects::Builder().Build();
   auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
-  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer, arena);
+  iris::RayTracer ray_tracer(*scene, nullptr, 0.0, internal_ray_tracer, arena);
 
-  EXPECT_FALSE(ray_tracer.Trace(
-      iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0))));
+  auto result = ray_tracer.Trace(
+      iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
+  EXPECT_FALSE(result.emission);
+  EXPECT_FALSE(result.surface_intersection);
+}
+
+TEST(RayTracerTest, WithEnvironmentalLight) {
+  iris::spectra::MockSpectrum spectrum;
+  iris::environmental_lights::MockEnvironmentalLight environmental_light;
+  EXPECT_CALL(environmental_light,
+              Emission(iris::Vector(1.0, 1.0, 1.0), testing::_, testing::_))
+      .WillOnce(testing::Return(&spectrum));
+
+  iris::internal::RayTracer internal_ray_tracer;
+  iris::internal::Arena arena;
+  auto objects = iris::SceneObjects::Builder().Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
+  iris::RayTracer ray_tracer(*scene, &environmental_light, 0.0,
+                             internal_ray_tracer, arena);
+
+  auto result = ray_tracer.Trace(
+      iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
+  EXPECT_EQ(&spectrum, result.emission);
+  EXPECT_FALSE(result.surface_intersection);
 }
 
 TEST(RayTracerTest, Minimal) {
@@ -158,16 +181,18 @@ TEST(RayTracerTest, Minimal) {
 
   iris::internal::RayTracer internal_ray_tracer;
   iris::internal::Arena arena;
-  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer, arena);
+  iris::RayTracer ray_tracer(*scene, nullptr, 0.0, internal_ray_tracer, arena);
 
   auto result = ray_tracer.Trace(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
-  ASSERT_TRUE(result);
-  EXPECT_FALSE(result->bsdf);
-  EXPECT_EQ(nullptr, result->emission);
-  EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result->hit_point);
-  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), result->surface_normal);
-  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), result->shading_normal);
+  EXPECT_FALSE(result.emission);
+  ASSERT_TRUE(result.surface_intersection);
+  EXPECT_FALSE(result.surface_intersection->bsdf);
+  EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result.surface_intersection->hit_point);
+  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
+            result.surface_intersection->surface_normal);
+  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
+            result.surface_intersection->shading_normal);
 }
 
 TEST(RayTracerTest, WithTransform) {
@@ -184,16 +209,18 @@ TEST(RayTracerTest, WithTransform) {
 
   iris::internal::RayTracer internal_ray_tracer;
   iris::internal::Arena arena;
-  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer, arena);
+  iris::RayTracer ray_tracer(*scene, nullptr, 0.0, internal_ray_tracer, arena);
 
   auto result = ray_tracer.Trace(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
-  ASSERT_TRUE(result);
-  EXPECT_FALSE(result->bsdf);
-  EXPECT_EQ(nullptr, result->emission);
-  EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result->hit_point);
-  EXPECT_EQ(iris::Vector(-1.0, 0.0, 0.0), result->surface_normal);
-  EXPECT_EQ(iris::Vector(-1.0, 0.0, 0.0), result->shading_normal);
+  EXPECT_FALSE(result.emission);
+  ASSERT_TRUE(result.surface_intersection);
+  EXPECT_FALSE(result.surface_intersection->bsdf);
+  EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result.surface_intersection->hit_point);
+  EXPECT_EQ(iris::Vector(-1.0, 0.0, 0.0),
+            result.surface_intersection->surface_normal);
+  EXPECT_EQ(iris::Vector(-1.0, 0.0, 0.0),
+            result.surface_intersection->shading_normal);
 }
 
 TEST(RayTracerTest, WithTextureCoordinates) {
@@ -209,16 +236,18 @@ TEST(RayTracerTest, WithTextureCoordinates) {
 
   iris::internal::RayTracer internal_ray_tracer;
   iris::internal::Arena arena;
-  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer, arena);
+  iris::RayTracer ray_tracer(*scene, nullptr, 0.0, internal_ray_tracer, arena);
 
   auto result = ray_tracer.Trace(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
-  ASSERT_TRUE(result);
-  EXPECT_TRUE(result->bsdf);  // TODO: Test Somehow
-  EXPECT_EQ(nullptr, result->emission);
-  EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result->hit_point);
-  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), result->surface_normal);
-  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), result->shading_normal);
+  EXPECT_FALSE(result.emission);
+  ASSERT_TRUE(result.surface_intersection);
+  EXPECT_TRUE(result.surface_intersection->bsdf);  // TODO: Test Somehow
+  EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result.surface_intersection->hit_point);
+  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
+            result.surface_intersection->surface_normal);
+  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
+            result.surface_intersection->shading_normal);
 }
 
 TEST(RayTracerTest, WithMaterial) {
@@ -233,16 +262,18 @@ TEST(RayTracerTest, WithMaterial) {
 
   iris::internal::RayTracer internal_ray_tracer;
   iris::internal::Arena arena;
-  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer, arena);
+  iris::RayTracer ray_tracer(*scene, nullptr, 0.0, internal_ray_tracer, arena);
 
   auto result = ray_tracer.Trace(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
-  ASSERT_TRUE(result);
-  EXPECT_TRUE(result->bsdf);  // TODO: Test Somehow
-  EXPECT_EQ(nullptr, result->emission);
-  EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result->hit_point);
-  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), result->surface_normal);
-  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), result->shading_normal);
+  EXPECT_FALSE(result.emission);
+  ASSERT_TRUE(result.surface_intersection);
+  EXPECT_TRUE(result.surface_intersection->bsdf);  // TODO: Test Somehow
+  EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result.surface_intersection->hit_point);
+  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
+            result.surface_intersection->surface_normal);
+  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
+            result.surface_intersection->shading_normal);
 }
 
 TEST(RayTracerTest, WithEmissiveMaterial) {
@@ -257,16 +288,18 @@ TEST(RayTracerTest, WithEmissiveMaterial) {
 
   iris::internal::RayTracer internal_ray_tracer;
   iris::internal::Arena arena;
-  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer, arena);
+  iris::RayTracer ray_tracer(*scene, nullptr, 0.0, internal_ray_tracer, arena);
 
   auto result = ray_tracer.Trace(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
-  ASSERT_TRUE(result);
-  EXPECT_FALSE(result->bsdf);
-  EXPECT_EQ(g_spectrum.get(), result->emission);
-  EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result->hit_point);
-  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), result->surface_normal);
-  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), result->shading_normal);
+  EXPECT_EQ(g_spectrum.get(), result.emission);
+  ASSERT_TRUE(result.surface_intersection);
+  EXPECT_FALSE(result.surface_intersection->bsdf);
+  EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result.surface_intersection->hit_point);
+  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
+            result.surface_intersection->surface_normal);
+  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
+            result.surface_intersection->shading_normal);
 }
 
 TEST(RayTracerTest, WithNormal) {
@@ -281,16 +314,18 @@ TEST(RayTracerTest, WithNormal) {
 
   iris::internal::RayTracer internal_ray_tracer;
   iris::internal::Arena arena;
-  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer, arena);
+  iris::RayTracer ray_tracer(*scene, nullptr, 0.0, internal_ray_tracer, arena);
 
   auto result = ray_tracer.Trace(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
-  ASSERT_TRUE(result);
-  EXPECT_FALSE(result->bsdf);
-  EXPECT_EQ(nullptr, result->emission);
-  EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result->hit_point);
-  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), result->surface_normal);
-  EXPECT_EQ(iris::Vector(0.0, 1.0, 0.0), result->shading_normal);
+  EXPECT_FALSE(result.emission);
+  ASSERT_TRUE(result.surface_intersection);
+  EXPECT_FALSE(result.surface_intersection->bsdf);
+  EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result.surface_intersection->hit_point);
+  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
+            result.surface_intersection->surface_normal);
+  EXPECT_EQ(iris::Vector(0.0, 1.0, 0.0),
+            result.surface_intersection->shading_normal);
 }
 
 TEST(RayTracerTest, WithNormalMap) {
@@ -305,14 +340,16 @@ TEST(RayTracerTest, WithNormalMap) {
 
   iris::internal::RayTracer internal_ray_tracer;
   iris::internal::Arena arena;
-  iris::RayTracer ray_tracer(*scene, 0.0, internal_ray_tracer, arena);
+  iris::RayTracer ray_tracer(*scene, nullptr, 0.0, internal_ray_tracer, arena);
 
   auto result = ray_tracer.Trace(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
-  ASSERT_TRUE(result);
-  EXPECT_FALSE(result->bsdf);
-  EXPECT_EQ(nullptr, result->emission);
-  EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result->hit_point);
-  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0), result->surface_normal);
-  EXPECT_EQ(iris::Vector(0.0, 0.0, 1.0), result->shading_normal);
+  EXPECT_FALSE(result.emission);
+  ASSERT_TRUE(result.surface_intersection);
+  EXPECT_FALSE(result.surface_intersection->bsdf);
+  EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result.surface_intersection->hit_point);
+  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
+            result.surface_intersection->surface_normal);
+  EXPECT_EQ(iris::Vector(0.0, 0.0, 1.0),
+            result.surface_intersection->shading_normal);
 }

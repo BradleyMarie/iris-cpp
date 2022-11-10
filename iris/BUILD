@@ -473,6 +473,7 @@ cc_library(
     deps = [
         ":bsdf",
         ":bxdf_allocator",
+        ":environmental_light",
         ":float",
         ":ray",
         ":scene",
@@ -488,6 +489,7 @@ cc_test(
     deps = [
         ":ray_tracer",
         "//iris/bxdfs:mock_bxdf",
+        "//iris/environmental_lights:mock_environmental_light",
         "//iris/internal:ray_tracer",
         "//iris/scenes:list_scene",
         "//iris/spectra:mock_spectrum",
@@ -603,11 +605,13 @@ cc_library(
     hdrs = ["scene_objects.h"],
     visibility = ["//visibility:public"],
     deps = [
+        ":environmental_light",
         ":geometry",
         ":light",
         ":matrix",
         ":reference_counted",
         "//iris/internal:area_light",
+        "//iris/internal:environmental_light",
     ],
 )
 
@@ -616,6 +620,7 @@ cc_test(
     srcs = ["scene_objects_test.cc"],
     deps = [
         ":scene_objects",
+        "//iris/environmental_lights:mock_environmental_light",
         "//iris/lights:mock_light",
         "@com_google_googletest//:gtest_main",
     ],

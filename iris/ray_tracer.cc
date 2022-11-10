@@ -43,14 +43,28 @@ std::optional<Bsdf> MakeBsdf(const iris::internal::Hit& hit,
   return Bsdf(*bxdf, world_surface_normal, world_shading_normal);
 }
 
+RayTracer::TraceResult HandleMiss(const Ray& ray,
+                                  const EnvironmentalLight* environmental_light,
+                                  SpectralAllocator& spectral_allocator) {
+  if (!environmental_light) {
+    return RayTracer::TraceResult{nullptr, std::nullopt};
+  }
+
+  return RayTracer::TraceResult{
+      environmental_light->Emission(ray.direction, spectral_allocator),
+      std::nullopt};
+}
+
 }  // namespace
 
-std::optional<RayTracer::Result> RayTracer::Trace(const Ray& ray) {
+RayTracer::TraceResult RayTracer::Trace(const Ray& ray) {
+  SpectralAllocator spectral_allocator(arena_);
+
   auto* hit =
       ray_tracer_.Trace(ray, minimum_distance_,
                         std::numeric_limits<geometric_t>::infinity(), scene_);
   if (!hit) {
-    return std::nullopt;
+    return HandleMiss(ray, environmental_light_, spectral_allocator);
   }
 
   Point world_hit_point = ray.Endpoint(hit->distance);
@@ -64,8 +78,6 @@ std::optional<RayTracer::Result> RayTracer::Trace(const Ray& ray) {
           ->ComputeTextureCoordinates(model_hit_point, hit->front,
                                       hit->additional_data)
           .value_or(TextureCoordinates{0.0, 0.0});
-
-  SpectralAllocator spectral_allocator(arena_);
 
   const Spectrum* spectrum = nullptr;
   if (auto* emissive_material = hit->geometry->GetEmissiveMaterial(
@@ -94,8 +106,9 @@ std::optional<RayTracer::Result> RayTracer::Trace(const Ray& ray) {
   auto bsdf = MakeBsdf(*hit, texture_coordinates, vectors.first, vectors.second,
                        spectral_allocator, bxdf_allocator);
 
-  return RayTracer::Result{bsdf, spectrum, world_hit_point, vectors.first,
-                           vectors.second};
+  return RayTracer::TraceResult{
+      spectrum, RayTracer::SurfaceIntersection{bsdf, world_hit_point,
+                                               vectors.first, vectors.second}};
 }
 
 }  // namespace iris

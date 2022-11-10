@@ -4,6 +4,7 @@
 #include <optional>
 
 #include "iris/bsdf.h"
+#include "iris/environmental_light.h"
 #include "iris/float.h"
 #include "iris/ray.h"
 #include "iris/scene.h"
@@ -17,28 +18,35 @@ class RayTracer;
 
 class RayTracer final {
  public:
-  RayTracer(const Scene& scene, geometric_t minimum_distance,
-            internal::RayTracer& ray_tracer, internal::Arena& arena) noexcept
+  RayTracer(const Scene& scene, const EnvironmentalLight* environmental_light,
+            geometric_t minimum_distance, internal::RayTracer& ray_tracer,
+            internal::Arena& arena) noexcept
       : scene_(scene),
+        environmental_light_(environmental_light),
         minimum_distance_(minimum_distance),
         ray_tracer_(ray_tracer),
         arena_(arena) {}
 
-  struct Result {
+  struct SurfaceIntersection {
     std::optional<Bsdf> bsdf;
-    const Spectrum* emission;
     Point hit_point;
     Vector surface_normal;
     Vector shading_normal;
   };
 
-  std::optional<Result> Trace(const Ray& ray);
+  struct TraceResult {
+    const Spectrum* emission;
+    std::optional<SurfaceIntersection> surface_intersection;
+  };
+
+  TraceResult Trace(const Ray& ray);
 
  private:
   RayTracer(const RayTracer&) = delete;
   RayTracer& operator=(const RayTracer&) = delete;
 
   const Scene& scene_;
+  const EnvironmentalLight* environmental_light_;
   geometric_t minimum_distance_;
   internal::RayTracer& ray_tracer_;
   internal::Arena& arena_;

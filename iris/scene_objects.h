@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 
+#include "iris/environmental_light.h"
 #include "iris/geometry.h"
 #include "iris/light.h"
 #include "iris/matrix.h"
@@ -34,6 +35,7 @@ class SceneObjects {
     void Add(ReferenceCounted<Geometry> geometry,
              const Matrix& matrix = iris::Matrix::Identity());
     void Add(ReferenceCounted<Light> light);
+    void Set(ReferenceCounted<EnvironmentalLight> environmental_light);
     SceneObjects Build();
 
    private:
@@ -42,6 +44,7 @@ class SceneObjects {
     std::vector<Matrix> matrices_ = {Matrix::Identity()};
     std::vector<std::pair<ReferenceCounted<Geometry>, const Matrix*>> geometry_;
     std::vector<ReferenceCounted<Light>> lights_;
+    ReferenceCounted<EnvironmentalLight> environmental_light_;
 
     friend class SceneObjects;
   };
@@ -62,11 +65,16 @@ class SceneObjects {
     return *lights_[index];
   }
 
+  const EnvironmentalLight* GetEnvironmentalLight() const noexcept {
+    return environmental_light_.Get();
+  }
+
  private:
   SceneObjects(Builder&& builder);
 
   std::vector<std::pair<ReferenceCounted<Geometry>, const Matrix*>> geometry_;
   std::vector<ReferenceCounted<Light>> lights_;
+  ReferenceCounted<EnvironmentalLight> environmental_light_;
   std::vector<Matrix> matrices_;
 };
 

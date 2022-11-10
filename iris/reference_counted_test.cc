@@ -172,6 +172,15 @@ TEST(ReferenceCountedTest, Swap) {
   EXPECT_EQ(raw1, ptr0.Get());
 }
 
+TEST(ReferenceCountedTest, Reset) {
+  bool allow_deletion = true, deleted = false;
+  auto unique = std::make_unique<Sharable>(&allow_deletion, &deleted);
+  iris::ReferenceCounted<Sharable> ptr(std::move(unique));
+  ptr.Reset();
+  EXPECT_EQ(nullptr, ptr.Get());
+  EXPECT_TRUE(deleted);
+}
+
 TEST(ReferenceCountedTest, Compare) {
   bool allow_deletion = true, deleted = false;
   auto ptr0 = iris::MakeReferenceCounted<Sharable>(&allow_deletion, &deleted);

@@ -63,7 +63,6 @@ cc_library(
         "//iris:light",
         "//iris:matrix",
         "//iris:ray",
-        "//iris:reference_counted",
         "//iris:spectral_allocator",
         "//iris:spectrum",
         "//iris:visibility_tester",

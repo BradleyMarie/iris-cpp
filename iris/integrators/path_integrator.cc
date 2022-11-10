@@ -43,29 +43,27 @@ const Spectrum* PathIntegrator::Integrate(const Ray& ray, RayTracer& ray_tracer,
   Ray trace_ray = ray;
   for (uint8_t bounces = 0;; bounces++) {
     auto trace_result = ray_tracer.Trace(trace_ray);
-    if (!trace_result) {
-      break;
-    }
 
     if (add_light_emissions) {
-      path_builder.Add(trace_result->emission, spectral_allocator);
+      path_builder.Add(trace_result.emission, spectral_allocator);
       add_light_emissions = false;
     }
 
-    if (!trace_result->bsdf) {
+    if (!trace_result.surface_intersection ||
+        !trace_result.surface_intersection->bsdf) {
       break;
     }
 
     auto* direct_lighting = internal::SampleDirectLighting(
-        light_sampler, trace_ray, *trace_result, rng, visibility_tester,
-        spectral_allocator);
+        light_sampler, trace_ray, *trace_result.surface_intersection, rng,
+        visibility_tester, spectral_allocator);
     path_builder.Add(direct_lighting, spectral_allocator);
 
     if (bounces == max_bounces_) {
       break;
     }
 
-    auto bsdf_sample = trace_result->bsdf->Sample(
+    auto bsdf_sample = trace_result.surface_intersection->bsdf->Sample(
         trace_ray.direction, iris::Sampler(rng), spectral_allocator);
 
     if (!bsdf_sample) {
@@ -77,7 +75,8 @@ const Spectrum* PathIntegrator::Integrate(const Ray& ray, RayTracer& ray_tracer,
     visual_t attenuation;
     if (bsdf_sample->pdf) {
       attenuation =
-          AbsDotProduct(trace_result->shading_normal, bsdf_sample->direction) /
+          AbsDotProduct(trace_result.surface_intersection->shading_normal,
+                        bsdf_sample->direction) /
           *bsdf_sample->pdf;
       path_throughput *= attenuation;
     } else {
@@ -97,7 +96,8 @@ const Spectrum* PathIntegrator::Integrate(const Ray& ray, RayTracer& ray_tracer,
     }
 
     path_builder.Bounce(&bsdf_sample->reflector, attenuation);
-    new (&trace_ray) Ray(trace_result->hit_point, bsdf_sample->direction);
+    new (&trace_ray) Ray(trace_result.surface_intersection->hit_point,
+                         bsdf_sample->direction);
   }
 
   return path_builder.Build(spectral_allocator);

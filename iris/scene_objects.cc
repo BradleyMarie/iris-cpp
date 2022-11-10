@@ -5,6 +5,7 @@
 
 #include "absl/log/check.h"
 #include "iris/internal/area_light.h"
+#include "iris/internal/environmental_light.h"
 
 namespace iris {
 
@@ -37,6 +38,11 @@ void SceneObjects::Builder::Add(ReferenceCounted<Light> light) {
   lights_.push_back(std::move(light));
 }
 
+void SceneObjects::Builder::Set(
+    ReferenceCounted<EnvironmentalLight> environmental_light) {
+  environmental_light_ = std::move(environmental_light);
+}
+
 SceneObjects SceneObjects::Builder::Build() {
   assert((std::set<std::pair<ReferenceCounted<Geometry>, const Matrix*>>(
               geometry_.begin(), geometry_.end())
@@ -48,6 +54,7 @@ SceneObjects SceneObjects::Builder::Build() {
   matrices_.clear();
   geometry_.clear();
   lights_.clear();
+  environmental_light_.Reset();
 
   matrix_to_transform_index_.insert({Matrix::Identity(), 0});
   matrices_.push_back(Matrix::Identity());
@@ -58,6 +65,7 @@ SceneObjects SceneObjects::Builder::Build() {
 SceneObjects::SceneObjects(Builder&& builder)
     : geometry_(std::move(builder.geometry_)),
       lights_(std::move(builder.lights_)),
+      environmental_light_(std::move(builder.environmental_light_)),
       matrices_(std::move(builder.matrices_)) {
   matrices_.shrink_to_fit();
   geometry_.shrink_to_fit();
@@ -75,6 +83,11 @@ SceneObjects::SceneObjects(Builder&& builder)
       lights_.push_back(iris::MakeReferenceCounted<internal::AreaLight>(
           std::cref(*entry.first), entry.second, face));
     }
+  }
+
+  if (environmental_light_) {
+    lights_.push_back(iris::MakeReferenceCounted<internal::EnvironmentalLight>(
+        std::cref(*environmental_light_)));
   }
 
   lights_.shrink_to_fit();

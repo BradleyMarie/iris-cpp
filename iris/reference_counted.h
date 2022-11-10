@@ -60,6 +60,11 @@ class ReferenceCounted final {
   void Swap(ReferenceCounted& other) noexcept { std::swap(ptr_, other.ptr_); }
   const T* Get() const noexcept { return ptr_; }
 
+  void Reset() {
+    MaybeDecrement();
+    ptr_ = nullptr;
+  }
+
  private:
   void MaybeDecrement() {
     if (ptr_ && ptr_->Decrement()) {

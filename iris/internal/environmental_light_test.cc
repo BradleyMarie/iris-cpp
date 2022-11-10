@@ -8,14 +8,11 @@
 #include "iris/testing/visibility_tester.h"
 
 TEST(EnvironmentalLightTest, EmissionFails) {
-  auto environmental_light =
-      std::make_unique<iris::environmental_lights::MockEnvironmentalLight>();
-  EXPECT_CALL(*environmental_light,
-              Emission(testing::_, testing::_, testing::_))
+  iris::environmental_lights::MockEnvironmentalLight environmental_light;
+  EXPECT_CALL(environmental_light, Emission(testing::_, testing::_, testing::_))
       .WillOnce(testing::Return(nullptr));
 
-  iris::internal::EnvironmentalLight light(
-      iris::ReferenceCounted(std::move(environmental_light)));
+  iris::internal::EnvironmentalLight light(environmental_light);
 
   EXPECT_EQ(nullptr,
             light.Emission(iris::Ray(iris::Point(0.0, 0.0, 0.0),
@@ -27,14 +24,11 @@ TEST(EnvironmentalLightTest, EmissionFails) {
 TEST(EnvironmentalLightTest, EmissionNotVisible) {
   iris::spectra::MockSpectrum spectrum;
 
-  auto environmental_light =
-      std::make_unique<iris::environmental_lights::MockEnvironmentalLight>();
-  EXPECT_CALL(*environmental_light,
-              Emission(testing::_, testing::_, testing::_))
+  iris::environmental_lights::MockEnvironmentalLight environmental_light;
+  EXPECT_CALL(environmental_light, Emission(testing::_, testing::_, testing::_))
       .WillOnce(testing::Return(&spectrum));
 
-  iris::internal::EnvironmentalLight light(
-      iris::ReferenceCounted(std::move(environmental_light)));
+  iris::internal::EnvironmentalLight light(environmental_light);
 
   EXPECT_EQ(nullptr,
             light.Emission(iris::Ray(iris::Point(0.0, 0.0, 0.0),
@@ -47,14 +41,12 @@ TEST(EnvironmentalLightTest, EmissionSucceeds) {
   iris::spectra::MockSpectrum spectrum;
   iris::visual_t pdf;
 
-  auto environmental_light =
-      std::make_unique<iris::environmental_lights::MockEnvironmentalLight>();
-  EXPECT_CALL(*environmental_light, Emission(testing::_, testing::_, &pdf))
+  iris::environmental_lights::MockEnvironmentalLight environmental_light;
+  EXPECT_CALL(environmental_light, Emission(testing::_, testing::_, &pdf))
       .WillOnce(testing::DoAll(testing::SetArgPointee<2>(1.0),
                                testing::Return(&spectrum)));
 
-  iris::internal::EnvironmentalLight light(
-      iris::ReferenceCounted(std::move(environmental_light)));
+  iris::internal::EnvironmentalLight light(environmental_light);
 
   EXPECT_EQ(&spectrum,
             light.Emission(iris::Ray(iris::Point(0.0, 0.0, 0.0),
@@ -65,13 +57,11 @@ TEST(EnvironmentalLightTest, EmissionSucceeds) {
 }
 
 TEST(EnvironmentalLightTest, SampleFails) {
-  auto environmental_light =
-      std::make_unique<iris::environmental_lights::MockEnvironmentalLight>();
-  EXPECT_CALL(*environmental_light, Sample(testing::_, testing::_))
+  iris::environmental_lights::MockEnvironmentalLight environmental_light;
+  EXPECT_CALL(environmental_light, Sample(testing::_, testing::_))
       .WillOnce(testing::Return(std::nullopt));
 
-  iris::internal::EnvironmentalLight light(
-      iris::ReferenceCounted(std::move(environmental_light)));
+  iris::internal::EnvironmentalLight light(environmental_light);
 
   iris::random::MockRandom random;
   EXPECT_CALL(random, DiscardGeometric(2));
@@ -84,14 +74,12 @@ TEST(EnvironmentalLightTest, SampleFails) {
 TEST(EnvironmentalLightTest, SampleNotVisible) {
   iris::spectra::MockSpectrum spectrum;
 
-  auto environmental_light =
-      std::make_unique<iris::environmental_lights::MockEnvironmentalLight>();
-  EXPECT_CALL(*environmental_light, Sample(testing::_, testing::_))
+  iris::environmental_lights::MockEnvironmentalLight environmental_light;
+  EXPECT_CALL(environmental_light, Sample(testing::_, testing::_))
       .WillOnce(testing::Return(iris::EnvironmentalLight::SampleResult{
           spectrum, iris::Vector(1.0, 0.0, 0.0), 1.0}));
 
-  iris::internal::EnvironmentalLight light(
-      iris::ReferenceCounted(std::move(environmental_light)));
+  iris::internal::EnvironmentalLight light(environmental_light);
 
   iris::random::MockRandom random;
   EXPECT_CALL(random, DiscardGeometric(2));
@@ -104,14 +92,12 @@ TEST(EnvironmentalLightTest, SampleNotVisible) {
 TEST(EnvironmentalLightTest, SampleSucceeds) {
   iris::spectra::MockSpectrum spectrum;
 
-  auto environmental_light =
-      std::make_unique<iris::environmental_lights::MockEnvironmentalLight>();
-  EXPECT_CALL(*environmental_light, Sample(testing::_, testing::_))
+  iris::environmental_lights::MockEnvironmentalLight environmental_light;
+  EXPECT_CALL(environmental_light, Sample(testing::_, testing::_))
       .WillOnce(testing::Return(iris::EnvironmentalLight::SampleResult{
           spectrum, iris::Vector(1.0, 0.0, 0.0), 1.0}));
 
-  iris::internal::EnvironmentalLight light(
-      iris::ReferenceCounted(std::move(environmental_light)));
+  iris::internal::EnvironmentalLight light(environmental_light);
 
   iris::random::MockRandom random;
   EXPECT_CALL(random, DiscardGeometric(2));
