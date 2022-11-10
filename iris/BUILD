@@ -116,6 +116,20 @@ cc_library(
 )
 
 cc_library(
+    name = "environmental_light",
+    hdrs = ["environmental_light.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":float",
+        ":reference_countable",
+        ":sampler",
+        ":spectral_allocator",
+        ":spectrum",
+        ":vector",
+    ],
+)
+
+cc_library(
     name = "float",
     hdrs = ["float.h"],
     visibility = ["//visibility:public"],

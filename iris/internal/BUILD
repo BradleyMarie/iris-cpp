@@ -52,6 +52,25 @@ cc_test(
 )
 
 cc_library(
+    name = "environmental_light",
+    srcs = ["environmental_light.cc"],
+    hdrs = ["environmental_light.h"],
+    deps = [
+        "//iris:environmental_light",
+        "//iris:float",
+        "//iris:geometry",
+        "//iris:integer",
+        "//iris:light",
+        "//iris:matrix",
+        "//iris:ray",
+        "//iris:reference_counted",
+        "//iris:spectral_allocator",
+        "//iris:spectrum",
+        "//iris:visibility_tester",
+    ],
+)
+
+cc_library(
     name = "hit_arena",
     srcs = ["hit_arena.cc"],
     hdrs = ["hit_arena.h"],
