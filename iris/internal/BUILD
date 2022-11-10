@@ -70,6 +70,20 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "environmental_light_test",
+    srcs = ["environmental_light_test.cc"],
+    deps = [
+        ":environmental_light",
+        "//iris/environmental_lights:mock_environmental_light",
+        "//iris/random:mock_random",
+        "//iris/spectra:mock_spectrum",
+        "//iris/testing:spectral_allocator",
+        "//iris/testing:visibility_tester",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "hit_arena",
     srcs = ["hit_arena.cc"],
