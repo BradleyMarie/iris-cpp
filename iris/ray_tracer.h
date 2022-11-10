@@ -28,7 +28,7 @@ class RayTracer final {
         arena_(arena) {}
 
   struct SurfaceIntersection {
-    std::optional<Bsdf> bsdf;
+    Bsdf bsdf;
     Point hit_point;
     Vector surface_normal;
     Vector shading_normal;

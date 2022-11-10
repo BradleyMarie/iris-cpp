@@ -170,7 +170,7 @@ TEST(RayTracerTest, WithEnvironmentalLight) {
   EXPECT_FALSE(result.surface_intersection);
 }
 
-TEST(RayTracerTest, Minimal) {
+TEST(RayTracerTest, NoBsdf) {
   iris::Ray ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0));
 
   auto builder = iris::SceneObjects::Builder();
@@ -186,8 +186,47 @@ TEST(RayTracerTest, Minimal) {
   auto result = ray_tracer.Trace(
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
   EXPECT_FALSE(result.emission);
+  EXPECT_FALSE(result.surface_intersection);
+}
+
+TEST(RayTracerTest, WithEmissiveMaterial) {
+  iris::Ray ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0));
+  TestEmissiveMaterial emissive_material({0.0, 0.0});
+
+  auto builder = iris::SceneObjects::Builder();
+  builder.Add(iris::MakeReferenceCounted<TestGeometry>(
+      ray, iris::Point(1.0, 1.0, 1.0), nullptr, &emissive_material));
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
+
+  iris::internal::RayTracer internal_ray_tracer;
+  iris::internal::Arena arena;
+  iris::RayTracer ray_tracer(*scene, nullptr, 0.0, internal_ray_tracer, arena);
+
+  auto result = ray_tracer.Trace(
+      iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
+  EXPECT_EQ(g_spectrum.get(), result.emission);
+  EXPECT_FALSE(result.surface_intersection);
+}
+
+TEST(RayTracerTest, Minimal) {
+  iris::Ray ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0));
+  TestMaterial material({0.0, 0.0});
+
+  auto builder = iris::SceneObjects::Builder();
+  builder.Add(iris::MakeReferenceCounted<TestGeometry>(
+      ray, iris::Point(1.0, 1.0, 1.0), &material));
+  auto objects = builder.Build();
+  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
+
+  iris::internal::RayTracer internal_ray_tracer;
+  iris::internal::Arena arena;
+  iris::RayTracer ray_tracer(*scene, nullptr, 0.0, internal_ray_tracer, arena);
+
+  auto result = ray_tracer.Trace(
+      iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
+  EXPECT_FALSE(result.emission);
   ASSERT_TRUE(result.surface_intersection);
-  EXPECT_FALSE(result.surface_intersection->bsdf);
   EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result.surface_intersection->hit_point);
   EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
             result.surface_intersection->surface_normal);
@@ -197,10 +236,11 @@ TEST(RayTracerTest, Minimal) {
 
 TEST(RayTracerTest, WithTransform) {
   iris::Ray ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(-1.0, 1.0, 1.0));
+  TestMaterial material({0.0, 0.0});
 
   auto builder = iris::SceneObjects::Builder();
   builder.Add(iris::MakeReferenceCounted<TestGeometry>(
-                  ray, iris::Point(-1.0, 1.0, 1.0)),
+                  ray, iris::Point(-1.0, 1.0, 1.0), &material),
               iris::Matrix::Scalar(-1.0, 1.0, 1.0).value());
   auto objects = builder.Build();
   auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
@@ -215,7 +255,6 @@ TEST(RayTracerTest, WithTransform) {
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
   EXPECT_FALSE(result.emission);
   ASSERT_TRUE(result.surface_intersection);
-  EXPECT_FALSE(result.surface_intersection->bsdf);
   EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result.surface_intersection->hit_point);
   EXPECT_EQ(iris::Vector(-1.0, 0.0, 0.0),
             result.surface_intersection->surface_normal);
@@ -242,7 +281,6 @@ TEST(RayTracerTest, WithTextureCoordinates) {
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
   EXPECT_FALSE(result.emission);
   ASSERT_TRUE(result.surface_intersection);
-  EXPECT_TRUE(result.surface_intersection->bsdf);  // TODO: Test Somehow
   EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result.surface_intersection->hit_point);
   EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
             result.surface_intersection->surface_normal);
@@ -268,33 +306,6 @@ TEST(RayTracerTest, WithMaterial) {
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
   EXPECT_FALSE(result.emission);
   ASSERT_TRUE(result.surface_intersection);
-  EXPECT_TRUE(result.surface_intersection->bsdf);  // TODO: Test Somehow
-  EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result.surface_intersection->hit_point);
-  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
-            result.surface_intersection->surface_normal);
-  EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
-            result.surface_intersection->shading_normal);
-}
-
-TEST(RayTracerTest, WithEmissiveMaterial) {
-  iris::Ray ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0));
-  TestEmissiveMaterial emissive_material({0.0, 0.0});
-
-  auto builder = iris::SceneObjects::Builder();
-  builder.Add(iris::MakeReferenceCounted<TestGeometry>(
-      ray, iris::Point(1.0, 1.0, 1.0), nullptr, &emissive_material));
-  auto objects = builder.Build();
-  auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
-
-  iris::internal::RayTracer internal_ray_tracer;
-  iris::internal::Arena arena;
-  iris::RayTracer ray_tracer(*scene, nullptr, 0.0, internal_ray_tracer, arena);
-
-  auto result = ray_tracer.Trace(
-      iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
-  EXPECT_EQ(g_spectrum.get(), result.emission);
-  ASSERT_TRUE(result.surface_intersection);
-  EXPECT_FALSE(result.surface_intersection->bsdf);
   EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result.surface_intersection->hit_point);
   EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
             result.surface_intersection->surface_normal);
@@ -304,10 +315,11 @@ TEST(RayTracerTest, WithEmissiveMaterial) {
 
 TEST(RayTracerTest, WithNormal) {
   iris::Ray ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0));
+  TestMaterial material({0.0, 0.0});
 
   auto builder = iris::SceneObjects::Builder();
   builder.Add(iris::MakeReferenceCounted<TestGeometry>(
-      ray, iris::Point(1.0, 1.0, 1.0), nullptr, nullptr,
+      ray, iris::Point(1.0, 1.0, 1.0), &material, nullptr,
       iris::Vector(0.0, 1.0, 0.0)));
   auto objects = builder.Build();
   auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
@@ -320,7 +332,6 @@ TEST(RayTracerTest, WithNormal) {
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
   EXPECT_FALSE(result.emission);
   ASSERT_TRUE(result.surface_intersection);
-  EXPECT_FALSE(result.surface_intersection->bsdf);
   EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result.surface_intersection->hit_point);
   EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
             result.surface_intersection->surface_normal);
@@ -330,11 +341,12 @@ TEST(RayTracerTest, WithNormal) {
 
 TEST(RayTracerTest, WithNormalMap) {
   iris::Ray ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0));
+  TestMaterial material({0.0, 0.0});
   TestNormalMap normal_map({0.0, 0.0});
 
   auto builder = iris::SceneObjects::Builder();
   builder.Add(iris::MakeReferenceCounted<TestGeometry>(
-      ray, iris::Point(1.0, 1.0, 1.0), nullptr, nullptr, &normal_map));
+      ray, iris::Point(1.0, 1.0, 1.0), &material, nullptr, &normal_map));
   auto objects = builder.Build();
   auto scene = iris::scenes::ListScene::Builder::Create()->Build(objects);
 
@@ -346,7 +358,6 @@ TEST(RayTracerTest, WithNormalMap) {
       iris::Ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(1.0, 1.0, 1.0)));
   EXPECT_FALSE(result.emission);
   ASSERT_TRUE(result.surface_intersection);
-  EXPECT_FALSE(result.surface_intersection->bsdf);
   EXPECT_EQ(iris::Point(1.0, 1.0, 1.0), result.surface_intersection->hit_point);
   EXPECT_EQ(iris::Vector(1.0, 0.0, 0.0),
             result.surface_intersection->surface_normal);

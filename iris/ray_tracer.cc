@@ -23,12 +23,11 @@ std::pair<Vector, Vector> MaybeTransform(const Matrix* model_to_world,
   return model_to_world ? Transform(*model_to_world, vectors) : vectors;
 }
 
-std::optional<Bsdf> MakeBsdf(const iris::internal::Hit& hit,
-                             const TextureCoordinates& texture_coordinates,
-                             const Vector& world_surface_normal,
-                             const Vector& world_shading_normal,
-                             SpectralAllocator& spectral_allocator,
-                             BxdfAllocator& bxdf_allocator) {
+std::optional<RayTracer::SurfaceIntersection> MakeSurfaceIntersection(
+    const iris::internal::Hit& hit,
+    const TextureCoordinates& texture_coordinates, const Point& world_hit_point,
+    const Point& model_hit_point, SpectralAllocator& spectral_allocator,
+    BxdfAllocator& bxdf_allocator) {
   auto* material = hit.geometry->GetMaterial(hit.front, hit.additional_data);
   if (!material) {
     return std::nullopt;
@@ -40,7 +39,25 @@ std::optional<Bsdf> MakeBsdf(const iris::internal::Hit& hit,
     return std::nullopt;
   }
 
-  return Bsdf(*bxdf, world_surface_normal, world_shading_normal);
+  Vector model_surface_normal = hit.geometry->ComputeSurfaceNormal(
+      model_hit_point, hit.front, hit.additional_data);
+
+  auto shading_normal_variant =
+      hit.geometry->ComputeShadingNormal(hit.front, hit.additional_data);
+  Vector model_shading_normal =
+      std::holds_alternative<const NormalMap*>(shading_normal_variant)
+          ? std::get<const NormalMap*>(shading_normal_variant)
+                ? std::get<const NormalMap*>(shading_normal_variant)
+                      ->Evaluate(texture_coordinates, model_surface_normal)
+                : model_surface_normal
+          : std::get<Vector>(shading_normal_variant);
+
+  auto vectors = MaybeTransform(hit.model_to_world, model_surface_normal,
+                                model_shading_normal);
+
+  return RayTracer::SurfaceIntersection{
+      Bsdf(*bxdf, vectors.first, vectors.second), world_hit_point,
+      vectors.first, vectors.second};
 }
 
 RayTracer::TraceResult HandleMiss(const Ray& ray,
@@ -86,29 +103,12 @@ RayTracer::TraceResult RayTracer::Trace(const Ray& ray) {
         emissive_material->Evaluate(texture_coordinates, spectral_allocator);
   }
 
-  Vector model_surface_normal = hit->geometry->ComputeSurfaceNormal(
-      model_hit_point, hit->front, hit->additional_data);
-
-  auto shading_normal_variant =
-      hit->geometry->ComputeShadingNormal(hit->front, hit->additional_data);
-  Vector model_shading_normal =
-      std::holds_alternative<const NormalMap*>(shading_normal_variant)
-          ? std::get<const NormalMap*>(shading_normal_variant)
-                ? std::get<const NormalMap*>(shading_normal_variant)
-                      ->Evaluate(texture_coordinates, model_surface_normal)
-                : model_surface_normal
-          : std::get<Vector>(shading_normal_variant);
-
-  auto vectors = MaybeTransform(hit->model_to_world, model_surface_normal,
-                                model_shading_normal);
-
   BxdfAllocator bxdf_allocator(arena_);
-  auto bsdf = MakeBsdf(*hit, texture_coordinates, vectors.first, vectors.second,
-                       spectral_allocator, bxdf_allocator);
+  auto surface_intersection = MakeSurfaceIntersection(
+      *hit, texture_coordinates, world_hit_point, model_hit_point,
+      spectral_allocator, bxdf_allocator);
 
-  return RayTracer::TraceResult{
-      spectrum, RayTracer::SurfaceIntersection{bsdf, world_hit_point,
-                                               vectors.first, vectors.second}};
+  return RayTracer::TraceResult{spectrum, surface_intersection};
 }
 
 }  // namespace iris

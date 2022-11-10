@@ -22,8 +22,8 @@ const Spectrum* DeltaLight(const Light::SampleResult& sample,
                            const Ray& traced_ray,
                            const RayTracer::SurfaceIntersection intersection,
                            SpectralAllocator& allocator) {
-  auto diffuse = intersection.bsdf->Reflectance(traced_ray.direction,
-                                                sample.to_light, allocator);
+  auto diffuse = intersection.bsdf.Reflectance(traced_ray.direction,
+                                               sample.to_light, allocator);
   if (!diffuse) {
     return nullptr;
   }
@@ -38,8 +38,8 @@ const Spectrum* FromLightSample(
     const Light::SampleResult& sample, const Ray& traced_ray,
     const RayTracer::SurfaceIntersection intersection,
     VisibilityTester& visibility_tester, SpectralAllocator& allocator) {
-  auto diffuse = intersection.bsdf->Reflectance(traced_ray.direction,
-                                                sample.to_light, allocator);
+  auto diffuse = intersection.bsdf.Reflectance(traced_ray.direction,
+                                               sample.to_light, allocator);
   if (!diffuse) {
     return nullptr;
   }
@@ -80,9 +80,7 @@ const Spectrum* EstimateDirectLighting(
     const RayTracer::SurfaceIntersection intersection, Sampler bsdf_sampler,
     Sampler light_sampler, VisibilityTester& visibility_tester,
     SpectralAllocator& allocator) {
-  assert(intersection.bsdf);  // Caller must check that hit contained a BSDF
-
-  auto bsdf_sample = intersection.bsdf->Sample(
+  auto bsdf_sample = intersection.bsdf.Sample(
       traced_ray.direction, std::move(bsdf_sampler), allocator);
 
   auto light_sample =
@@ -114,8 +112,6 @@ const Spectrum* SampleDirectLighting(
     LightSampler& light_sampler, const Ray& traced_ray,
     const RayTracer::SurfaceIntersection intersection, Random& rng,
     VisibilityTester& visibility_tester, SpectralAllocator& allocator) {
-  assert(intersection.bsdf);  // Caller must check that hit contained a BSDF
-
   const Spectrum* result = nullptr;
   for (auto* light_samples = light_sampler.Sample(intersection.hit_point);
        light_samples; light_samples = light_samples->next) {

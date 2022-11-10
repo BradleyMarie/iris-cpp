@@ -49,8 +49,7 @@ const Spectrum* PathIntegrator::Integrate(const Ray& ray, RayTracer& ray_tracer,
       add_light_emissions = false;
     }
 
-    if (!trace_result.surface_intersection ||
-        !trace_result.surface_intersection->bsdf) {
+    if (!trace_result.surface_intersection) {
       break;
     }
 
@@ -63,7 +62,7 @@ const Spectrum* PathIntegrator::Integrate(const Ray& ray, RayTracer& ray_tracer,
       break;
     }
 
-    auto bsdf_sample = trace_result.surface_intersection->bsdf->Sample(
+    auto bsdf_sample = trace_result.surface_intersection->bsdf.Sample(
         trace_ray.direction, iris::Sampler(rng), spectral_allocator);
 
     if (!bsdf_sample) {
