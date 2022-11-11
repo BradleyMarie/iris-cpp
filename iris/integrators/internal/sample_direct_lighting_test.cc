@@ -353,3 +353,50 @@ TEST(EstimateDirectLighting, DeltaLight) {
   EXPECT_CALL(spectrum, Intensity(testing::_)).WillOnce(testing::Return(1.0));
   EXPECT_NEAR(0.125, result->Intensity(1.0), 0.001);
 }
+
+TEST(EstimateDirectLighting, FullTest) {
+  iris::Ray trace_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(0.0, 0.0, 1.0));
+  auto hit_point = trace_ray.Endpoint(1.0);
+  iris::Vector surface_normal(0.0, 0.0, 1.0);
+  iris::bxdfs::MockBxdf bxdf;
+  iris::RayTracer::RayTracer::SurfaceIntersection intersection{
+      iris::Bsdf(bxdf, surface_normal, surface_normal), hit_point,
+      surface_normal, surface_normal};
+
+  iris::Vector to_light(0.0, 0.866025, 0.5);
+
+  iris::reflectors::MockReflector reflector;
+
+  EXPECT_CALL(bxdf, Sample(trace_ray.direction, testing::_))
+      .WillOnce(testing::Return(to_light));
+  EXPECT_CALL(bxdf, Pdf(trace_ray.direction, to_light, testing::_))
+      .WillRepeatedly(testing::Return(1.0));
+  EXPECT_CALL(bxdf, Reflectance(trace_ray.direction, to_light, testing::_,
+                                testing::_, testing::_))
+      .WillRepeatedly(testing::Return(&reflector));
+
+  iris::spectra::MockSpectrum spectrum;
+  iris::Light::SampleResult light_sample{spectrum, to_light, 1.0};
+
+  iris::lights::MockLight light;
+  EXPECT_CALL(light, Sample(hit_point, testing::_, testing::_, testing::_))
+      .WillOnce(testing::Return(light_sample));
+  EXPECT_CALL(light, Emission(testing::_, testing::_, testing::_, testing::_))
+      .WillOnce(testing::DoAll(testing::SetArgPointee<3, iris::visual_t>(1.0),
+                               testing::Return(&spectrum)));
+
+  iris::random::MockRandom rng;
+  EXPECT_CALL(rng, DiscardGeometric(2)).Times(2);
+
+  auto* result = EstimateDirectLighting(
+      light, trace_ray, intersection, iris::Sampler(rng), iris::Sampler(rng),
+      iris::testing::GetAlwaysVisibleVisibilityTester(),
+      iris::testing::GetSpectralAllocator());
+  ASSERT_NE(nullptr, result);
+
+  EXPECT_CALL(reflector, Reflectance(1.0))
+      .WillRepeatedly(testing::Return(0.25));
+  EXPECT_CALL(spectrum, Intensity(testing::_))
+      .WillRepeatedly(testing::Return(1.0));
+  EXPECT_NEAR(0.125, result->Intensity(1.0), 0.001);
+}
