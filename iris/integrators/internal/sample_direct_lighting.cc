@@ -83,6 +83,10 @@ const Spectrum* EstimateDirectLighting(
   auto bsdf_sample = intersection.bsdf.Sample(
       traced_ray.direction, std::move(bsdf_sampler), allocator);
 
+  if (bsdf_sample && !bsdf_sample->pdf) {
+    return nullptr;
+  }
+
   auto light_sample =
       light.Sample(intersection.hit_point, std::move(light_sampler),
                    visibility_tester, allocator);

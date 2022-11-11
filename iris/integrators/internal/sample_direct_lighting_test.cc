@@ -285,6 +285,33 @@ TEST(EstimateDirectLighting, NoSamples) {
   ASSERT_EQ(nullptr, result);
 }
 
+TEST(EstimateDirectLighting, DeltaBsdf) {
+  iris::Ray trace_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(0.0, 0.0, 1.0));
+  auto hit_point = trace_ray.Endpoint(1.0);
+  iris::Vector surface_normal(0.0, 0.0, 1.0);
+  iris::bxdfs::MockBxdf bxdf;
+  iris::RayTracer::RayTracer::SurfaceIntersection intersection{
+      iris::Bsdf(bxdf, surface_normal, surface_normal), hit_point,
+      surface_normal, surface_normal};
+
+  iris::Vector to_light(0.0, 0.866025, 0.5);
+  EXPECT_CALL(bxdf, Sample(trace_ray.direction, testing::_))
+      .WillOnce(testing::Return(to_light));
+  EXPECT_CALL(bxdf, Pdf(trace_ray.direction, to_light, testing::_))
+      .WillOnce(testing::Return(absl::nullopt));
+
+  iris::lights::MockLight light;
+
+  iris::random::MockRandom rng;
+  EXPECT_CALL(rng, DiscardGeometric(2)).Times(2);
+
+  auto* result = EstimateDirectLighting(
+      light, trace_ray, intersection, iris::Sampler(rng), iris::Sampler(rng),
+      iris::testing::GetAlwaysVisibleVisibilityTester(),
+      iris::testing::GetSpectralAllocator());
+  EXPECT_EQ(nullptr, result);
+}
+
 TEST(EstimateDirectLighting, DeltaLight) {
   iris::Ray trace_ray(iris::Point(0.0, 0.0, 0.0), iris::Vector(0.0, 0.0, 1.0));
   auto hit_point = trace_ray.Endpoint(1.0);
