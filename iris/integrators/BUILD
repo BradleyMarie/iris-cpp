@@ -37,3 +37,17 @@ cc_library(
         "//iris/integrators/internal:sample_direct_lighting",
     ],
 )
+
+cc_test(
+    name = "path_integrator_test",
+    srcs = ["path_integrator_test.cc"],
+    deps = [
+        ":path_integrator",
+        "//iris/random:mock_random",
+        "//iris/testing:light_sampler",
+        "//iris/testing:ray_tracer",
+        "//iris/testing:spectral_allocator",
+        "//iris/testing:visibility_tester",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

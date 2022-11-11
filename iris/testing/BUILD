@@ -27,6 +27,33 @@ cc_library(
 )
 
 cc_library(
+    name = "light_sampler",
+    testonly = True,
+    srcs = ["light_sampler.cc"],
+    hdrs = ["light_sampler.h"],
+    deps = [
+        "//iris:light_sample_allocator",
+        "//iris:light_sampler",
+        "//iris:light_scene",
+        "//iris/internal:arena",
+        "//iris/random:mock_random",
+    ],
+)
+
+cc_library(
+    name = "ray_tracer",
+    testonly = True,
+    srcs = ["ray_tracer.cc"],
+    hdrs = ["ray_tracer.h"],
+    deps = [
+        "//iris:ray_tracer",
+        "//iris:scene",
+        "//iris/internal:arena",
+        "//iris/internal:ray_tracer",
+    ],
+)
+
+cc_library(
     name = "scene",
     testonly = True,
     srcs = ["scene.cc"],
