@@ -11,17 +11,16 @@ namespace iris {
 namespace integrators {
 
 PathIntegrator::PathIntegrator(visual maximum_path_continue_probability,
-                               visual path_continue_probability_cutoff,
+                               visual always_continue_threshold,
                                uint8_t min_bounces,
                                uint8_t max_bounces) noexcept
     : maximum_path_continue_probability_(
           std::max(static_cast<visual>(0.0),
                    std::min(static_cast<visual>(1.0),
                             maximum_path_continue_probability))),
-      path_continue_probability_cutoff_(
-          std::max(static_cast<visual>(0.0),
-                   std::min(static_cast<visual>(1.0),
-                            path_continue_probability_cutoff))),
+      always_continue_threshold_(std::max(
+          static_cast<visual>(0.0),
+          std::min(static_cast<visual>(1.0), always_continue_threshold))),
       min_bounces_(min_bounces),
       max_bounces_(max_bounces) {
   reflectors_.reserve(max_bounces);
@@ -35,7 +34,7 @@ const Spectrum* PathIntegrator::Integrate(const Ray& ray, RayTracer& ray_tracer,
                                           SpectralAllocator& spectral_allocator,
                                           Random& rng) {
   internal::RussianRoulette russian_roulette(maximum_path_continue_probability_,
-                                             path_continue_probability_cutoff_);
+                                             always_continue_threshold_);
   internal::PathBuilder path_builder(reflectors_, spectra_, attenuations_);
 
   visual_t path_throughput = 1.0;
@@ -83,7 +82,7 @@ const Spectrum* PathIntegrator::Integrate(const Ray& ray, RayTracer& ray_tracer,
       add_light_emissions = true;
     }
 
-    if (min_bounces_ < bounces) {
+    if (min_bounces_ <= bounces) {
       auto roulette_pdf = russian_roulette.Evaluate(rng, path_throughput);
       if (!roulette_pdf) {
         break;
@@ -104,7 +103,7 @@ const Spectrum* PathIntegrator::Integrate(const Ray& ray, RayTracer& ray_tracer,
 
 std::unique_ptr<Integrator> PathIntegrator::Duplicate() const {
   return std::make_unique<PathIntegrator>(maximum_path_continue_probability_,
-                                          path_continue_probability_cutoff_,
+                                          always_continue_threshold_,
                                           min_bounces_, max_bounces_);
 }
 

@@ -202,3 +202,189 @@ TEST(PathIntegratorTest, TwoSpecularBouncesHitsEmissive) {
     EXPECT_EQ(0.25, result->Intensity(1.0));
   });
 }
+
+TEST(PathIntegratorTest, DiffuseBounceToSpecularBounceToEmissive) {
+  iris::reflectors::MockReflector reflector;
+  EXPECT_CALL(reflector, Reflectance(testing::_))
+      .WillRepeatedly(testing::Return(0.5));
+  EXPECT_CALL(reflector, Albedo()).WillRepeatedly(testing::Return(0.5));
+
+  iris::bxdfs::MockBxdf diffuse, specular;
+  EXPECT_CALL(diffuse, Sample(testing::_, testing::_))
+      .WillRepeatedly(
+          testing::Return(iris::Normalize(iris::Vector(1.0, 0.0, -1.0))));
+  EXPECT_CALL(specular, Sample(testing::_, testing::_))
+      .WillRepeatedly(testing::Return(iris::Vector(0.0, 0.0, 1.0)));
+  EXPECT_CALL(diffuse, Pdf(testing::_, testing::_, testing::_))
+      .WillRepeatedly(testing::Return(0.5));
+  EXPECT_CALL(specular, Pdf(testing::_, testing::_, testing::_))
+      .WillRepeatedly(testing::Return(absl::nullopt));
+  EXPECT_CALL(diffuse, Reflectance(testing::_, testing::_, testing::_,
+                                   testing::_, testing::_))
+      .WillRepeatedly(testing::Return(&reflector));
+  EXPECT_CALL(specular, Reflectance(testing::_, testing::_, testing::_,
+                                    testing::_, testing::_))
+      .WillRepeatedly(testing::Return(&reflector));
+
+  iris::spectra::MockSpectrum spectrum;
+  EXPECT_CALL(spectrum, Intensity(testing::_))
+      .WillRepeatedly(testing::Return(1.0));
+
+  iris::random::MockRandom rng;
+  EXPECT_CALL(rng, DiscardGeometric(2)).Times(2);
+
+  iris::testing::RayTracerPathNode path[] = {
+      {1.0, nullptr, &diffuse, iris::Vector(0.0, 0.0, -1.0),
+       iris::Vector(0.0, 0.0, -1.0)},
+      {1.0, nullptr, &specular, iris::Vector(0.0, 0.0, 1.0),
+       iris::Vector(0.0, 0.0, 1.0)},
+      {1.0, &spectrum, nullptr, iris::Vector(0.0, 0.0, -1.0),
+       iris::Vector(0.0, 0.0, -1.0)}};
+
+  iris::integrators::PathIntegrator integrator(1.0, 1.0, 4u, 8u);
+  iris::testing::ScopedHitsRayTracer(nullptr, path, [&](auto& ray_tracer) {
+    auto* result = integrator.Integrate(
+        iris::Ray(iris::Point(0.0, 0.0, 1.0), iris::Vector(0.0, 0.0, 1.0)),
+        ray_tracer, iris::testing::GetEmptyLightSampler(),
+        iris::testing::GetAlwaysVisibleVisibilityTester(),
+        iris::testing::GetSpectralAllocator(), rng);
+    EXPECT_TRUE(result);
+    EXPECT_NEAR(0.35355339, result->Intensity(1.0), 0.0001);
+  });
+}
+
+TEST(PathIntegratorTest, SpecularBounceRouletteFails) {
+  iris::reflectors::MockReflector reflector;
+  EXPECT_CALL(reflector, Reflectance(testing::_))
+      .WillRepeatedly(testing::Return(0.5));
+  EXPECT_CALL(reflector, Albedo()).WillRepeatedly(testing::Return(0.5));
+
+  iris::bxdfs::MockBxdf specular;
+  EXPECT_CALL(specular, Sample(testing::_, testing::_))
+      .WillRepeatedly(testing::Return(iris::Vector(0.0, 0.0, -1.0)));
+  EXPECT_CALL(specular, Pdf(testing::_, testing::_, testing::_))
+      .WillRepeatedly(testing::Return(absl::nullopt));
+  EXPECT_CALL(specular, Reflectance(testing::_, testing::_, testing::_,
+                                    testing::_, testing::_))
+      .WillRepeatedly(testing::Return(&reflector));
+
+  iris::spectra::MockSpectrum spectrum;
+  EXPECT_CALL(spectrum, Intensity(testing::_))
+      .WillRepeatedly(testing::Return(1.0));
+
+  iris::random::MockRandom rng;
+  EXPECT_CALL(rng, DiscardGeometric(2)).Times(1);
+  EXPECT_CALL(rng, NextVisual()).WillOnce(testing::Return(0.6));
+
+  iris::testing::RayTracerPathNode path[] = {
+      {1.0, nullptr, &specular, iris::Vector(0.0, 0.0, -1.0),
+       iris::Vector(0.0, 0.0, -1.0)},
+      {1.0, &spectrum, nullptr, iris::Vector(0.0, 0.0, -1.0),
+       iris::Vector(0.0, 0.0, -1.0)}};
+
+  iris::integrators::PathIntegrator integrator(1.0, 1.0, 0u, 1u);
+  iris::testing::ScopedHitsRayTracer(nullptr, path, [&](auto& ray_tracer) {
+    auto* result = integrator.Integrate(
+        iris::Ray(iris::Point(0.0, 0.0, 1.0), iris::Vector(0.0, 0.0, 1.0)),
+        ray_tracer, iris::testing::GetEmptyLightSampler(),
+        iris::testing::GetAlwaysVisibleVisibilityTester(),
+        iris::testing::GetSpectralAllocator(), rng);
+    EXPECT_EQ(nullptr, result);
+  });
+}
+
+TEST(PathIntegratorTest, OneSpecularBounceRoulettePasses) {
+  iris::reflectors::MockReflector reflector;
+  EXPECT_CALL(reflector, Reflectance(testing::_))
+      .WillRepeatedly(testing::Return(0.5));
+  EXPECT_CALL(reflector, Albedo()).WillRepeatedly(testing::Return(0.5));
+
+  iris::bxdfs::MockBxdf specular;
+  EXPECT_CALL(specular, Sample(testing::_, testing::_))
+      .WillRepeatedly(testing::Return(iris::Vector(0.0, 0.0, -1.0)));
+  EXPECT_CALL(specular, Pdf(testing::_, testing::_, testing::_))
+      .WillRepeatedly(testing::Return(absl::nullopt));
+  EXPECT_CALL(specular, Reflectance(testing::_, testing::_, testing::_,
+                                    testing::_, testing::_))
+      .WillRepeatedly(testing::Return(&reflector));
+
+  iris::spectra::MockSpectrum spectrum;
+  EXPECT_CALL(spectrum, Intensity(testing::_))
+      .WillRepeatedly(testing::Return(1.0));
+
+  iris::random::MockRandom rng;
+  EXPECT_CALL(rng, DiscardGeometric(2)).Times(1);
+  EXPECT_CALL(rng, NextVisual()).WillOnce(testing::Return(0.4));
+
+  iris::testing::RayTracerPathNode path[] = {
+      {1.0, nullptr, &specular, iris::Vector(0.0, 0.0, -1.0),
+       iris::Vector(0.0, 0.0, -1.0)},
+      {1.0, &spectrum, nullptr, iris::Vector(0.0, 0.0, -1.0),
+       iris::Vector(0.0, 0.0, -1.0)}};
+
+  iris::integrators::PathIntegrator integrator(1.0, 1.0, 0u, 1u);
+  iris::testing::ScopedHitsRayTracer(nullptr, path, [&](auto& ray_tracer) {
+    auto* result = integrator.Integrate(
+        iris::Ray(iris::Point(0.0, 0.0, 1.0), iris::Vector(0.0, 0.0, 1.0)),
+        ray_tracer, iris::testing::GetEmptyLightSampler(),
+        iris::testing::GetAlwaysVisibleVisibilityTester(),
+        iris::testing::GetSpectralAllocator(), rng);
+    ASSERT_TRUE(result);
+    EXPECT_EQ(1.0, result->Intensity(1.0));
+  });
+}
+
+TEST(PathIntegratorTest, TwoSpecularBounceRoulettePasses) {
+  iris::reflectors::MockReflector reflector0;
+  EXPECT_CALL(reflector0, Reflectance(testing::_))
+      .WillRepeatedly(testing::Return(0.4));
+  EXPECT_CALL(reflector0, Albedo()).WillRepeatedly(testing::Return(0.4));
+
+  iris::reflectors::MockReflector reflector1;
+  EXPECT_CALL(reflector1, Reflectance(testing::_))
+      .WillRepeatedly(testing::Return(0.01));
+  EXPECT_CALL(reflector1, Albedo()).WillRepeatedly(testing::Return(0.01));
+
+  iris::bxdfs::MockBxdf specular0, specular1;
+  EXPECT_CALL(specular0, Sample(testing::_, testing::_))
+      .WillRepeatedly(testing::Return(iris::Vector(0.0, 0.0, -1.0)));
+  EXPECT_CALL(specular1, Sample(testing::_, testing::_))
+      .WillRepeatedly(testing::Return(iris::Vector(0.0, 0.0, 1.0)));
+  EXPECT_CALL(specular0, Pdf(testing::_, testing::_, testing::_))
+      .WillRepeatedly(testing::Return(absl::nullopt));
+  EXPECT_CALL(specular1, Pdf(testing::_, testing::_, testing::_))
+      .WillRepeatedly(testing::Return(absl::nullopt));
+  EXPECT_CALL(specular0, Reflectance(testing::_, testing::_, testing::_,
+                                     testing::_, testing::_))
+      .WillRepeatedly(testing::Return(&reflector0));
+  EXPECT_CALL(specular1, Reflectance(testing::_, testing::_, testing::_,
+                                     testing::_, testing::_))
+      .WillRepeatedly(testing::Return(&reflector1));
+
+  iris::spectra::MockSpectrum spectrum;
+  EXPECT_CALL(spectrum, Intensity(testing::_))
+      .WillRepeatedly(testing::Return(1.0));
+
+  iris::random::MockRandom rng;
+  EXPECT_CALL(rng, DiscardGeometric(2)).Times(2);
+  EXPECT_CALL(rng, NextVisual()).WillRepeatedly(testing::Return(0.0));
+
+  iris::testing::RayTracerPathNode path[] = {
+      {1.0, nullptr, &specular0, iris::Vector(0.0, 0.0, -1.0),
+       iris::Vector(0.0, 0.0, -1.0)},
+      {1.0, nullptr, &specular1, iris::Vector(0.0, 0.0, 1.0),
+       iris::Vector(0.0, 0.0, 1.0)},
+      {1.0, &spectrum, nullptr, iris::Vector(0.0, 0.0, -1.0),
+       iris::Vector(0.0, 0.0, -1.0)}};
+
+  iris::integrators::PathIntegrator integrator(0.2, 1.0, 0u, 3u);
+  iris::testing::ScopedHitsRayTracer(nullptr, path, [&](auto& ray_tracer) {
+    auto* result = integrator.Integrate(
+        iris::Ray(iris::Point(0.0, 0.0, 1.0), iris::Vector(0.0, 0.0, 1.0)),
+        ray_tracer, iris::testing::GetEmptyLightSampler(),
+        iris::testing::GetAlwaysVisibleVisibilityTester(),
+        iris::testing::GetSpectralAllocator(), rng);
+    ASSERT_TRUE(result);
+    EXPECT_NEAR(1.0, result->Intensity(1.0), 0.001);
+  });
+}
