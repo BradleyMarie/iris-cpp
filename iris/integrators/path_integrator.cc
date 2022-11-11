@@ -88,7 +88,8 @@ const Spectrum* PathIntegrator::Integrate(const Ray& ray, RayTracer& ray_tracer,
         break;
       }
 
-      visual_t inverse_roulette_pdf = 1.0 / *roulette_pdf;
+      visual_t inverse_roulette_pdf =
+          static_cast<visual_t>(1.0) / *roulette_pdf;
       attenuation *= inverse_roulette_pdf;
       path_throughput *= inverse_roulette_pdf;
     }

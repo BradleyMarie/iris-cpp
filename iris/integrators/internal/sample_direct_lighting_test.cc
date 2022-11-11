@@ -582,7 +582,7 @@ TEST(SampleDirectLighting, TwoDeltaLights) {
   EXPECT_CALL(rng, DiscardGeometric(2)).Times(4);
 
   iris::testing::LightSampleListEntry list[] = {
-      {&light, absl::nullopt},
+      {&light, std::nullopt},
       {&light, 0.5},
   };
 

@@ -131,7 +131,8 @@ const Spectrum* SampleDirectLighting(
         std::move(light_sampler), visibility_tester, allocator);
 
     if (light_samples->pdf) {
-      direct_light = allocator.Scale(direct_light, 1.0 / *light_samples->pdf);
+      direct_light = allocator.Scale(
+          direct_light, static_cast<visual_t>(1.0) / *light_samples->pdf);
     }
 
     result = allocator.Add(result, direct_light);
