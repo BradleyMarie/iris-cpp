@@ -43,8 +43,10 @@ cc_test(
     srcs = ["path_integrator_test.cc"],
     deps = [
         ":path_integrator",
+        "//iris/bxdfs:mock_bxdf",
         "//iris/environmental_lights:mock_environmental_light",
         "//iris/random:mock_random",
+        "//iris/reflectors:mock_reflector",
         "//iris/spectra:mock_spectrum",
         "//iris/testing:light_sampler",
         "//iris/testing:ray_tracer",
