@@ -43,7 +43,9 @@ cc_test(
     srcs = ["path_integrator_test.cc"],
     deps = [
         ":path_integrator",
+        "//iris/environmental_lights:mock_environmental_light",
         "//iris/random:mock_random",
+        "//iris/spectra:mock_spectrum",
         "//iris/testing:light_sampler",
         "//iris/testing:ray_tracer",
         "//iris/testing:spectral_allocator",

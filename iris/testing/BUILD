@@ -46,6 +46,7 @@ cc_library(
     srcs = ["ray_tracer.cc"],
     hdrs = ["ray_tracer.h"],
     deps = [
+        "//iris:environmental_light",
         "//iris:ray_tracer",
         "//iris:scene",
         "//iris/internal:arena",

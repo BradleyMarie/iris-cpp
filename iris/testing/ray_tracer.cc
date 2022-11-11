@@ -24,5 +24,15 @@ RayTracer& GetNoHitsRayTracer() {
   return ray_tracer;
 }
 
+void ScopedNoHitsRayTracer(const EnvironmentalLight& environmental_light,
+                           std::function<void(RayTracer&)> callback) {
+  static NoHitsScene no_hits_scene;
+  internal::RayTracer internal_ray_tracer;
+  internal::Arena arena;
+  RayTracer ray_tracer(no_hits_scene, &environmental_light, 0.0,
+                       internal_ray_tracer, arena);
+  callback(ray_tracer);
+}
+
 }  // namespace testing
 }  // namespace iris
