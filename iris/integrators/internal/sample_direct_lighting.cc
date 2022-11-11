@@ -134,7 +134,7 @@ const Spectrum* SampleDirectLighting(
       direct_light = allocator.Scale(direct_light, 1.0 / *light_samples->pdf);
     }
 
-    allocator.Add(result, direct_light);
+    result = allocator.Add(result, direct_light);
   }
   return result;
 }

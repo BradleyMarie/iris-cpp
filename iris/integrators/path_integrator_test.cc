@@ -54,7 +54,7 @@ TEST(PathIntegratorTest, BounceLimit) {
   EXPECT_CALL(specular0, Sample(testing::_, testing::_))
       .WillRepeatedly(testing::Return(iris::Vector(0.0, 0.0, -1.0)));
   EXPECT_CALL(specular0, Pdf(testing::_, testing::_, testing::_))
-      .WillRepeatedly(testing::Return(absl::nullopt));
+      .WillRepeatedly(testing::Return(std::nullopt));
   EXPECT_CALL(specular0, Reflectance(testing::_, testing::_, testing::_,
                                      testing::_, testing::_))
       .WillRepeatedly(testing::Return(&reflector));
@@ -166,9 +166,9 @@ TEST(PathIntegratorTest, TwoSpecularBouncesHitsEmissive) {
   EXPECT_CALL(specular1, Sample(testing::_, testing::_))
       .WillRepeatedly(testing::Return(iris::Vector(0.0, 0.0, 1.0)));
   EXPECT_CALL(specular0, Pdf(testing::_, testing::_, testing::_))
-      .WillRepeatedly(testing::Return(absl::nullopt));
+      .WillRepeatedly(testing::Return(std::nullopt));
   EXPECT_CALL(specular1, Pdf(testing::_, testing::_, testing::_))
-      .WillRepeatedly(testing::Return(absl::nullopt));
+      .WillRepeatedly(testing::Return(std::nullopt));
   EXPECT_CALL(specular0, Reflectance(testing::_, testing::_, testing::_,
                                      testing::_, testing::_))
       .WillRepeatedly(testing::Return(&reflector));
@@ -218,7 +218,7 @@ TEST(PathIntegratorTest, DiffuseBounceToSpecularBounceToEmissive) {
   EXPECT_CALL(diffuse, Pdf(testing::_, testing::_, testing::_))
       .WillRepeatedly(testing::Return(0.5));
   EXPECT_CALL(specular, Pdf(testing::_, testing::_, testing::_))
-      .WillRepeatedly(testing::Return(absl::nullopt));
+      .WillRepeatedly(testing::Return(std::nullopt));
   EXPECT_CALL(diffuse, Reflectance(testing::_, testing::_, testing::_,
                                    testing::_, testing::_))
       .WillRepeatedly(testing::Return(&reflector));
@@ -263,7 +263,7 @@ TEST(PathIntegratorTest, SpecularBounceRouletteFails) {
   EXPECT_CALL(specular, Sample(testing::_, testing::_))
       .WillRepeatedly(testing::Return(iris::Vector(0.0, 0.0, -1.0)));
   EXPECT_CALL(specular, Pdf(testing::_, testing::_, testing::_))
-      .WillRepeatedly(testing::Return(absl::nullopt));
+      .WillRepeatedly(testing::Return(std::nullopt));
   EXPECT_CALL(specular, Reflectance(testing::_, testing::_, testing::_,
                                     testing::_, testing::_))
       .WillRepeatedly(testing::Return(&reflector));
@@ -303,7 +303,7 @@ TEST(PathIntegratorTest, OneSpecularBounceRoulettePasses) {
   EXPECT_CALL(specular, Sample(testing::_, testing::_))
       .WillRepeatedly(testing::Return(iris::Vector(0.0, 0.0, -1.0)));
   EXPECT_CALL(specular, Pdf(testing::_, testing::_, testing::_))
-      .WillRepeatedly(testing::Return(absl::nullopt));
+      .WillRepeatedly(testing::Return(std::nullopt));
   EXPECT_CALL(specular, Reflectance(testing::_, testing::_, testing::_,
                                     testing::_, testing::_))
       .WillRepeatedly(testing::Return(&reflector));
@@ -351,9 +351,9 @@ TEST(PathIntegratorTest, TwoSpecularBounceRoulettePasses) {
   EXPECT_CALL(specular1, Sample(testing::_, testing::_))
       .WillRepeatedly(testing::Return(iris::Vector(0.0, 0.0, 1.0)));
   EXPECT_CALL(specular0, Pdf(testing::_, testing::_, testing::_))
-      .WillRepeatedly(testing::Return(absl::nullopt));
+      .WillRepeatedly(testing::Return(std::nullopt));
   EXPECT_CALL(specular1, Pdf(testing::_, testing::_, testing::_))
-      .WillRepeatedly(testing::Return(absl::nullopt));
+      .WillRepeatedly(testing::Return(std::nullopt));
   EXPECT_CALL(specular0, Reflectance(testing::_, testing::_, testing::_,
                                      testing::_, testing::_))
       .WillRepeatedly(testing::Return(&reflector0));
