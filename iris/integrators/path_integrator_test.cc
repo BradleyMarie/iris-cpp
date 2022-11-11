@@ -3,6 +3,7 @@
 #include "googletest/include/gtest/gtest.h"
 #include "iris/bxdfs/mock_bxdf.h"
 #include "iris/environmental_lights/mock_environmental_light.h"
+#include "iris/lights/mock_light.h"
 #include "iris/random/mock_random.h"
 #include "iris/reflectors/mock_reflector.h"
 #include "iris/spectra/mock_spectrum.h"
@@ -386,5 +387,56 @@ TEST(PathIntegratorTest, TwoSpecularBounceRoulettePasses) {
         iris::testing::GetSpectralAllocator(), rng);
     ASSERT_TRUE(result);
     EXPECT_NEAR(1.0, result->Intensity(1.0), 0.001);
+  });
+}
+
+TEST(PathIntegratorTest, DirectLighting) {
+  iris::reflectors::MockReflector reflector;
+  EXPECT_CALL(reflector, Reflectance(testing::_))
+      .WillRepeatedly(testing::Return(0.5));
+
+  iris::Vector to_light(0.0, 0.0, -1.0);
+
+  iris::bxdfs::MockBxdf diffuse;
+  EXPECT_CALL(diffuse, Sample(testing::_, testing::_))
+      .WillRepeatedly(testing::Return(to_light));
+  EXPECT_CALL(diffuse, Pdf(testing::_, testing::_, testing::_))
+      .WillRepeatedly(testing::Return(1.0));
+  EXPECT_CALL(diffuse, Reflectance(testing::_, testing::_, testing::_,
+                                   testing::_, testing::_))
+      .WillRepeatedly(testing::Return(&reflector));
+
+  iris::spectra::MockSpectrum spectrum;
+  EXPECT_CALL(spectrum, Intensity(testing::_))
+      .WillRepeatedly(testing::Return(1.0));
+
+  iris::Light::SampleResult light_sample{spectrum, to_light, std::nullopt};
+
+  iris::lights::MockLight light;
+  EXPECT_CALL(light, Sample(testing::_, testing::_, testing::_, testing::_))
+      .WillRepeatedly(testing::Return(light_sample));
+
+  iris::random::MockRandom rng;
+  EXPECT_CALL(rng, DiscardGeometric(2)).Times(2);
+
+  iris::testing::RayTracerPathNode path[] = {{1.0, nullptr, &diffuse,
+                                              iris::Vector(0.0, 0.0, -1.0),
+                                              iris::Vector(0.0, 0.0, -1.0)}};
+
+  iris::integrators::PathIntegrator integrator0(1.0, 1.0, 0u, 0u);
+  iris::testing::ScopedHitsRayTracer(nullptr, path, [&](auto& ray_tracer) {
+    iris::testing::LightSampleListEntry list[] = {
+        {&light, 0.25},
+    };
+
+    iris::testing::ScopedListLightSampler(list, [&](auto& light_sampler) {
+      auto* result = integrator0.Integrate(
+          iris::Ray(iris::Point(0.0, 0.0, 1.0), iris::Vector(0.0, 0.0, 1.0)),
+          ray_tracer, light_sampler,
+          iris::testing::GetAlwaysVisibleVisibilityTester(),
+          iris::testing::GetSpectralAllocator(), rng);
+      EXPECT_TRUE(result);
+      EXPECT_EQ(2.0, result->Intensity(1.0));
+    });
   });
 }

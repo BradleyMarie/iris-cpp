@@ -45,6 +45,7 @@ cc_test(
         ":path_integrator",
         "//iris/bxdfs:mock_bxdf",
         "//iris/environmental_lights:mock_environmental_light",
+        "//iris/lights:mock_light",
         "//iris/random:mock_random",
         "//iris/reflectors:mock_reflector",
         "//iris/spectra:mock_spectrum",
