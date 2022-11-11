@@ -2,7 +2,6 @@
 #define _IRIS_TESTING_VISIBILITY_TESTER_
 
 #include <functional>
-#include <memory>
 
 #include "iris/geometry.h"
 #include "iris/matrix.h"
