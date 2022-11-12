@@ -67,11 +67,23 @@ bool Tokenizer::ParseNext(std::string& output) {
     }
 
     char ch = static_cast<char>(read);
+
+    if (ch == '#') {
+      for (read = stream_->get(); read != EOF; read = stream_->get()) {
+        ch = static_cast<char>(read);
+        if (ch == '\r' || ch == '\n') {
+          break;
+        }
+      }
+
+      continue;
+    }
+
+    output.push_back(ch);
+
     if (ch == '"') {
-      output.push_back(ch);
       bool just_escaped = false;
       bool found_end = false;
-
       for (read = stream_->get(); read != EOF; read = stream_->get()) {
         ch = static_cast<char>(read);
 
@@ -108,23 +120,14 @@ bool Tokenizer::ParseNext(std::string& output) {
       return true;
     }
 
-    if (ch == '[' || ch == ']') {
-      output.push_back(ch);
+    if (ch == '[') {
       return true;
     }
 
-    if (ch == '#') {
-      for (read = stream_->get(); read != EOF; read = stream_->get()) {
-        ch = static_cast<char>(read);
-        if (ch == '\r' || ch == '\n') {
-          break;
-        }
-      }
-
-      continue;
+    if (ch == ']') {
+      return true;
     }
 
-    output.push_back(ch);
     for (int peeked = stream_->peek(); peeked != EOF;
          peeked = stream_->peek()) {
       if (std::isspace(peeked) || peeked == '"' || peeked == '[' ||
