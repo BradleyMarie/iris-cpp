@@ -10,8 +10,8 @@ namespace iris {
 
 struct Color final {
   enum Space {
-    CIE_XYZ,
-    LINEAR_SRGB,
+    CIE_XYZ = 0,
+    LINEAR_SRGB = 1,
   };
 
   explicit Color(visual_t c0, visual_t c1, visual_t c2, Space space) noexcept
@@ -19,9 +19,11 @@ struct Color final {
     assert(x >= 0.0);
     assert(y >= 0.0);
     assert(z >= 0.0);
+    assert(space >= CIE_XYZ);
+    assert(space <= LINEAR_SRGB);
   }
 
-  Color(const Color&) noexcept = default;
+  Color ConvertTo(Space target) const;
 
   const visual_t& operator[](size_t index) const {
     assert(index < 3);
@@ -42,7 +44,7 @@ struct Color final {
     };
   };
 
-  Space space;
+  const Space space;
 };
 
 bool operator==(const Color& lhs, const Color& rhs) {

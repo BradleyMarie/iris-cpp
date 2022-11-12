@@ -87,6 +87,7 @@ cc_library(
 
 cc_library(
     name = "color",
+    srcs = ["color.cc"],
     hdrs = ["color.h"],
     visibility = ["//visibility:public"],
     deps = [
