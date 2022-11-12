@@ -11,8 +11,8 @@ class Tokenizer {
  public:
   Tokenizer(std::istream& stream) noexcept : stream_(&stream) {}
 
-  Tokenizer(Tokenizer&& moved_from);
-  Tokenizer& operator=(Tokenizer&& moved_from);
+  Tokenizer(Tokenizer&& moved_from) noexcept;
+  Tokenizer& operator=(Tokenizer&& moved_from) noexcept;
 
   Tokenizer(const Tokenizer&) = delete;
   Tokenizer& operator=(const Tokenizer&) = delete;

@@ -11,6 +11,33 @@ TEST(Tokenizer, Empty) {
   EXPECT_FALSE(tokenizer.Next());
 }
 
+TEST(Tokenizer, MoveConstruct) {
+  std::stringstream input("hello");
+  iris::pbrt_frontend::Tokenizer tokenizer0(input);
+  EXPECT_EQ("hello", tokenizer0.Peek());
+
+  iris::pbrt_frontend::Tokenizer tokenizer1(std::move(tokenizer0));
+  EXPECT_FALSE(tokenizer0.Peek());
+  EXPECT_FALSE(tokenizer0.Next());
+  EXPECT_EQ("hello", tokenizer1.Peek());
+  EXPECT_EQ("hello", tokenizer1.Next());
+}
+
+TEST(Tokenizer, Move) {
+  std::stringstream input("hello");
+  iris::pbrt_frontend::Tokenizer tokenizer0(input);
+  EXPECT_EQ("hello", tokenizer0.Peek());
+
+  std::stringstream empty;
+  iris::pbrt_frontend::Tokenizer tokenizer1(empty);
+  tokenizer1 = std::move(tokenizer0);
+
+  EXPECT_FALSE(tokenizer0.Peek());
+  EXPECT_FALSE(tokenizer0.Next());
+  EXPECT_EQ("hello", tokenizer1.Peek());
+  EXPECT_EQ("hello", tokenizer1.Next());
+}
+
 TEST(Tokenizer, QuotedString) {
   std::stringstream input("\"hello world!\"");
   iris::pbrt_frontend::Tokenizer tokenizer(input);

@@ -31,7 +31,7 @@ static char ReadEscapedCharacter(char ch) {
 
 }  // namespace
 
-Tokenizer::Tokenizer(Tokenizer&& moved_from)
+Tokenizer::Tokenizer(Tokenizer&& moved_from) noexcept
     : stream_(moved_from.stream_),
       next_(moved_from.next_),
       peeked_(moved_from.peeked_),
@@ -42,7 +42,7 @@ Tokenizer::Tokenizer(Tokenizer&& moved_from)
   moved_from.peeked_valid_.reset();
 }
 
-Tokenizer& Tokenizer::operator=(Tokenizer&& moved_from) {
+Tokenizer& Tokenizer::operator=(Tokenizer&& moved_from) noexcept {
   stream_ = moved_from.stream_;
   next_ = moved_from.next_;
   peeked_ = moved_from.peeked_;
