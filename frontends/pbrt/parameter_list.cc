@@ -187,8 +187,7 @@ const std::vector<Point> ParameterList::GetPoint3Values() const {
   return points_;
 }
 
-const std::vector<std::array<visual, 2>>& ParameterList::GetSpectrumValues()
-    const {
+const std::map<visual, visual>& ParameterList::GetSpectrumValues() const {
   assert(type_.value() == SPECTRUM);
   return spectrum_;
 }
@@ -344,7 +343,13 @@ ParameterList::Type ParameterList::ParseSpectrum(Tokenizer& tokenizer,
       exit(EXIT_FAILURE);
     }
 
-    spectrum_.push_back(std::array<visual, 2>{wavelength, intensity});
+    auto result = spectrum_.emplace(wavelength, intensity);
+    if (!result.second) {
+      std::cerr << "ERROR: A " << type_name
+                << " parameter list contained duplicate wavelengths"
+                << std::endl;
+      exit(EXIT_FAILURE);
+    }
   }
 
   return SPECTRUM;

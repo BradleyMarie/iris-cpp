@@ -388,6 +388,16 @@ TEST(ParameterList, SpectrumNumericOutOfRangeIntensity) {
               "ERROR: A spectrum parameter list value was out of range");
 }
 
+TEST(ParameterList, SpectrumDuplicateWavelengths) {
+  std::stringstream input("\"spectrum name\" [1 2 1 3]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  EXPECT_EXIT(
+      parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB),
+      testing::ExitedWithCode(EXIT_FAILURE),
+      "ERROR: A spectrum parameter list contained duplicate wavelengths");
+}
+
 TEST(ParameterList, Spectrum) {
   std::stringstream input("\"spectrum name\" [1 2 3 4]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
@@ -397,10 +407,8 @@ TEST(ParameterList, Spectrum) {
   EXPECT_EQ(iris::pbrt_frontend::ParameterList::SPECTRUM,
             parameter_list.GetType());
   ASSERT_EQ(2u, parameter_list.GetSpectrumValues().size());
-  ASSERT_EQ(1, parameter_list.GetSpectrumValues().at(0)[0]);
-  ASSERT_EQ(2, parameter_list.GetSpectrumValues().at(0)[1]);
-  ASSERT_EQ(3, parameter_list.GetSpectrumValues().at(1)[0]);
-  ASSERT_EQ(4, parameter_list.GetSpectrumValues().at(1)[1]);
+  ASSERT_EQ(2, parameter_list.GetSpectrumValues().at(1));
+  ASSERT_EQ(4, parameter_list.GetSpectrumValues().at(3));
 }
 
 TEST(ParameterList, StringNotQuoted) {
