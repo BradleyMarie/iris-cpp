@@ -318,6 +318,8 @@ ParameterList::Type ParameterList::ParseSpectrum(Tokenizer& tokenizer,
     }
   } else {
     // TODO: Parse SPD file
+    std::cerr << "ERROR: SPD File Support not implemented" << std::endl;
+    exit(EXIT_FAILURE);
   }
 
   if (floats_.size() % 2 != 0) {
