@@ -12,3 +12,22 @@ cc_library(
         "@com_google_googletest//:gtest",
     ],
 )
+
+cc_library(
+    name = "sampled_reflector",
+    srcs = ["sampled_reflector.cc"],
+    hdrs = ["sampled_reflector.h"],
+    deps = [
+        "//iris:float",
+        "//iris:reflector",
+    ],
+)
+
+cc_test(
+    name = "sampled_reflector_test",
+    srcs = ["sampled_reflector_test.cc"],
+    deps = [
+        ":sampled_reflector",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
