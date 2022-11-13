@@ -1,6 +1,7 @@
 #ifndef _FRONTENDS_PBRT_PARAMETER_LIST_
 #define _FRONTENDS_PBRT_PARAMETER_LIST_
 
+#include <array>
 #include <cstdint>
 #include <string>
 #include <string_view>
@@ -31,8 +32,6 @@ class ParameterList {
     VECTOR3,
   };
 
-  ParameterList() noexcept;
-
   std::string_view GetName() const;
   Type GetType() const;
 
@@ -42,10 +41,10 @@ class ParameterList {
   const std::vector<int64_t> GetIntegerValues() const;
   const std::vector<Vector> GetNormalValues() const;
   const std::vector<Point> GetPoint3Values() const;
-  const std::vector<long double>& GetSpectrumValues() const;
+  const std::vector<std::array<visual, 2>>& GetSpectrumValues() const;
   const std::vector<std::string_view> GetStringValues() const;
   const std::vector<std::string_view> GetTextureValues() const;
-  const std::vector<Vector> GetVectorValues() const;
+  const std::vector<Vector> GetVector3Values() const;
 
   bool ParseFrom(Tokenizer& tokenizer, Color::Space rgb_color_space);
 
@@ -80,6 +79,7 @@ class ParameterList {
   std::vector<Color> colors_;
   std::vector<long double> floats_;
   std::vector<int64_t> integers_;
+  std::vector<std::array<visual, 2>> spectrum_;
   std::vector<std::string_view> strings_;
   std::vector<std::string> string_storage_;
   std::vector<Point> points_;

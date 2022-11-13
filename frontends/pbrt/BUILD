@@ -15,6 +15,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "parameter_list_test",
+    srcs = ["parameter_list_test.cc"],
+    deps = [
+        ":parameter_list",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "quoted_string",
     srcs = ["quoted_string.cc"],

@@ -24,7 +24,7 @@ std::optional<std::pair<std::string_view, std::string_view>> ParseTypeAndName(
     return std::nullopt;
   }
 
-  size_t type_end = unquoted->find_first_not_of(" \t");
+  size_t type_end = unquoted->find_first_of(" \t");
   if (type_end == std::string_view::npos) {
     return std::nullopt;
   }
@@ -41,9 +41,7 @@ std::optional<std::pair<std::string_view, std::string_view>> ParseTypeAndName(
 
   size_t name_size = unquoted->size() - name_start;
   std::string_view name = unquoted->substr(name_start, name_size);
-  if (name.empty()) {
-    return std::nullopt;
-  }
+  assert(!name.empty());
 
   if (name.find_first_of(" \t") != std::string_view::npos) {
     return std::nullopt;
@@ -75,7 +73,7 @@ template <typename Type, typename ParseType,
 size_t ParseLoop(Tokenizer& tokenizer, std::string_view type_name,
                  std::vector<Type>& result) {
   size_t insert_index = 0;
-  for (;;) {
+  for (;; insert_index++) {
     auto token = tokenizer.Next();
 
     if (!token) {
@@ -141,6 +139,10 @@ std::optional<int64_t> ParseIntegerToken(std::string_view token) {
   return value;
 }
 
+std::optional<std::string_view> ParseRawStringToken(std::string_view token) {
+  return token;
+}
+
 std::optional<std::string_view> ParseStringToken(std::string_view token) {
   auto value = Unquote(token);
   if (!value) {
@@ -185,9 +187,10 @@ const std::vector<Point> ParameterList::GetPoint3Values() const {
   return points_;
 }
 
-const std::vector<long double>& ParameterList::GetSpectrumValues() const {
+const std::vector<std::array<visual, 2>>& ParameterList::GetSpectrumValues()
+    const {
   assert(type_.value() == SPECTRUM);
-  return floats_;
+  return spectrum_;
 }
 
 const std::vector<std::string_view> ParameterList::GetStringValues() const {
@@ -200,7 +203,7 @@ const std::vector<std::string_view> ParameterList::GetTextureValues() const {
   return strings_;
 }
 
-const std::vector<Vector> ParameterList::GetVectorValues() const {
+const std::vector<Vector> ParameterList::GetVector3Values() const {
   assert(type_.value() == VECTOR3);
   return vectors_;
 }
@@ -234,19 +237,7 @@ ParameterList::Type ParameterList::ParseInteger(Tokenizer& tokenizer,
 ParameterList::Type ParameterList::ParseNormal(Tokenizer& tokenizer,
                                                std::string_view type_name,
                                                Color::Space rgb_color_space) {
-  ParseFloat(tokenizer, type_name, rgb_color_space);
-
-  if (floats_.size() % 3 != 0) {
-    std::cerr << "ERROR: The number of values in a " << type_name
-              << " parameter list must be evenly divisible by 3" << std::endl;
-    exit(EXIT_FAILURE);
-  }
-
-  vectors_.clear();
-  for (size_t i = 0; i < floats_.size(); i += 3) {
-    vectors_.emplace_back(floats_[i], floats_[i + 1], floats_[i + 2]);
-  }
-
+  ParseVector3(tokenizer, type_name, rgb_color_space);
   return NORMAL;
 }
 
@@ -263,7 +254,16 @@ ParameterList::Type ParameterList::ParsePoint3(Tokenizer& tokenizer,
 
   points_.clear();
   for (size_t i = 0; i < floats_.size(); i += 3) {
-    points_.emplace_back(floats_[i], floats_[i + 1], floats_[i + 2]);
+    geometric x = static_cast<geometric>(floats_[i]);
+    geometric y = static_cast<geometric>(floats_[i + 1]);
+    geometric z = static_cast<geometric>(floats_[i + 2]);
+    if (!std::isfinite(x) || !std::isfinite(y) || !std::isfinite(z)) {
+      std::cerr << "ERROR: A " << type_name
+                << " parameter list value was out of range" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    points_.emplace_back(x, y, z);
   }
 
   return POINT3;
@@ -282,14 +282,22 @@ ParameterList::Type ParameterList::ParseRgb(Tokenizer& tokenizer,
 
   colors_.clear();
   for (size_t i = 0; i < floats_.size(); i += 3) {
-    if (floats_[i] < 0.0) {
+    if (floats_[i] < 0.0 || floats_[i + 1] < 0.0 || floats_[i + 2] < 0.0) {
       std::cerr << "ERROR: The values in an " << type_name
                 << " parameter list cannot be negative" << std::endl;
       exit(EXIT_FAILURE);
     }
 
-    colors_.emplace_back(floats_[i], floats_[i + 1], floats_[i + 2],
-                         rgb_color_space);
+    visual_t r = static_cast<visual_t>(floats_[i]);
+    visual_t g = static_cast<visual_t>(floats_[i + 1]);
+    visual_t b = static_cast<visual_t>(floats_[i + 2]);
+    if (!std::isfinite(r) || !std::isfinite(g) || !std::isfinite(b)) {
+      std::cerr << "ERROR: A " << type_name
+                << " parameter list value was out of range" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    colors_.emplace_back(r, g, b, rgb_color_space);
   }
 
   return COLOR;
@@ -298,18 +306,15 @@ ParameterList::Type ParameterList::ParseRgb(Tokenizer& tokenizer,
 ParameterList::Type ParameterList::ParseSpectrum(Tokenizer& tokenizer,
                                                  std::string_view type_name,
                                                  Color::Space rgb_color_space) {
-  ParseString(tokenizer, type_name, rgb_color_space);
+  size_t num_added =
+      ParseData<std::string, std::string_view, ParseRawStringToken>(
+          tokenizer, type_name, string_storage_);
 
   floats_.clear();
-  if (strings_[0].empty() || strings_[0][0] != '"') {
-    for (size_t i = 0; i < strings_.size(); i++) {
+  if (string_storage_[0].empty() || string_storage_[0][0] != '"') {
+    for (size_t i = 0; i < num_added; i++) {
       ParseSingle<long double, long double, ParseFloatToken>(
-          strings_[i], type_name, i, floats_);
-      if (floats_[i] < 0.0) {
-        std::cerr << "ERROR: The values in a " << type_name
-                  << " parameter list cannot be negative" << std::endl;
-        exit(EXIT_FAILURE);
-      }
+          string_storage_[i], type_name, i, floats_);
     }
   } else {
     // TODO: Parse SPD file
@@ -319,6 +324,25 @@ ParameterList::Type ParameterList::ParseSpectrum(Tokenizer& tokenizer,
     std::cerr << "ERROR: The number of values in a " << type_name
               << " parameter list cannot be odd" << std::endl;
     exit(EXIT_FAILURE);
+  }
+
+  spectrum_.clear();
+  for (size_t i = 0; i < floats_.size(); i += 2) {
+    if (floats_[i] < 0.0 || floats_[i + 1] < 0.0) {
+      std::cerr << "ERROR: The values in an " << type_name
+                << " parameter list cannot be negative" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    visual wavelength = static_cast<visual>(floats_[i]);
+    visual intensity = static_cast<visual>(floats_[i + 1]);
+    if (!std::isfinite(wavelength) || !std::isfinite(intensity)) {
+      std::cerr << "ERROR: A " << type_name
+                << " parameter list value was out of range" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    spectrum_.push_back(std::array<visual, 2>{wavelength, intensity});
   }
 
   return SPECTRUM;
@@ -356,7 +380,24 @@ ParameterList::Type ParameterList::ParseVector3(Tokenizer& tokenizer,
 
   vectors_.clear();
   for (size_t i = 0; i < floats_.size(); i += 3) {
-    vectors_.emplace_back(floats_[i], floats_[i + 1], floats_[i + 2]);
+    if (floats_[i] == 0.0 && floats_[i + 1] == 0.0 && floats_[i + 2] == 0.0) {
+      std::cerr << "ERROR: A " << type_name
+                << " parameter list must contain at least one non-zero value "
+                   "for each output "
+                << type_name << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    geometric x = static_cast<geometric>(floats_[i]);
+    geometric y = static_cast<geometric>(floats_[i + 1]);
+    geometric z = static_cast<geometric>(floats_[i + 2]);
+    if (!std::isfinite(x) || !std::isfinite(y) || !std::isfinite(z)) {
+      std::cerr << "ERROR: A " << type_name
+                << " parameter list value was out of range" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    vectors_.emplace_back(x, y, z);
   }
 
   return VECTOR3;
@@ -375,14 +416,22 @@ ParameterList::Type ParameterList::ParseXyz(Tokenizer& tokenizer,
 
   colors_.clear();
   for (size_t i = 0; i < floats_.size(); i += 3) {
-    if (floats_[i] < 0.0) {
+    if (floats_[i] < 0.0 || floats_[i + 1] < 0.0 || floats_[i + 2] < 0.0) {
       std::cerr << "ERROR: The values in an " << type_name
                 << " parameter list cannot be negative" << std::endl;
       exit(EXIT_FAILURE);
     }
 
-    colors_.emplace_back(floats_[i], floats_[i + 1], floats_[i + 2],
-                         Color::CIE_XYZ);
+    visual_t x = static_cast<visual_t>(floats_[i]);
+    visual_t y = static_cast<visual_t>(floats_[i + 1]);
+    visual_t z = static_cast<visual_t>(floats_[i + 2]);
+    if (!std::isfinite(x) || !std::isfinite(y) || !std::isfinite(z)) {
+      std::cerr << "ERROR: A " << type_name
+                << " parameter list value was out of range" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    colors_.emplace_back(x, y, z, Color::CIE_XYZ);
   }
 
   return COLOR;
@@ -390,12 +439,12 @@ ParameterList::Type ParameterList::ParseXyz(Tokenizer& tokenizer,
 
 bool ParameterList::ParseFrom(Tokenizer& tokenizer,
                               Color::Space rgb_color_space) {
-  auto type_ane_name = ParseTypeAndName(tokenizer);
-  if (!type_ane_name) {
+  auto type_and_name = ParseTypeAndName(tokenizer);
+  if (!type_and_name) {
     return false;
   }
 
-  name_storage_ = type_ane_name->second;
+  name_storage_ = type_and_name->second;
   name_ = name_storage_;
 
   static const std::unordered_map<
@@ -421,7 +470,7 @@ bool ParameterList::ParseFrom(Tokenizer& tokenizer,
           {"xyz", &ParameterList::ParseXyz},
       };
 
-  auto iter = functions.find(type_ane_name->first);
+  auto iter = functions.find(type_and_name->first);
   if (iter == functions.end()) {
     return false;
   }
@@ -430,7 +479,7 @@ bool ParameterList::ParseFrom(Tokenizer& tokenizer,
   tokenizer.Next();
 
   type_ =
-      (this->*(iter->second))(tokenizer, type_ane_name->first, rgb_color_space);
+      (this->*(iter->second))(tokenizer, type_and_name->first, rgb_color_space);
 
   return true;
 }

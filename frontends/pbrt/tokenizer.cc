@@ -104,6 +104,10 @@ bool Tokenizer::ParseNext(std::string& output) {
         }
 
         output.push_back(ch);
+
+        if (found_end) {
+          break;
+        }
       }
 
       if (just_escaped) {

@@ -92,7 +92,7 @@ TEST(Tokenizer, Array) {
 }
 
 TEST(Tokenizer, MultipleTokens) {
-  std::stringstream input("Token1 [1.0] Two [3]");
+  std::stringstream input("Token1 [1.0] Two \"hello world\" [3] [\"a\"]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   EXPECT_EQ("Token1", tokenizer.Peek());
   EXPECT_EQ("Token1", tokenizer.Peek());
@@ -105,10 +105,18 @@ TEST(Tokenizer, MultipleTokens) {
   EXPECT_EQ("]", tokenizer.Next());
   EXPECT_EQ("Two", tokenizer.Peek());
   EXPECT_EQ("Two", tokenizer.Next());
+  EXPECT_EQ("\"hello world\"", tokenizer.Peek());
+  EXPECT_EQ("\"hello world\"", tokenizer.Next());
   EXPECT_EQ("[", tokenizer.Peek());
   EXPECT_EQ("[", tokenizer.Next());
   EXPECT_EQ("3", tokenizer.Peek());
   EXPECT_EQ("3", tokenizer.Next());
+  EXPECT_EQ("]", tokenizer.Peek());
+  EXPECT_EQ("]", tokenizer.Next());
+  EXPECT_EQ("[", tokenizer.Peek());
+  EXPECT_EQ("[", tokenizer.Next());
+  EXPECT_EQ("\"a\"", tokenizer.Peek());
+  EXPECT_EQ("\"a\"", tokenizer.Next());
   EXPECT_EQ("]", tokenizer.Peek());
   EXPECT_EQ("]", tokenizer.Next());
   EXPECT_EQ(std::nullopt, tokenizer.Peek());
