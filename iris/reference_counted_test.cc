@@ -79,6 +79,16 @@ TEST(ReferenceCountedTest, MoveConstruct) {
   ptr.reset();
 }
 
+TEST(ReferenceCountedTest, DoesNotIncrementEmpty) {
+  iris::ReferenceCounted<Sharable> empty;
+  iris::ReferenceCounted<Sharable> empty_copy(empty);
+  iris::ReferenceCounted<Sharable> moved(std::move(empty));
+  empty = empty_copy;
+  empty_copy = std::move(moved);
+  EXPECT_EQ(nullptr, empty.Get());
+  EXPECT_EQ(nullptr, empty_copy.Get());
+}
+
 TEST(ReferenceCountedTest, CopyUpcast) {
   bool allow_deletion = false, deleted = false;
   auto ptr = MakeDerived(&allow_deletion, &deleted);

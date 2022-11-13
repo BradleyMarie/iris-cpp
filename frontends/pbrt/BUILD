@@ -25,6 +25,27 @@ cc_test(
 )
 
 cc_library(
+    name = "texture_manager",
+    srcs = ["texture_manager.cc"],
+    hdrs = ["texture_manager.h"],
+    deps = [
+        "//iris:reference_counted",
+        "//iris:reflector",
+        "//iris:spectral_allocator",
+        "//iris/textures:texture2d",
+    ],
+)
+
+cc_test(
+    name = "texture_manager_test",
+    srcs = ["texture_manager_test.cc"],
+    deps = [
+        ":texture_manager",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "quoted_string",
     srcs = ["quoted_string.cc"],
     hdrs = ["quoted_string.h"],
