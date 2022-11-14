@@ -39,8 +39,7 @@ class Parameter {
   const std::vector<long double>& GetFloatValues(
       size_t max_num_values = 0, size_t min_num_values = 1) const;
 
-  const std::vector<ReferenceCounted<
-      textures::PointerTexture2D<Reflector, SpectralAllocator>>>&
+  const std::vector<ReferenceCounted<textures::ValueTexture2D<visual>>>&
   GetFloatTextures(size_t max_num_values = 0, size_t min_num_values = 1) const;
 
   const std::vector<int64_t> GetIntegerValues(size_t max_num_values = 0,
@@ -52,8 +51,8 @@ class Parameter {
   const std::vector<Point> GetPoint3Values(size_t max_num_values = 0,
                                            size_t min_num_values = 1) const;
 
-  const ReferenceCounted<
-      textures::PointerTexture2D<Reflector, SpectralAllocator>>&
+  const std::vector<ReferenceCounted<
+      textures::PointerTexture2D<Reflector, SpectralAllocator>>>&
   GetReflectorTextures(size_t max_num_values = 0,
                        size_t min_num_values = 1) const;
 

@@ -1,5 +1,6 @@
 #include "frontends/pbrt/parameter.h"
 
+#include <cassert>
 #include <cstdlib>
 #include <iostream>
 #include <unordered_map>
@@ -23,11 +24,87 @@ void ParseSimpleType(const ParameterList& parameter_list,
   }
 }
 
+template <Parameter::Type type, typename ReturnType>
+const std::vector<ReturnType>& GetValues(const Parameter& parameter,
+                                         const std::vector<ReturnType>& result,
+                                         size_t max_num_values,
+                                         size_t min_num_values) {
+  assert(type == parameter.GetType());
+  if (result.size() < min_num_values) {
+    std::cerr << "ERROR: Too few values in parameter list: "
+              << parameter.GetName() << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  if (max_num_values != 0 && result.size() > max_num_values) {
+    std::cerr << "ERROR: Too many values in parameter list: "
+              << parameter.GetName() << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  return result;
+}
+
 }  // namespace
 
 std::string_view Parameter::GetName() const { return name_.value(); }
 
 Parameter::Type Parameter::GetType() const { return type_.value(); }
+
+const std::vector<bool>& Parameter::GetBoolValues(size_t max_num_values,
+                                                  size_t min_num_values) const {
+  return GetValues<BOOL>(*this, bools_, max_num_values, min_num_values);
+}
+
+const std::vector<long double>& Parameter::GetFloatValues(
+    size_t max_num_values, size_t min_num_values) const {
+  return GetValues<FLOAT>(*this, floats_, max_num_values, min_num_values);
+}
+
+const std::vector<ReferenceCounted<textures::ValueTexture2D<visual>>>&
+Parameter::GetFloatTextures(size_t max_num_values,
+                            size_t min_num_values) const {
+  return GetValues<FLOAT_TEXTURE>(*this, float_textures_, max_num_values,
+                                  min_num_values);
+}
+
+const std::vector<int64_t> Parameter::GetIntegerValues(
+    size_t max_num_values, size_t min_num_values) const {
+  return GetValues<INTEGER>(*this, integers_, max_num_values, min_num_values);
+}
+
+const std::vector<Vector> Parameter::GetNormalValues(
+    size_t max_num_values, size_t min_num_values) const {
+  return GetValues<NORMAL>(*this, vectors_, max_num_values, min_num_values);
+}
+
+const std::vector<Point> Parameter::GetPoint3Values(
+    size_t max_num_values, size_t min_num_values) const {
+  return GetValues<POINT3>(*this, points_, max_num_values, min_num_values);
+}
+
+const std::vector<
+    ReferenceCounted<textures::PointerTexture2D<Reflector, SpectralAllocator>>>&
+Parameter::GetReflectorTextures(size_t max_num_values,
+                                size_t min_num_values) const {
+  return GetValues<REFLECTOR_TEXTURE>(*this, reflector_textures_,
+                                      max_num_values, min_num_values);
+}
+
+const std::vector<std::string_view> Parameter::GetStringValues(
+    size_t max_num_values, size_t min_num_values) const {
+  return GetValues<STRING>(*this, strings_, max_num_values, min_num_values);
+}
+
+const std::vector<iris::ReferenceCounted<Spectrum>>& Parameter::GetSpectra(
+    size_t max_num_values, size_t min_num_values) const {
+  return GetValues<SPECTRUM>(*this, spectra_, max_num_values, min_num_values);
+}
+
+const std::vector<Vector> Parameter::GetVector3Values(
+    size_t max_num_values, size_t min_num_values) const {
+  return GetValues<VECTOR3>(*this, vectors_, max_num_values, min_num_values);
+}
 
 void Parameter::ParseBool(const ParameterList& parameter_list,
                           SpectrumManager& spectrum_manager,
@@ -49,8 +126,15 @@ void Parameter::ParseFloatTexture(const ParameterList& parameter_list,
   float_textures_.clear();
   if (parameter_list.GetType() == ParameterList::FLOAT) {
     for (const auto& entry : parameter_list.GetFloatValues()) {
+      visual as_visual = static_cast<visual>(entry);
+      if (!std::isfinite(as_visual)) {
+        std::cerr << "ERROR: A value in parameter list " << GetName()
+                  << " was out of range" << std::endl;
+        exit(EXIT_FAILURE);
+      }
+
       float_textures_.push_back(
-          texture_manager.AllocateUniformFloatTexture(entry));
+          texture_manager.AllocateUniformFloatTexture(as_visual));
     }
     return;
   }
