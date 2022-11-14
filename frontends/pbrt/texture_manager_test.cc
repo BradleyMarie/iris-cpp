@@ -1,6 +1,24 @@
 #include "frontends/pbrt/texture_manager.h"
 
 #include "googletest/include/gtest/gtest.h"
+#include "iris/reflectors/mock_reflector.h"
+
+TEST(TextureManager, AllocateUniformFloatTexture) {
+  iris::pbrt_frontend::TextureManager texture_manager;
+  auto texture0 = texture_manager.AllocateUniformFloatTexture(1.0);
+  auto texture1 = texture_manager.AllocateUniformFloatTexture(1.0);
+  EXPECT_EQ(texture0.Get(), texture1.Get());
+}
+
+TEST(TextureManager, AllocateUniformReflectorTexture) {
+  auto reflector =
+      iris::MakeReferenceCounted<iris::reflectors::MockReflector>();
+
+  iris::pbrt_frontend::TextureManager texture_manager;
+  auto texture0 = texture_manager.AllocateUniformReflectorTexture(reflector);
+  auto texture1 = texture_manager.AllocateUniformReflectorTexture(reflector);
+  EXPECT_EQ(texture0.Get(), texture1.Get());
+}
 
 TEST(TextureManager, FloatTextureGetFails) {
   iris::pbrt_frontend::TextureManager texture_manager;

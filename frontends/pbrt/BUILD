@@ -55,6 +55,7 @@ cc_library(
         "//iris:reference_counted",
         "//iris:reflector",
         "//iris:spectral_allocator",
+        "//iris/textures:constant_texture",
         "//iris/textures:texture2d",
     ],
 )
@@ -64,6 +65,7 @@ cc_test(
     srcs = ["texture_manager_test.cc"],
     deps = [
         ":texture_manager",
+        "//iris/reflectors:mock_reflector",
         "@com_google_googletest//:gtest_main",
     ],
 )
