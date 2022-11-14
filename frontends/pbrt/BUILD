@@ -25,6 +25,22 @@ cc_test(
 )
 
 cc_library(
+    name = "parameter",
+    srcs = ["parameter.cc"],
+    hdrs = ["parameter.h"],
+    deps = [
+        ":parameter_list",
+        ":spectrum_manager",
+        ":texture_manager",
+        "//iris:reference_counted",
+        "//iris:reflector",
+        "//iris:spectral_allocator",
+        "//iris:spectrum",
+        "//iris/textures:texture2d",
+    ],
+)
+
+cc_library(
     name = "spectrum_manager",
     srcs = ["spectrum_manager.cc"],
     hdrs = ["spectrum_manager.h"],
