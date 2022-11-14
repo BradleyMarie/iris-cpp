@@ -25,6 +25,29 @@ cc_test(
 )
 
 cc_library(
+    name = "spectrum_manager",
+    srcs = ["spectrum_manager.cc"],
+    hdrs = ["spectrum_manager.h"],
+    deps = [
+        "//iris:color",
+        "//iris:reference_counted",
+        "//iris:reflector",
+        "//iris:spectrum",
+    ],
+)
+
+cc_test(
+    name = "spectrum_manager_test",
+    srcs = ["spectrum_manager_test.cc"],
+    deps = [
+        ":spectrum_manager",
+        "//iris/reflectors:mock_reflector",
+        "//iris/spectra:mock_spectrum",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "texture_manager",
     srcs = ["texture_manager.cc"],
     hdrs = ["texture_manager.h"],
