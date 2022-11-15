@@ -1,5 +1,6 @@
 #include "frontends/pbrt/spectrum_manager.h"
 
+#include <algorithm>
 #include <utility>
 
 namespace iris::pbrt_frontend {
@@ -30,13 +31,18 @@ ReferenceCounted<Reflector> SpectrumManager::AllocateReflector(
     return ReferenceCounted<Reflector>();
   }
 
-  std::array<visual, 3> key = {rgb.r, rgb.g, rgb.g};
+  Color clamped_rgb(std::min(static_cast<visual_t>(1.0), rgb.r),
+                    std::min(static_cast<visual_t>(1.0), rgb.g),
+                    std::min(static_cast<visual_t>(1.0), rgb.b),
+                    Color::LINEAR_SRGB);
+
+  std::array<visual, 3> key = {clamped_rgb.r, clamped_rgb.g, clamped_rgb.g};
   auto iter = color_reflectors_.find(key);
   if (iter != color_reflectors_.end()) {
     return iter->second;
   }
 
-  auto reflector = std::as_const(*this).AllocateReflector(rgb);
+  auto reflector = std::as_const(*this).AllocateReflector(clamped_rgb);
   color_reflectors_[key] = reflector;
 
   return reflector;
