@@ -42,28 +42,28 @@ class Parameter {
   const std::vector<ReferenceCounted<textures::ValueTexture2D<visual>>>&
   GetFloatTextures(size_t max_num_values = 0, size_t min_num_values = 1) const;
 
-  const std::vector<int64_t> GetIntegerValues(size_t max_num_values = 0,
-                                              size_t min_num_values = 1) const;
+  const std::vector<int64_t>& GetIntegerValues(size_t max_num_values = 0,
+                                               size_t min_num_values = 1) const;
 
-  const std::vector<Vector> GetNormalValues(size_t max_num_values = 0,
+  const std::vector<Vector>& GetNormalValues(size_t max_num_values = 0,
+                                             size_t min_num_values = 1) const;
+
+  const std::vector<Point>& GetPoint3Values(size_t max_num_values = 0,
                                             size_t min_num_values = 1) const;
-
-  const std::vector<Point> GetPoint3Values(size_t max_num_values = 0,
-                                           size_t min_num_values = 1) const;
 
   const std::vector<ReferenceCounted<
       textures::PointerTexture2D<Reflector, SpectralAllocator>>>&
   GetReflectorTextures(size_t max_num_values = 0,
                        size_t min_num_values = 1) const;
 
-  const std::vector<std::string_view> GetStringValues(
+  const std::vector<std::string_view>& GetStringValues(
       size_t max_num_values = 0, size_t min_num_values = 1) const;
 
   const std::vector<iris::ReferenceCounted<Spectrum>>& GetSpectra(
       size_t max_num_values = 0, size_t min_num_values = 1) const;
 
-  const std::vector<Vector> GetVector3Values(size_t max_num_values = 0,
-                                             size_t min_num_values = 1) const;
+  const std::vector<Vector>& GetVector3Values(size_t max_num_values = 0,
+                                              size_t min_num_values = 1) const;
 
   void LoadFrom(const ParameterList& parameter_list, Type type,
                 SpectrumManager& spectrum_manager,

@@ -39,13 +39,13 @@ class ParameterList {
   const std::vector<bool>& GetBoolValues() const;
   const std::vector<Color> GetColorValues() const;
   const std::vector<long double>& GetFloatValues() const;
-  const std::vector<int64_t> GetIntegerValues() const;
-  const std::vector<Vector> GetNormalValues() const;
-  const std::vector<Point> GetPoint3Values() const;
+  const std::vector<int64_t>& GetIntegerValues() const;
+  const std::vector<Vector>& GetNormalValues() const;
+  const std::vector<Point>& GetPoint3Values() const;
   const std::map<visual, visual>& GetSpectrumValues() const;
-  const std::vector<std::string_view> GetStringValues() const;
-  const std::vector<std::string_view> GetTextureValues() const;
-  const std::vector<Vector> GetVector3Values() const;
+  const std::vector<std::string_view>& GetStringValues() const;
+  const std::vector<std::string_view>& GetTextureValues() const;
+  const std::vector<Vector>& GetVector3Values() const;
 
   bool ParseFrom(Tokenizer& tokenizer, Color::Space rgb_color_space);
 

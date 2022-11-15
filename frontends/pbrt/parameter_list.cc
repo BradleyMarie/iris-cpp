@@ -176,17 +176,17 @@ const std::vector<long double>& ParameterList::GetFloatValues() const {
   return floats_;
 }
 
-const std::vector<int64_t> ParameterList::GetIntegerValues() const {
+const std::vector<int64_t>& ParameterList::GetIntegerValues() const {
   assert(type_.value() == INTEGER);
   return integers_;
 }
 
-const std::vector<Vector> ParameterList::GetNormalValues() const {
+const std::vector<Vector>& ParameterList::GetNormalValues() const {
   assert(type_.value() == NORMAL);
   return vectors_;
 }
 
-const std::vector<Point> ParameterList::GetPoint3Values() const {
+const std::vector<Point>& ParameterList::GetPoint3Values() const {
   assert(type_.value() == POINT3);
   return points_;
 }
@@ -196,17 +196,17 @@ const std::map<visual, visual>& ParameterList::GetSpectrumValues() const {
   return spectrum_;
 }
 
-const std::vector<std::string_view> ParameterList::GetStringValues() const {
+const std::vector<std::string_view>& ParameterList::GetStringValues() const {
   assert(type_.value() == STRING);
   return strings_;
 }
 
-const std::vector<std::string_view> ParameterList::GetTextureValues() const {
+const std::vector<std::string_view>& ParameterList::GetTextureValues() const {
   assert(type_.value() == TEXTURE);
   return strings_;
 }
 
-const std::vector<Vector> ParameterList::GetVector3Values() const {
+const std::vector<Vector>& ParameterList::GetVector3Values() const {
   assert(type_.value() == VECTOR3);
   return vectors_;
 }

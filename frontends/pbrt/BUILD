@@ -40,6 +40,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "parameter_test",
+    srcs = ["parameter_test.cc"],
+    deps = [
+        ":parameter",
+        "//iris/reflectors:mock_reflector",
+        "//iris/spectra:mock_spectrum",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "spectrum_manager",
     srcs = ["spectrum_manager.cc"],

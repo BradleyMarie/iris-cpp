@@ -9,9 +9,10 @@ namespace iris::pbrt_frontend {
 namespace {
 
 template <ParameterList::Type type, typename StoredType>
-void ParseSimpleType(const ParameterList& parameter_list,
-                     const std::vector<StoredType>& source,
-                     std::vector<StoredType>& destination) {
+void ParseSimpleType(
+    const ParameterList& parameter_list,
+    const std::vector<StoredType>& (ParameterList::*get_source)() const,
+    std::vector<StoredType>& destination) {
   if (parameter_list.GetType() != type) {
     std::cerr << "ERROR: Wrong type for parameter list: "
               << parameter_list.GetName() << std::endl;
@@ -19,7 +20,7 @@ void ParseSimpleType(const ParameterList& parameter_list,
   }
 
   destination.clear();
-  for (const auto& entry : source) {
+  for (const auto& entry : (parameter_list.*get_source)()) {
     destination.emplace_back(entry);
   }
 }
@@ -68,17 +69,17 @@ Parameter::GetFloatTextures(size_t max_num_values,
                                   min_num_values);
 }
 
-const std::vector<int64_t> Parameter::GetIntegerValues(
+const std::vector<int64_t>& Parameter::GetIntegerValues(
     size_t max_num_values, size_t min_num_values) const {
   return GetValues<INTEGER>(*this, integers_, max_num_values, min_num_values);
 }
 
-const std::vector<Vector> Parameter::GetNormalValues(
+const std::vector<Vector>& Parameter::GetNormalValues(
     size_t max_num_values, size_t min_num_values) const {
   return GetValues<NORMAL>(*this, vectors_, max_num_values, min_num_values);
 }
 
-const std::vector<Point> Parameter::GetPoint3Values(
+const std::vector<Point>& Parameter::GetPoint3Values(
     size_t max_num_values, size_t min_num_values) const {
   return GetValues<POINT3>(*this, points_, max_num_values, min_num_values);
 }
@@ -91,7 +92,7 @@ Parameter::GetReflectorTextures(size_t max_num_values,
                                       max_num_values, min_num_values);
 }
 
-const std::vector<std::string_view> Parameter::GetStringValues(
+const std::vector<std::string_view>& Parameter::GetStringValues(
     size_t max_num_values, size_t min_num_values) const {
   return GetValues<STRING>(*this, strings_, max_num_values, min_num_values);
 }
@@ -101,7 +102,7 @@ const std::vector<iris::ReferenceCounted<Spectrum>>& Parameter::GetSpectra(
   return GetValues<SPECTRUM>(*this, spectra_, max_num_values, min_num_values);
 }
 
-const std::vector<Vector> Parameter::GetVector3Values(
+const std::vector<Vector>& Parameter::GetVector3Values(
     size_t max_num_values, size_t min_num_values) const {
   return GetValues<VECTOR3>(*this, vectors_, max_num_values, min_num_values);
 }
@@ -110,14 +111,14 @@ void Parameter::ParseBool(const ParameterList& parameter_list,
                           SpectrumManager& spectrum_manager,
                           TextureManager& texture_manager) {
   ParseSimpleType<ParameterList::BOOL>(parameter_list,
-                                       parameter_list.GetBoolValues(), bools_);
+                                       &ParameterList::GetBoolValues, bools_);
 }
 
 void Parameter::ParseFloat(const ParameterList& parameter_list,
                            SpectrumManager& spectrum_manager,
                            TextureManager& texture_manager) {
   ParseSimpleType<ParameterList::FLOAT>(
-      parameter_list, parameter_list.GetFloatValues(), floats_);
+      parameter_list, &ParameterList::GetFloatValues, floats_);
 }
 
 void Parameter::ParseFloatTexture(const ParameterList& parameter_list,
@@ -155,21 +156,21 @@ void Parameter::ParseInteger(const ParameterList& parameter_list,
                              SpectrumManager& spectrum_manager,
                              TextureManager& texture_manager) {
   ParseSimpleType<ParameterList::INTEGER>(
-      parameter_list, parameter_list.GetIntegerValues(), integers_);
+      parameter_list, &ParameterList::GetIntegerValues, integers_);
 }
 
 void Parameter::ParseNormal(const ParameterList& parameter_list,
                             SpectrumManager& spectrum_manager,
                             TextureManager& texture_manager) {
   ParseSimpleType<ParameterList::NORMAL>(
-      parameter_list, parameter_list.GetNormalValues(), vectors_);
+      parameter_list, &ParameterList::GetNormalValues, vectors_);
 }
 
 void Parameter::ParsePoint3(const ParameterList& parameter_list,
                             SpectrumManager& spectrum_manager,
                             TextureManager& texture_manager) {
   ParseSimpleType<ParameterList::POINT3>(
-      parameter_list, parameter_list.GetPoint3Values(), points_);
+      parameter_list, &ParameterList::GetPoint3Values, points_);
 }
 
 void Parameter::ParseReflectorTexture(const ParameterList& parameter_list,
@@ -246,7 +247,7 @@ void Parameter::ParseVector3(const ParameterList& parameter_list,
                              SpectrumManager& spectrum_manager,
                              TextureManager& texture_manager) {
   ParseSimpleType<ParameterList::VECTOR3>(
-      parameter_list, parameter_list.GetVector3Values(), vectors_);
+      parameter_list, &ParameterList::GetVector3Values, vectors_);
 }
 
 void Parameter::LoadFrom(const ParameterList& parameter_list, Type type,
