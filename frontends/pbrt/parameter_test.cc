@@ -560,6 +560,23 @@ TEST(Parameter, ReflectorTextureTooMany) {
               "ERROR: Too many values in parameter list: name");
 }
 
+TEST(Parameter, ReflectorColorTexture) {
+  std::stringstream input("\"rgb name\" [1 1 1]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  parameter.LoadFrom(parameter_list,
+                     iris::pbrt_frontend::Parameter::REFLECTOR_TEXTURE,
+                     spectrum_manager, texture_manager);
+
+  EXPECT_EQ(1u, parameter.GetReflectorTextures(1u, 1u).size());
+  EXPECT_NE(nullptr, parameter.GetReflectorTextures(1u, 1u).at(0).Get());
+}
+
 TEST(Parameter, ReflectorTexture) {
   std::stringstream input(
       "\"spectrum name\" [1 1] \"texture name\" [\"texture0\"]");

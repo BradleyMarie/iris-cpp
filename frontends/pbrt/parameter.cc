@@ -177,6 +177,15 @@ void Parameter::ParseReflectorTexture(const ParameterList& parameter_list,
                                       SpectrumManager& spectrum_manager,
                                       TextureManager& texture_manager) {
   reflector_textures_.clear();
+  if (parameter_list.GetType() == ParameterList::COLOR) {
+    for (const auto& entry : parameter_list.GetColorValues()) {
+      reflector_textures_.push_back(
+          texture_manager.AllocateUniformReflectorTexture(
+              spectrum_manager.AllocateReflector(entry)));
+    }
+    return;
+  }
+
   if (parameter_list.GetType() == ParameterList::SPECTRUM) {
     for (const auto& entry : parameter_list.GetSpectrumValues()) {
       if (entry.second > 1.0) {
