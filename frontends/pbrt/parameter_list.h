@@ -33,6 +33,7 @@ class ParameterList {
   };
 
   std::string_view GetName() const;
+  std::string_view GetTypeName() const;
   Type GetType() const;
 
   const std::vector<bool>& GetBoolValues() const;
@@ -74,6 +75,7 @@ class ParameterList {
 
   std::optional<std::string_view> name_;
   std::string name_storage_;
+  std::optional<std::string_view> type_name_;
   std::optional<Type> type_;
   std::vector<bool> bools_;
   std::vector<Color> colors_;

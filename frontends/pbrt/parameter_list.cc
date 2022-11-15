@@ -155,6 +155,10 @@ std::optional<std::string_view> ParseStringToken(std::string_view token) {
 
 std::string_view ParameterList::GetName() const { return name_.value(); }
 
+std::string_view ParameterList::GetTypeName() const {
+  return type_name_.value();
+}
+
 ParameterList::Type ParameterList::GetType() const { return type_.value(); }
 
 const std::vector<bool>& ParameterList::GetBoolValues() const {
@@ -485,6 +489,7 @@ bool ParameterList::ParseFrom(Tokenizer& tokenizer,
   // Consume the peeked token
   tokenizer.Next();
 
+  type_name_ = iter->first;
   type_ =
       (this->*(iter->second))(tokenizer, type_and_name->first, rgb_color_space);
 

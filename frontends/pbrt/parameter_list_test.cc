@@ -98,6 +98,7 @@ TEST(ParameterList, SingleValue) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
   EXPECT_EQ("name", parameter_list.GetName());
+  EXPECT_EQ("bool", parameter_list.GetTypeName());
   EXPECT_EQ(iris::pbrt_frontend::ParameterList::BOOL, parameter_list.GetType());
   ASSERT_EQ(1u, parameter_list.GetBoolValues().size());
   EXPECT_TRUE(parameter_list.GetBoolValues().at(0));
