@@ -7,13 +7,13 @@
 class TestSpectrumManager final : public iris::pbrt_frontend::SpectrumManager {
  public:
   iris::ReferenceCounted<iris::Spectrum> AllocateSpectrum(
-      const std::map<iris::visual, iris::visual> wavelengths) const override {
+      const std::map<iris::visual, iris::visual>& wavelengths) const override {
     EXPECT_FALSE(true);
     return iris::ReferenceCounted<iris::Spectrum>();
   }
 
   iris::ReferenceCounted<iris::Reflector> AllocateReflector(
-      const std::map<iris::visual, iris::visual> wavelengths) const override {
+      const std::map<iris::visual, iris::visual>& wavelengths) const override {
     EXPECT_FALSE(true);
     return iris::ReferenceCounted<iris::Reflector>();
   }

@@ -129,8 +129,8 @@ void Parameter::ParseFloatTexture(const ParameterList& parameter_list,
     for (const auto& entry : parameter_list.GetFloatValues()) {
       visual as_visual = static_cast<visual>(entry);
       if (!std::isfinite(as_visual)) {
-        std::cerr << "ERROR: A value in parameter list " << GetName()
-                  << " was out of range" << std::endl;
+        std::cerr << "ERROR: Out of range value in parameter list: "
+                  << GetName() << std::endl;
         exit(EXIT_FAILURE);
       }
 
@@ -177,7 +177,15 @@ void Parameter::ParseReflectorTexture(const ParameterList& parameter_list,
                                       SpectrumManager& spectrum_manager,
                                       TextureManager& texture_manager) {
   reflector_textures_.clear();
-  if (parameter_list.GetType() == ParameterList::FLOAT) {
+  if (parameter_list.GetType() == ParameterList::SPECTRUM) {
+    for (const auto& entry : parameter_list.GetSpectrumValues()) {
+      if (entry.second > 1.0) {
+        std::cerr << "ERROR: Out of range value in parameter list: "
+                  << GetName() << std::endl;
+        exit(EXIT_FAILURE);
+      }
+    }
+
     reflector_textures_.push_back(
         texture_manager.AllocateUniformReflectorTexture(
             spectrum_manager.AllocateReflector(

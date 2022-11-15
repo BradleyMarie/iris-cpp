@@ -7,15 +7,13 @@
 class TestSpectrumManager final : public iris::pbrt_frontend::SpectrumManager {
  public:
   iris::ReferenceCounted<iris::Spectrum> AllocateSpectrum(
-      const std::map<iris::visual, iris::visual> wavelengths) const override {
-    EXPECT_FALSE(true);
-    return iris::ReferenceCounted<iris::Spectrum>();
+      const std::map<iris::visual, iris::visual>& wavelengths) const override {
+    return iris::MakeReferenceCounted<iris::spectra::MockSpectrum>();
   }
 
   iris::ReferenceCounted<iris::Reflector> AllocateReflector(
-      const std::map<iris::visual, iris::visual> wavelengths) const override {
-    EXPECT_FALSE(true);
-    return iris::ReferenceCounted<iris::Reflector>();
+      const std::map<iris::visual, iris::visual>& wavelengths) const override {
+    return iris::MakeReferenceCounted<iris::reflectors::MockReflector>();
   }
 
  protected:
@@ -162,7 +160,113 @@ TEST(Parameter, Float) {
   EXPECT_EQ(1.0, parameter.GetFloatValues(1u, 1u).at(0));
 }
 
-// FLOAT_TEXTURE
+TEST(Parameter, FloatTextureWrongType) {
+  std::stringstream input("\"integer name\" [3e39]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  EXPECT_EXIT(parameter.LoadFrom(parameter_list,
+                                 iris::pbrt_frontend::Parameter::FLOAT_TEXTURE,
+                                 spectrum_manager, texture_manager),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Wrong type for parameter list: name");
+}
+
+TEST(Parameter, FloatTextureOutOfRange) {
+  std::stringstream input("\"float name\" [3e39]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  EXPECT_EXIT(parameter.LoadFrom(parameter_list,
+                                 iris::pbrt_frontend::Parameter::FLOAT_TEXTURE,
+                                 spectrum_manager, texture_manager),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Out of range value in parameter list: name");
+}
+
+TEST(Parameter, FloatTextureTooFew) {
+  std::stringstream input("\"float name\" [1.0]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  parameter.LoadFrom(parameter_list,
+                     iris::pbrt_frontend::Parameter::FLOAT_TEXTURE,
+                     spectrum_manager, texture_manager);
+
+  EXPECT_EXIT(parameter.GetFloatTextures(2u, 2u),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Too few values in parameter list: name");
+}
+
+TEST(Parameter, FloatTextureFloat) {
+  std::stringstream input("\"float name\" [1.0]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  parameter.LoadFrom(parameter_list,
+                     iris::pbrt_frontend::Parameter::FLOAT_TEXTURE,
+                     spectrum_manager, texture_manager);
+
+  EXPECT_EQ(1u, parameter.GetFloatTextures(1u, 1u).size());
+  EXPECT_NE(nullptr, parameter.GetFloatTextures(1u, 1u).at(0).Get());
+}
+
+TEST(Parameter, FloatTextureTexture) {
+  std::stringstream input(
+      "\"float name\" [1.0] \"texture name\" [\"texture\"]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  parameter.LoadFrom(parameter_list,
+                     iris::pbrt_frontend::Parameter::FLOAT_TEXTURE,
+                     spectrum_manager, texture_manager);
+
+  EXPECT_EQ(1u, parameter.GetFloatTextures(1u, 1u).size());
+  auto texture = parameter.GetFloatTextures(1u, 1u).at(0);
+
+  texture_manager.Put("texture", texture);
+
+  EXPECT_EQ(1u, parameter.GetFloatTextures(1u, 1u).size());
+  EXPECT_NE(nullptr, parameter.GetFloatTextures(1u, 1u).at(0).Get());
+}
+
+TEST(Parameter, FloatTextureTooMany) {
+  std::stringstream input("\"float name\" [1.0 1.0 1.0]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  parameter.LoadFrom(parameter_list,
+                     iris::pbrt_frontend::Parameter::FLOAT_TEXTURE,
+                     spectrum_manager, texture_manager);
+
+  EXPECT_EXIT(parameter.GetFloatTextures(1u, 1u),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Too many values in parameter list: name");
+}
 
 TEST(Parameter, IntegerWrongType) {
   std::stringstream input("\"float name\" [1]");
@@ -364,9 +468,273 @@ TEST(Parameter, Point3) {
             parameter.GetPoint3Values(1u, 1u).at(0));
 }
 
-// REFLECTOR_TEXTURE
-// SPECTRUM
-// STRING
+TEST(Parameter, ReflectorTextureWrongType) {
+  std::stringstream input("\"integer name\" [1]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  EXPECT_EXIT(
+      parameter.LoadFrom(parameter_list,
+                         iris::pbrt_frontend::Parameter::REFLECTOR_TEXTURE,
+                         spectrum_manager, texture_manager),
+      testing::ExitedWithCode(EXIT_FAILURE),
+      "ERROR: Wrong type for parameter list: name");
+}
+
+TEST(Parameter, ReflectorTextureOutOfRange) {
+  std::stringstream input("\"spectrum name\" [1 2]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  EXPECT_EXIT(
+      parameter.LoadFrom(parameter_list,
+                         iris::pbrt_frontend::Parameter::REFLECTOR_TEXTURE,
+                         spectrum_manager, texture_manager),
+      testing::ExitedWithCode(EXIT_FAILURE),
+      "ERROR: Out of range value in parameter list: name");
+}
+
+TEST(Parameter, ReflectorTextureTooFew) {
+  std::stringstream input(
+      "\"spectrum name\" [1 1] \"texture name\" [\"texture0\" \"texture1\"]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  parameter.LoadFrom(parameter_list,
+                     iris::pbrt_frontend::Parameter::REFLECTOR_TEXTURE,
+                     spectrum_manager, texture_manager);
+
+  EXPECT_EQ(1u, parameter.GetReflectorTextures(1u, 1u).size());
+  auto texture = parameter.GetReflectorTextures(1u, 1u).at(0);
+
+  texture_manager.Put("texture0", texture);
+  texture_manager.Put("texture1", texture);
+
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  parameter.LoadFrom(parameter_list,
+                     iris::pbrt_frontend::Parameter::REFLECTOR_TEXTURE,
+                     spectrum_manager, texture_manager);
+  EXPECT_EXIT(parameter.GetReflectorTextures(3u, 3u),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Too few values in parameter list: name");
+}
+
+TEST(Parameter, ReflectorTextureTooMany) {
+  std::stringstream input(
+      "\"spectrum name\" [1 1] \"texture name\" [\"texture0\" \"texture1\"]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  parameter.LoadFrom(parameter_list,
+                     iris::pbrt_frontend::Parameter::REFLECTOR_TEXTURE,
+                     spectrum_manager, texture_manager);
+
+  EXPECT_EQ(1u, parameter.GetReflectorTextures(1u, 1u).size());
+  auto texture = parameter.GetReflectorTextures(1u, 1u).at(0);
+
+  texture_manager.Put("texture0", texture);
+  texture_manager.Put("texture1", texture);
+
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  parameter.LoadFrom(parameter_list,
+                     iris::pbrt_frontend::Parameter::REFLECTOR_TEXTURE,
+                     spectrum_manager, texture_manager);
+  EXPECT_EXIT(parameter.GetReflectorTextures(1u, 1u),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Too many values in parameter list: name");
+}
+
+TEST(Parameter, ReflectorTexture) {
+  std::stringstream input(
+      "\"spectrum name\" [1 1] \"texture name\" [\"texture0\"]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  parameter.LoadFrom(parameter_list,
+                     iris::pbrt_frontend::Parameter::REFLECTOR_TEXTURE,
+                     spectrum_manager, texture_manager);
+
+  EXPECT_EQ(1u, parameter.GetReflectorTextures(1u, 1u).size());
+  auto texture = parameter.GetReflectorTextures(1u, 1u).at(0);
+
+  texture_manager.Put("texture0", texture);
+
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  parameter.LoadFrom(parameter_list,
+                     iris::pbrt_frontend::Parameter::REFLECTOR_TEXTURE,
+                     spectrum_manager, texture_manager);
+
+  EXPECT_EQ(1u, parameter.GetReflectorTextures(1u, 1u).size());
+  EXPECT_NE(nullptr, parameter.GetReflectorTextures(1u, 1u).at(0).Get());
+}
+
+TEST(Parameter, SpectrumWrongType) {
+  std::stringstream input("\"integer name\" [1]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  EXPECT_EXIT(parameter.LoadFrom(parameter_list,
+                                 iris::pbrt_frontend::Parameter::SPECTRUM,
+                                 spectrum_manager, texture_manager),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Wrong type for parameter list: name");
+}
+
+TEST(Parameter, SpectrumTooFew) {
+  std::stringstream input("\"rgb name\" [1 1 1 1 1 1]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::SPECTRUM,
+                     spectrum_manager, texture_manager);
+
+  EXPECT_EXIT(parameter.GetSpectra(3u, 3u),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Too few values in parameter list: name");
+}
+
+TEST(Parameter, SpectrumTooMany) {
+  std::stringstream input("\"rgb name\" [1 1 1 1 1 1]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::SPECTRUM,
+                     spectrum_manager, texture_manager);
+
+  EXPECT_EXIT(parameter.GetSpectra(1u, 1u),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Too many values in parameter list: name");
+}
+
+TEST(Parameter, SpectrumTooManyColor) {
+  std::stringstream input("\"rgb name\" [1 1 1]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::SPECTRUM,
+                     spectrum_manager, texture_manager);
+
+  ASSERT_EQ(1u, parameter.GetSpectra(1u, 1u).size());
+  EXPECT_NE(nullptr, parameter.GetSpectra(1u, 1u).at(0).Get());
+}
+
+TEST(Parameter, SpectrumTooManySampled) {
+  std::stringstream input("\"spectrum name\" [2 2]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::SPECTRUM,
+                     spectrum_manager, texture_manager);
+
+  ASSERT_EQ(1u, parameter.GetSpectra(1u, 1u).size());
+  EXPECT_NE(nullptr, parameter.GetSpectra(1u, 1u).at(0).Get());
+}
+
+TEST(Parameter, StringWrongType) {
+  std::stringstream input("\"float name\" [1]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  EXPECT_EXIT(
+      parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::STRING,
+                         spectrum_manager, texture_manager),
+      testing::ExitedWithCode(EXIT_FAILURE),
+      "ERROR: Wrong type for parameter list: name");
+}
+
+TEST(Parameter, StringTooFew) {
+  std::stringstream input("\"string name\" [\"str\"]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::STRING,
+                     spectrum_manager, texture_manager);
+
+  EXPECT_EXIT(parameter.GetStringValues(0u, 3u),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Too few values in parameter list: name");
+}
+
+TEST(Parameter, StringTooMany) {
+  std::stringstream input("\"string name\" [\"str\" \"str\" \"str\"]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::STRING,
+                     spectrum_manager, texture_manager);
+
+  EXPECT_EXIT(parameter.GetStringValues(1u, 1u),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Too many values in parameter list: name");
+}
+
+TEST(Parameter, String) {
+  std::stringstream input("\"string name\" [\"str\"]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::STRING,
+                     spectrum_manager, texture_manager);
+
+  ASSERT_EQ(1u, parameter.GetStringValues(1u, 1u).size());
+  EXPECT_EQ("str", parameter.GetStringValues(1u, 1u).at(0));
+}
 
 TEST(Parameter, Vector3WrongType) {
   std::stringstream input("\"float name\" [1]");

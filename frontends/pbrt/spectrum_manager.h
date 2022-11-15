@@ -13,11 +13,11 @@ namespace iris::pbrt_frontend {
 class SpectrumManager {
  public:
   virtual ReferenceCounted<Spectrum> AllocateSpectrum(
-      const std::map<visual, visual> wavelengths) const = 0;
+      const std::map<visual, visual>& wavelengths) const = 0;
   ReferenceCounted<Spectrum> AllocateSpectrum(const Color& color);
 
   virtual ReferenceCounted<Reflector> AllocateReflector(
-      const std::map<visual, visual> wavelengths) const = 0;
+      const std::map<visual, visual>& wavelengths) const = 0;
   ReferenceCounted<Reflector> AllocateReflector(const Color& color);
 
  protected:
