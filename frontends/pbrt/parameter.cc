@@ -179,6 +179,13 @@ void Parameter::ParseReflectorTexture(const ParameterList& parameter_list,
   reflector_textures_.clear();
   if (parameter_list.GetType() == ParameterList::COLOR) {
     for (const auto& entry : parameter_list.GetColorValues()) {
+      if (entry.values[0] > 1.0 || entry.values[1] > 1.0 ||
+          entry.values[2] > 1.0) {
+        std::cerr << "ERROR: Out of range value in parameter list: "
+                  << GetName() << std::endl;
+        exit(EXIT_FAILURE);
+      }
+
       reflector_textures_.push_back(
           texture_manager.AllocateUniformReflectorTexture(
               spectrum_manager.AllocateReflector(entry)));

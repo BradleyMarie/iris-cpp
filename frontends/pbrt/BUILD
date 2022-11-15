@@ -3,13 +3,21 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 package(default_visibility = ["//frontends/pbrt:__subpackages__"])
 
 cc_library(
+    name = "color",
+    hdrs = ["color.h"],
+    deps = [
+        "//iris:float",
+    ],
+)
+
+cc_library(
     name = "parameter_list",
     srcs = ["parameter_list.cc"],
     hdrs = ["parameter_list.h"],
     deps = [
+        ":color",
         ":quoted_string",
         ":tokenizer",
-        "//iris:color",
         "//iris:point",
         "//iris:vector",
     ],
@@ -29,6 +37,7 @@ cc_library(
     srcs = ["parameter.cc"],
     hdrs = ["parameter.h"],
     deps = [
+        ":color",
         ":parameter_list",
         ":spectrum_manager",
         ":texture_manager",
@@ -53,24 +62,12 @@ cc_test(
 
 cc_library(
     name = "spectrum_manager",
-    srcs = ["spectrum_manager.cc"],
     hdrs = ["spectrum_manager.h"],
     deps = [
-        "//iris:color",
+        ":color",
         "//iris:reference_counted",
         "//iris:reflector",
         "//iris:spectrum",
-    ],
-)
-
-cc_test(
-    name = "spectrum_manager_test",
-    srcs = ["spectrum_manager_test.cc"],
-    deps = [
-        ":spectrum_manager",
-        "//iris/reflectors:mock_reflector",
-        "//iris/spectra:mock_spectrum",
-        "@com_google_googletest//:gtest_main",
     ],
 )
 

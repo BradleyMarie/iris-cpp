@@ -212,16 +212,14 @@ const std::vector<Vector>& ParameterList::GetVector3Values() const {
 }
 
 ParameterList::Type ParameterList::ParseBool(Tokenizer& tokenizer,
-                                             std::string_view type_name,
-                                             Color::Space rgb_color_space) {
+                                             std::string_view type_name) {
   bools_.clear();
   ParseData<bool, bool, ParseBoolToken>(tokenizer, type_name, bools_);
   return BOOL;
 }
 
 ParameterList::Type ParameterList::ParseFloat(Tokenizer& tokenizer,
-                                              std::string_view type_name,
-                                              Color::Space rgb_color_space) {
+                                              std::string_view type_name) {
   floats_.clear();
   ParseData<long double, long double, ParseFloatToken>(tokenizer, type_name,
                                                        floats_);
@@ -229,8 +227,7 @@ ParameterList::Type ParameterList::ParseFloat(Tokenizer& tokenizer,
 }
 
 ParameterList::Type ParameterList::ParseInteger(Tokenizer& tokenizer,
-                                                std::string_view type_name,
-                                                Color::Space rgb_color_space) {
+                                                std::string_view type_name) {
   integers_.clear();
   ParseData<int64_t, int64_t, ParseIntegerToken>(tokenizer, type_name,
                                                  integers_);
@@ -238,16 +235,14 @@ ParameterList::Type ParameterList::ParseInteger(Tokenizer& tokenizer,
 }
 
 ParameterList::Type ParameterList::ParseNormal(Tokenizer& tokenizer,
-                                               std::string_view type_name,
-                                               Color::Space rgb_color_space) {
-  ParseVector3(tokenizer, type_name, rgb_color_space);
+                                               std::string_view type_name) {
+  ParseVector3(tokenizer, type_name);
   return NORMAL;
 }
 
 ParameterList::Type ParameterList::ParsePoint3(Tokenizer& tokenizer,
-                                               std::string_view type_name,
-                                               Color::Space rgb_color_space) {
-  ParseFloat(tokenizer, type_name, rgb_color_space);
+                                               std::string_view type_name) {
+  ParseFloat(tokenizer, type_name);
 
   if (floats_.size() % 3 != 0) {
     std::cerr << "ERROR: The number of values in a " << type_name
@@ -273,9 +268,8 @@ ParameterList::Type ParameterList::ParsePoint3(Tokenizer& tokenizer,
 }
 
 ParameterList::Type ParameterList::ParseRgb(Tokenizer& tokenizer,
-                                            std::string_view type_name,
-                                            Color::Space rgb_color_space) {
-  ParseFloat(tokenizer, type_name, rgb_color_space);
+                                            std::string_view type_name) {
+  ParseFloat(tokenizer, type_name);
 
   if (floats_.size() % 3 != 0) {
     std::cerr << "ERROR: The number of values in an " << type_name
@@ -300,15 +294,14 @@ ParameterList::Type ParameterList::ParseRgb(Tokenizer& tokenizer,
       exit(EXIT_FAILURE);
     }
 
-    colors_.emplace_back(r, g, b, rgb_color_space);
+    colors_.emplace_back(std::array<visual_t, 3>({r, g, b}), Color::RGB);
   }
 
   return COLOR;
 }
 
 ParameterList::Type ParameterList::ParseSpectrum(Tokenizer& tokenizer,
-                                                 std::string_view type_name,
-                                                 Color::Space rgb_color_space) {
+                                                 std::string_view type_name) {
   size_t num_added =
       ParseData<std::string, std::string_view, ParseRawStringToken>(
           tokenizer, type_name, string_storage_);
@@ -360,8 +353,7 @@ ParameterList::Type ParameterList::ParseSpectrum(Tokenizer& tokenizer,
 }
 
 ParameterList::Type ParameterList::ParseString(Tokenizer& tokenizer,
-                                               std::string_view type_name,
-                                               Color::Space rgb_color_space) {
+                                               std::string_view type_name) {
   size_t num_added = ParseData<std::string, std::string_view, ParseStringToken>(
       tokenizer, type_name, string_storage_);
   strings_.clear();
@@ -372,16 +364,14 @@ ParameterList::Type ParameterList::ParseString(Tokenizer& tokenizer,
 }
 
 ParameterList::Type ParameterList::ParseTexture(Tokenizer& tokenizer,
-                                                std::string_view type_name,
-                                                Color::Space rgb_color_space) {
-  ParseString(tokenizer, type_name, rgb_color_space);
+                                                std::string_view type_name) {
+  ParseString(tokenizer, type_name);
   return TEXTURE;
 }
 
 ParameterList::Type ParameterList::ParseVector3(Tokenizer& tokenizer,
-                                                std::string_view type_name,
-                                                Color::Space rgb_color_space) {
-  ParseFloat(tokenizer, type_name, rgb_color_space);
+                                                std::string_view type_name) {
+  ParseFloat(tokenizer, type_name);
 
   if (floats_.size() % 3 != 0) {
     std::cerr << "ERROR: The number of values in a " << type_name
@@ -415,9 +405,8 @@ ParameterList::Type ParameterList::ParseVector3(Tokenizer& tokenizer,
 }
 
 ParameterList::Type ParameterList::ParseXyz(Tokenizer& tokenizer,
-                                            std::string_view type_name,
-                                            Color::Space rgb_color_space) {
-  ParseFloat(tokenizer, type_name, rgb_color_space);
+                                            std::string_view type_name) {
+  ParseFloat(tokenizer, type_name);
 
   if (floats_.size() % 3 != 0) {
     std::cerr << "ERROR: The number of values in an " << type_name
@@ -442,14 +431,13 @@ ParameterList::Type ParameterList::ParseXyz(Tokenizer& tokenizer,
       exit(EXIT_FAILURE);
     }
 
-    colors_.emplace_back(x, y, z, Color::CIE_XYZ);
+    colors_.emplace_back(std::array<visual_t, 3>({x, y, z}), Color::XYZ);
   }
 
   return COLOR;
 }
 
-bool ParameterList::ParseFrom(Tokenizer& tokenizer,
-                              Color::Space rgb_color_space) {
+bool ParameterList::ParseFrom(Tokenizer& tokenizer) {
   auto type_and_name = ParseTypeAndName(tokenizer);
   if (!type_and_name) {
     return false;
@@ -459,8 +447,7 @@ bool ParameterList::ParseFrom(Tokenizer& tokenizer,
   name_ = name_storage_;
 
   static const std::unordered_map<
-      std::string_view,
-      Type (ParameterList::*)(Tokenizer&, std::string_view, Color::Space)>
+      std::string_view, Type (ParameterList::*)(Tokenizer&, std::string_view)>
       functions = {
           // blackbody
           {"bool", &ParameterList::ParseBool},
@@ -490,8 +477,7 @@ bool ParameterList::ParseFrom(Tokenizer& tokenizer,
   tokenizer.Next();
 
   type_name_ = iter->first;
-  type_ =
-      (this->*(iter->second))(tokenizer, type_and_name->first, rgb_color_space);
+  type_ = (this->*(iter->second))(tokenizer, type_and_name->first);
 
   return true;
 }

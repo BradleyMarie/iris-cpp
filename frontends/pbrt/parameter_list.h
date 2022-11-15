@@ -1,14 +1,15 @@
 #ifndef _FRONTENDS_PBRT_PARAMETER_LIST_
 #define _FRONTENDS_PBRT_PARAMETER_LIST_
 
+#include <array>
 #include <cstdint>
 #include <map>
 #include <string>
 #include <string_view>
 #include <vector>
 
+#include "frontends/pbrt/color.h"
 #include "frontends/pbrt/tokenizer.h"
-#include "iris/color.h"
 #include "iris/point.h"
 #include "iris/vector.h"
 
@@ -47,31 +48,20 @@ class ParameterList {
   const std::vector<std::string_view>& GetTextureValues() const;
   const std::vector<Vector>& GetVector3Values() const;
 
-  bool ParseFrom(Tokenizer& tokenizer, Color::Space rgb_color_space);
+  bool ParseFrom(Tokenizer& tokenizer);
 
  private:
-  Type ParseBool(Tokenizer& tokenizer, std::string_view type_name,
-                 Color::Space rgb_color_space);
-  Type ParseFloat(Tokenizer& tokenizer, std::string_view type_name,
-                  Color::Space rgb_color_space);
-  Type ParseInteger(Tokenizer& tokenizer, std::string_view type_name,
-                    Color::Space rgb_color_space);
-  Type ParseNormal(Tokenizer& tokenizer, std::string_view type_name,
-                   Color::Space rgb_color_space);
-  Type ParsePoint3(Tokenizer& tokenizer, std::string_view type_name,
-                   Color::Space rgb_color_space);
-  Type ParseRgb(Tokenizer& tokenizer, std::string_view type_name,
-                Color::Space rgb_color_space);
-  Type ParseSpectrum(Tokenizer& tokenizer, std::string_view type_name,
-                     Color::Space rgb_color_space);
-  Type ParseString(Tokenizer& tokenizer, std::string_view type_name,
-                   Color::Space rgb_color_space);
-  Type ParseTexture(Tokenizer& tokenizer, std::string_view type_name,
-                    Color::Space rgb_color_space);
-  Type ParseVector3(Tokenizer& tokenizer, std::string_view type_name,
-                    Color::Space rgb_color_space);
-  Type ParseXyz(Tokenizer& tokenizer, std::string_view type_name,
-                Color::Space rgb_color_space);
+  Type ParseBool(Tokenizer& tokenizer, std::string_view type_name);
+  Type ParseFloat(Tokenizer& tokenizer, std::string_view type_name);
+  Type ParseInteger(Tokenizer& tokenizer, std::string_view type_name);
+  Type ParseNormal(Tokenizer& tokenizer, std::string_view type_name);
+  Type ParsePoint3(Tokenizer& tokenizer, std::string_view type_name);
+  Type ParseRgb(Tokenizer& tokenizer, std::string_view type_name);
+  Type ParseSpectrum(Tokenizer& tokenizer, std::string_view type_name);
+  Type ParseString(Tokenizer& tokenizer, std::string_view type_name);
+  Type ParseTexture(Tokenizer& tokenizer, std::string_view type_name);
+  Type ParseVector3(Tokenizer& tokenizer, std::string_view type_name);
+  Type ParseXyz(Tokenizer& tokenizer, std::string_view type_name);
 
   std::optional<std::string_view> name_;
   std::string name_storage_;

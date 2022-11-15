@@ -4,6 +4,7 @@
 #include <span>
 #include <string_view>
 
+#include "frontends/pbrt/color.h"
 #include "frontends/pbrt/parameter_list.h"
 #include "frontends/pbrt/spectrum_manager.h"
 #include "frontends/pbrt/texture_manager.h"

@@ -7,23 +7,21 @@
 class TestSpectrumManager final : public iris::pbrt_frontend::SpectrumManager {
  public:
   iris::ReferenceCounted<iris::Spectrum> AllocateSpectrum(
-      const std::map<iris::visual, iris::visual>& wavelengths) const override {
+      const std::map<iris::visual, iris::visual>& wavelengths) override {
+    return iris::MakeReferenceCounted<iris::spectra::MockSpectrum>();
+  }
+  iris::ReferenceCounted<iris::Spectrum> AllocateSpectrum(
+      const iris::pbrt_frontend::Color& color) override {
     return iris::MakeReferenceCounted<iris::spectra::MockSpectrum>();
   }
 
   iris::ReferenceCounted<iris::Reflector> AllocateReflector(
-      const std::map<iris::visual, iris::visual>& wavelengths) const override {
+      const std::map<iris::visual, iris::visual>& wavelengths) override {
     return iris::MakeReferenceCounted<iris::reflectors::MockReflector>();
   }
 
- protected:
-  iris::ReferenceCounted<iris::Spectrum> AllocateSpectrum(
-      const iris::Color& color) const override {
-    return iris::MakeReferenceCounted<iris::spectra::MockSpectrum>();
-  }
-
   iris::ReferenceCounted<iris::Reflector> AllocateReflector(
-      const iris::Color& color) const override {
+      const iris::pbrt_frontend::Color& color) override {
     return iris::MakeReferenceCounted<iris::reflectors::MockReflector>();
   }
 };
@@ -32,7 +30,7 @@ TEST(Parameter, BoolWrongType) {
   std::stringstream input("\"integer name\" [1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -48,7 +46,7 @@ TEST(Parameter, BoolTooFew) {
   std::stringstream input("\"bool name\" [\"true\" \"true\"]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -65,7 +63,7 @@ TEST(Parameter, BoolTooMany) {
   std::stringstream input("\"bool name\" [\"true\" \"true\"]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -82,7 +80,7 @@ TEST(Parameter, Bool) {
   std::stringstream input("\"bool name\" [\"true\"]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -98,7 +96,7 @@ TEST(Parameter, FloatWrongType) {
   std::stringstream input("\"integer name\" [1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -114,7 +112,7 @@ TEST(Parameter, FloatTooFew) {
   std::stringstream input("\"float name\" [1.0 1.0]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -131,7 +129,7 @@ TEST(Parameter, FloatTooMany) {
   std::stringstream input("\"float name\" [1.0 1.0]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -148,7 +146,7 @@ TEST(Parameter, Float) {
   std::stringstream input("\"float name\" [1.0]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -164,7 +162,7 @@ TEST(Parameter, FloatTextureWrongType) {
   std::stringstream input("\"integer name\" [3e39]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -180,7 +178,7 @@ TEST(Parameter, FloatTextureOutOfRange) {
   std::stringstream input("\"float name\" [3e39]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -196,7 +194,7 @@ TEST(Parameter, FloatTextureTooFew) {
   std::stringstream input("\"float name\" [1.0]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -214,7 +212,7 @@ TEST(Parameter, FloatTextureFloat) {
   std::stringstream input("\"float name\" [1.0]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -232,7 +230,7 @@ TEST(Parameter, FloatTextureTexture) {
       "\"float name\" [1.0] \"texture name\" [\"texture\"]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -254,7 +252,7 @@ TEST(Parameter, FloatTextureTooMany) {
   std::stringstream input("\"float name\" [1.0 1.0 1.0]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -272,7 +270,7 @@ TEST(Parameter, IntegerWrongType) {
   std::stringstream input("\"float name\" [1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -288,7 +286,7 @@ TEST(Parameter, IntegerTooFew) {
   std::stringstream input("\"integer name\" [1 1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -305,7 +303,7 @@ TEST(Parameter, IntegerTooMany) {
   std::stringstream input("\"integer name\" [1 1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -322,7 +320,7 @@ TEST(Parameter, Integer) {
   std::stringstream input("\"integer name\" [1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -338,7 +336,7 @@ TEST(Parameter, NormalWrongType) {
   std::stringstream input("\"float name\" [1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -354,7 +352,7 @@ TEST(Parameter, NormalTooFew) {
   std::stringstream input("\"normal name\" [1 1 1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -371,7 +369,7 @@ TEST(Parameter, NormalTooMany) {
   std::stringstream input("\"normal name\" [1 1 1 1 1 1 1 1 1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -388,7 +386,7 @@ TEST(Parameter, Normal) {
   std::stringstream input("\"normal name\" [1 1 1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -405,7 +403,7 @@ TEST(Parameter, Point3WrongType) {
   std::stringstream input("\"float name\" [1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -421,7 +419,7 @@ TEST(Parameter, Point3TooFew) {
   std::stringstream input("\"point3 name\" [1 1 1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -438,7 +436,7 @@ TEST(Parameter, Point3TooMany) {
   std::stringstream input("\"point3 name\" [1 1 1 1 1 1 1 1 1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -455,7 +453,7 @@ TEST(Parameter, Point3) {
   std::stringstream input("\"point3 name\" [1 1 1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -472,7 +470,7 @@ TEST(Parameter, ReflectorTextureWrongType) {
   std::stringstream input("\"integer name\" [1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -489,7 +487,58 @@ TEST(Parameter, ReflectorTextureOutOfRange) {
   std::stringstream input("\"spectrum name\" [1 2]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  EXPECT_EXIT(
+      parameter.LoadFrom(parameter_list,
+                         iris::pbrt_frontend::Parameter::REFLECTOR_TEXTURE,
+                         spectrum_manager, texture_manager),
+      testing::ExitedWithCode(EXIT_FAILURE),
+      "ERROR: Out of range value in parameter list: name");
+}
+
+TEST(Parameter, ReflectorTextureOutOfRangeX) {
+  std::stringstream input("\"rgb name\" [2 1 1]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  EXPECT_EXIT(
+      parameter.LoadFrom(parameter_list,
+                         iris::pbrt_frontend::Parameter::REFLECTOR_TEXTURE,
+                         spectrum_manager, texture_manager),
+      testing::ExitedWithCode(EXIT_FAILURE),
+      "ERROR: Out of range value in parameter list: name");
+}
+
+TEST(Parameter, ReflectorTextureOutOfRangeY) {
+  std::stringstream input("\"rgb name\" [1 2 1]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
+
+  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  EXPECT_EXIT(
+      parameter.LoadFrom(parameter_list,
+                         iris::pbrt_frontend::Parameter::REFLECTOR_TEXTURE,
+                         spectrum_manager, texture_manager),
+      testing::ExitedWithCode(EXIT_FAILURE),
+      "ERROR: Out of range value in parameter list: name");
+}
+
+TEST(Parameter, ReflectorTextureOutOfRangeZ) {
+  std::stringstream input("\"rgb name\" [1 1 2]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -507,7 +556,7 @@ TEST(Parameter, ReflectorTextureTooFew) {
       "\"spectrum name\" [1 1] \"texture name\" [\"texture0\" \"texture1\"]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -522,7 +571,7 @@ TEST(Parameter, ReflectorTextureTooFew) {
   texture_manager.Put("texture0", texture);
   texture_manager.Put("texture1", texture);
 
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
   parameter.LoadFrom(parameter_list,
                      iris::pbrt_frontend::Parameter::REFLECTOR_TEXTURE,
                      spectrum_manager, texture_manager);
@@ -536,7 +585,7 @@ TEST(Parameter, ReflectorTextureTooMany) {
       "\"spectrum name\" [1 1] \"texture name\" [\"texture0\" \"texture1\"]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -551,7 +600,7 @@ TEST(Parameter, ReflectorTextureTooMany) {
   texture_manager.Put("texture0", texture);
   texture_manager.Put("texture1", texture);
 
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
   parameter.LoadFrom(parameter_list,
                      iris::pbrt_frontend::Parameter::REFLECTOR_TEXTURE,
                      spectrum_manager, texture_manager);
@@ -564,7 +613,7 @@ TEST(Parameter, ReflectorColorTexture) {
   std::stringstream input("\"rgb name\" [1 1 1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -582,7 +631,7 @@ TEST(Parameter, ReflectorTexture) {
       "\"spectrum name\" [1 1] \"texture name\" [\"texture0\"]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -596,7 +645,7 @@ TEST(Parameter, ReflectorTexture) {
 
   texture_manager.Put("texture0", texture);
 
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
   parameter.LoadFrom(parameter_list,
                      iris::pbrt_frontend::Parameter::REFLECTOR_TEXTURE,
                      spectrum_manager, texture_manager);
@@ -609,7 +658,7 @@ TEST(Parameter, SpectrumWrongType) {
   std::stringstream input("\"integer name\" [1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -625,7 +674,7 @@ TEST(Parameter, SpectrumTooFew) {
   std::stringstream input("\"rgb name\" [1 1 1 1 1 1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -642,7 +691,7 @@ TEST(Parameter, SpectrumTooMany) {
   std::stringstream input("\"rgb name\" [1 1 1 1 1 1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -659,7 +708,7 @@ TEST(Parameter, SpectrumTooManyColor) {
   std::stringstream input("\"rgb name\" [1 1 1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -675,7 +724,7 @@ TEST(Parameter, SpectrumTooManySampled) {
   std::stringstream input("\"spectrum name\" [2 2]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -691,7 +740,7 @@ TEST(Parameter, StringWrongType) {
   std::stringstream input("\"float name\" [1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -707,7 +756,7 @@ TEST(Parameter, StringTooFew) {
   std::stringstream input("\"string name\" [\"str\"]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -724,7 +773,7 @@ TEST(Parameter, StringTooMany) {
   std::stringstream input("\"string name\" [\"str\" \"str\" \"str\"]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -741,7 +790,7 @@ TEST(Parameter, String) {
   std::stringstream input("\"string name\" [\"str\"]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -757,7 +806,7 @@ TEST(Parameter, Vector3WrongType) {
   std::stringstream input("\"float name\" [1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -773,7 +822,7 @@ TEST(Parameter, Vector3TooFew) {
   std::stringstream input("\"vector3 name\" [1 1 1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -790,7 +839,7 @@ TEST(Parameter, Vector3TooMany) {
   std::stringstream input("\"vector3 name\" [1 1 1 1 1 1 1 1 1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
@@ -807,7 +856,7 @@ TEST(Parameter, Vector3) {
   std::stringstream input("\"vector3 name\" [1 1 1]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   iris::pbrt_frontend::ParameterList parameter_list;
-  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer, iris::Color::LINEAR_SRGB));
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
   TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
