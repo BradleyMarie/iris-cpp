@@ -3,10 +3,31 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 package(default_visibility = ["//frontends/pbrt:__subpackages__"])
 
 cc_library(
+    name = "build_objects",
+    hdrs = ["build_objects.h"],
+    deps = [
+        ":object_builder",
+        ":parameter_list",
+        ":spectrum_manager",
+        ":texture_manager",
+        ":tokenizer",
+    ],
+)
+
+cc_library(
     name = "color",
     hdrs = ["color.h"],
     deps = [
         "//iris:float",
+    ],
+)
+
+cc_library(
+    name = "object_builder",
+    hdrs = ["object_builder.h"],
+    deps = [
+        ":parameter",
+        ":parameter_list",
     ],
 )
 
