@@ -2,6 +2,7 @@
 #define _FRONTENDS_PBRT_OBJECT_BUILDER_
 
 #include <cstdlib>
+#include <iostream>
 #include <optional>
 #include <string_view>
 #include <unordered_map>
@@ -22,7 +23,7 @@ class ObjectBuilder {
   std::optional<Parameter> Parse(
       const ParameterList& parameter_list, SpectrumManager& spectrum_manager,
       TextureManager& texture_manager,
-      std::unordered_set<std::string_view> handled_args,
+      std::unordered_set<std::string_view>& handled_args,
       bool must_succeed = true) const {
     if (handled_args.contains(parameter_list.GetName())) {
       std::cerr << "ERROR: A parameter was specified twice: "
@@ -46,6 +47,8 @@ class ObjectBuilder {
                        texture_manager);
 
     handled_args.insert(iter->first);
+
+    return parameter;
   }
 
   virtual T Build(

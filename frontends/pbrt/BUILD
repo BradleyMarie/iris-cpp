@@ -14,6 +14,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "build_objects_test",
+    srcs = ["build_objects_test.cc"],
+    deps = [
+        ":build_objects",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "color",
     hdrs = ["color.h"],
@@ -28,6 +37,15 @@ cc_library(
     deps = [
         ":parameter",
         ":parameter_list",
+    ],
+)
+
+cc_test(
+    name = "object_builder_test",
+    srcs = ["object_builder_test.cc"],
+    deps = [
+        ":object_builder",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
