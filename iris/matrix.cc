@@ -318,6 +318,79 @@ absl::StatusOr<Matrix> Matrix::Rotation(geometric theta, geometric x,
   return Matrix(matrix, inverse);
 }
 
+absl::StatusOr<Matrix> Matrix::LookAt(geometric eye_x, geometric eye_y,
+                                      geometric eye_z, geometric look_at_x,
+                                      geometric look_at_y, geometric look_at_z,
+                                      geometric up_x, geometric up_y,
+                                      geometric up_z) {
+  if (!std::isfinite(eye_x)) {
+    return absl::InvalidArgumentError("eye_x");
+  }
+
+  if (!std::isfinite(eye_y)) {
+    return absl::InvalidArgumentError("eye_y");
+  }
+
+  if (!std::isfinite(eye_z)) {
+    return absl::InvalidArgumentError("eye_z");
+  }
+
+  if (!std::isfinite(look_at_x)) {
+    return absl::InvalidArgumentError("look_at_x");
+  }
+
+  if (!std::isfinite(look_at_y)) {
+    return absl::InvalidArgumentError("look_at_y");
+  }
+
+  if (!std::isfinite(look_at_z)) {
+    return absl::InvalidArgumentError("look_at_z");
+  }
+
+  if (!std::isfinite(up_x)) {
+    return absl::InvalidArgumentError("up_x");
+  }
+
+  if (!std::isfinite(up_y)) {
+    return absl::InvalidArgumentError("up_y");
+  }
+
+  if (!std::isfinite(up_z)) {
+    return absl::InvalidArgumentError("up_z");
+  }
+
+  if (eye_x == look_at_x && eye_y == look_at_y && eye_z == look_at_z) {
+    return absl::InvalidArgumentError("eye and look_at are the same point");
+  }
+
+  if (up_x == 0.0 && up_y == 0.0 && up_z == 0.0) {
+    return absl::InvalidArgumentError(
+        "One of up_x, up_y, or up_z must be non-zero");
+  }
+
+  Point eye(eye_x, eye_y, eye_z);
+  Point look_at(look_at_x, look_at_y, look_at_z);
+  Vector user_up(up_x, up_y, up_z);
+
+  auto look_direction = Normalize(look_at - eye);
+
+  auto orthogonal = CrossProduct(user_up, look_direction);
+  if (orthogonal.x == 0.0 && orthogonal.y == 0.0 && orthogonal.z == 0.0) {
+    return absl::InvalidArgumentError("up");
+  }
+
+  auto right = Normalize(orthogonal);
+  auto up = CrossProduct(look_direction, right);
+
+  std::array<std::array<geometric, 4>, 4> matrix = {
+      {{right.x, up.x, look_direction.x, eye.x},
+       {right.y, up.y, look_direction.y, eye.y},
+       {right.z, up.z, look_direction.z, eye.z},
+       {0.0, 0.0, 0.0, 1.0}}};
+
+  return Matrix::Create(matrix).value();
+}
+
 absl::StatusOr<Matrix> Matrix::Orthographic(geometric left, geometric right,
                                             geometric bottom, geometric top,
                                             geometric near, geometric far) {

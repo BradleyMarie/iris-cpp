@@ -21,6 +21,11 @@ struct Matrix final {
   static absl::StatusOr<Matrix> Scalar(geometric x, geometric y, geometric z);
   static absl::StatusOr<Matrix> Rotation(geometric theta, geometric x,
                                          geometric y, geometric z);
+  static absl::StatusOr<Matrix> LookAt(geometric eye_x, geometric eye_y,
+                                       geometric eye_z, geometric look_at_x,
+                                       geometric look_at_y, geometric look_at_z,
+                                       geometric up_x, geometric up_y,
+                                       geometric up_z);
   static absl::StatusOr<Matrix> Orthographic(geometric left, geometric right,
                                              geometric bottom, geometric top,
                                              geometric near, geometric far);

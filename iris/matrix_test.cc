@@ -304,6 +304,44 @@ TEST(MatrixTest, Orthographic) {
   EXPECT_EQ(1.0, matrix.i[3][3]);
 }
 
+TEST(MatrixTest, LookAt) {
+  auto matrix =
+      iris::Matrix::LookAt(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 1.0, 2.0, 3.0).value();
+  EXPECT_NEAR(-0.408248276, matrix.m[0][0], 0.001);
+  EXPECT_NEAR(-0.707106829, matrix.m[0][1], 0.001);
+  EXPECT_NEAR(0.577350318, matrix.m[0][2], 0.001);
+  EXPECT_NEAR(1.0, matrix.m[0][3], 0.001);
+  EXPECT_NEAR(0.816496551, matrix.m[1][0], 0.001);
+  EXPECT_NEAR(2.98023e-08, matrix.m[1][1], 0.001);
+  EXPECT_NEAR(0.577350318, matrix.m[1][2], 0.001);
+  EXPECT_NEAR(2.0, matrix.m[1][3], 0.001);
+  EXPECT_NEAR(-0.408248335, matrix.m[2][0], 0.001);
+  EXPECT_NEAR(0.707106829, matrix.m[2][1], 0.001);
+  EXPECT_NEAR(0.577350318, matrix.m[2][2], 0.001);
+  EXPECT_NEAR(3.0, matrix.m[2][3], 0.001);
+  EXPECT_NEAR(0.0, matrix.m[3][0], 0.001);
+  EXPECT_NEAR(0.0, matrix.m[3][1], 0.001);
+  EXPECT_NEAR(0.0, matrix.m[3][2], 0.001);
+  EXPECT_NEAR(1.0, matrix.m[3][3], 0.001);
+
+  EXPECT_NEAR(-0.408248276, matrix.i[0][0], 0.001);
+  EXPECT_NEAR(0.816496611, matrix.i[0][1], 0.001);
+  EXPECT_NEAR(-0.408248305, matrix.i[0][2], 0.001);
+  EXPECT_NEAR(3.441275e-08, matrix.i[0][3], 0.001);
+  EXPECT_NEAR(-0.707106769, matrix.i[1][0], 0.001);
+  EXPECT_NEAR(3.441275e-08, matrix.i[1][1], 0.001);
+  EXPECT_NEAR(0.707106709, matrix.i[1][2], 0.001);
+  EXPECT_NEAR(-1.41421342, matrix.i[1][3], 0.001);
+  EXPECT_NEAR(0.577350199, matrix.i[2][0], 0.001);
+  EXPECT_NEAR(0.577350259, matrix.i[2][1], 0.001);
+  EXPECT_NEAR(0.577350199, matrix.i[2][2], 0.001);
+  EXPECT_NEAR(-3.46410131, matrix.i[2][3], 0.001);
+  EXPECT_NEAR(0.0, matrix.i[3][0], 0.001);
+  EXPECT_NEAR(0.0, matrix.i[3][1], 0.001);
+  EXPECT_NEAR(0.0, matrix.i[3][2], 0.001);
+  EXPECT_NEAR(1.0, matrix.i[3][3], 0.001);
+}
+
 TEST(MatrixTest, CreateErrors) {
   for (size_t i = 0; i < 4; i++) {
     for (size_t j = 0; j < 4; j++) {
