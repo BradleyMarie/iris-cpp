@@ -32,6 +32,26 @@ cc_library(
 )
 
 cc_library(
+    name = "matrix_manager",
+    srcs = ["matrix_manager.cc"],
+    hdrs = ["matrix_manager.h"],
+    deps = [
+        ":quoted_string",
+        ":tokenizer",
+        "//iris:matrix",
+    ],
+)
+
+cc_test(
+    name = "matrix_manager_test",
+    srcs = ["matrix_manager_test.cc"],
+    deps = [
+        ":matrix_manager",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "object_builder",
     hdrs = ["object_builder.h"],
     deps = [
