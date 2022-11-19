@@ -368,24 +368,60 @@ absl::StatusOr<Matrix> Matrix::LookAt(geometric eye_x, geometric eye_y,
         "One of up_x, up_y, or up_z must be non-zero");
   }
 
-  Point eye(eye_x, eye_y, eye_z);
-  Point look_at(look_at_x, look_at_y, look_at_z);
-  Vector user_up(up_x, up_y, up_z);
+  intermediate_t intermediate_eye_x = eye_x;
+  intermediate_t intermediate_eye_y = eye_y;
+  intermediate_t intermediate_eye_z = eye_z;
 
-  auto look_direction = Normalize(look_at - eye);
+  intermediate_t intermediate_look_at_x = look_at_x;
+  intermediate_t intermediate_look_at_y = look_at_y;
+  intermediate_t intermediate_look_at_z = look_at_z;
 
-  auto orthogonal = CrossProduct(user_up, look_direction);
-  if (orthogonal.x == 0.0 && orthogonal.y == 0.0 && orthogonal.z == 0.0) {
+  intermediate_t intermediate_up_x = up_x;
+  intermediate_t intermediate_up_y = up_y;
+  intermediate_t intermediate_up_z = up_z;
+
+  intermediate_t look_direction_x = intermediate_look_at_x - intermediate_eye_x;
+  intermediate_t look_direction_y = intermediate_look_at_y - intermediate_eye_y;
+  intermediate_t look_direction_z = intermediate_look_at_z - intermediate_eye_z;
+
+  intermediate_t look_direction_magnitude =
+      std::sqrt(look_direction_x * look_direction_x +
+                look_direction_y * look_direction_y +
+                look_direction_z * look_direction_z);
+  look_direction_x /= look_direction_magnitude;
+  look_direction_y /= look_direction_magnitude;
+  look_direction_z /= look_direction_magnitude;
+
+  intermediate_t right_x = intermediate_up_y * look_direction_z -
+                           intermediate_up_z * look_direction_y;
+  intermediate_t right_y = intermediate_up_z * look_direction_x -
+                           intermediate_up_x * look_direction_z;
+  intermediate_t right_z = intermediate_up_x * look_direction_y -
+                           intermediate_up_y * look_direction_x;
+  if (right_x == 0.0 && right_y == 0.0 && right_z == 0.0) {
     return absl::InvalidArgumentError("up");
   }
 
-  auto right = Normalize(orthogonal);
-  auto up = CrossProduct(look_direction, right);
+  intermediate_t right_magnitude =
+      std::sqrt(right_x * right_x + right_y * right_y + right_z * right_z);
+  right_x /= right_magnitude;
+  right_y /= right_magnitude;
+  right_z /= right_magnitude;
+
+  intermediate_up_x = look_direction_y * right_z - look_direction_z * right_y;
+  intermediate_up_y = look_direction_z * right_x - look_direction_x * right_z;
+  intermediate_up_z = look_direction_x * right_y - look_direction_y * right_x;
 
   std::array<std::array<geometric, 4>, 4> matrix = {
-      {{right.x, up.x, look_direction.x, eye.x},
-       {right.y, up.y, look_direction.y, eye.y},
-       {right.z, up.z, look_direction.z, eye.z},
+      {{static_cast<geometric>(right_x),
+        static_cast<geometric>(intermediate_up_x),
+        static_cast<geometric>(look_direction_x), eye_x},
+       {static_cast<geometric>(right_y),
+        static_cast<geometric>(intermediate_up_y),
+        static_cast<geometric>(look_direction_y), eye_y},
+       {static_cast<geometric>(right_z),
+        static_cast<geometric>(intermediate_up_z),
+        static_cast<geometric>(look_direction_z), eye_z},
        {0.0, 0.0, 0.0, 1.0}}};
 
   return Matrix::Create(matrix).value();
