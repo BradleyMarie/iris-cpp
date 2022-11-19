@@ -27,13 +27,13 @@ std::array<geometric, N> ParseFloats(Tokenizer& tokenizer,
     if (std::from_chars(token->begin(), token->end(), result[i]).ec !=
         std::errc{}) {
       std::cerr << "ERROR: Failed to parse " << type_name
-                << " value: " << *token << std::endl;
+                << " parameter: " << *token << std::endl;
       exit(EXIT_FAILURE);
     }
 
     if (!std::isfinite(result[i])) {
-      std::cerr << "ERROR: Out of range " << type_name << " value:" << *token
-                << std::endl;
+      std::cerr << "ERROR: Out of range " << type_name
+                << " parameter: " << *token << std::endl;
       exit(EXIT_FAILURE);
     }
   }
@@ -77,7 +77,7 @@ void MatrixManager::Scale(Tokenizer& tokenizer) {
 
 void MatrixManager::Rotate(Tokenizer& tokenizer) {
   auto values = ParseFloats<4>(tokenizer, "Rotate");
-  if (values[1] == 0.0 || values[2] == 0.0 || values[3] == 0.0) {
+  if (values[1] == 0.0 && values[2] == 0.0 && values[3] == 0.0) {
     std::cerr
         << "ERROR: One of the x, y, or z parameters to Rotate must be non-zero"
         << std::endl;
@@ -236,12 +236,12 @@ void MatrixManager::TransformEnd(Tokenizer& tokenizer) {
 
 void MatrixManager::Transform(const Matrix& m) {
   Matrix start = (active_transform_stack_.top() != ActiveTransformation::END)
-                     ? transformation_stack_.top().start
-                     : transformation_stack_.top().start.Multiply(m);
+                     ? transformation_stack_.top().start.Multiply(m)
+                     : transformation_stack_.top().start;
 
   Matrix end = (active_transform_stack_.top() != ActiveTransformation::START)
-                   ? transformation_stack_.top().end
-                   : transformation_stack_.top().end.Multiply(m);
+                   ? transformation_stack_.top().end.Multiply(m)
+                   : transformation_stack_.top().end;
 
   transformation_stack_.pop();
   transformation_stack_.emplace(start, end);
@@ -249,12 +249,12 @@ void MatrixManager::Transform(const Matrix& m) {
 
 void MatrixManager::Set(const Matrix& m) {
   Matrix start = (active_transform_stack_.top() != ActiveTransformation::END)
-                     ? transformation_stack_.top().start
-                     : m;
+                     ? m
+                     : transformation_stack_.top().start;
 
   Matrix end = (active_transform_stack_.top() != ActiveTransformation::START)
-                   ? transformation_stack_.top().end
-                   : m;
+                   ? m
+                   : transformation_stack_.top().end;
 
   transformation_stack_.pop();
   transformation_stack_.emplace(start, end);
@@ -319,9 +319,10 @@ void MatrixManager::Pop(PushPopReason reason) {
   }
 
   if (stack_manipulation_reasons_.top() != reason) {
-    const char* message = (reason == PushPopReason::ATTRIBUTE)
-                              ? "AttributeBegin and AttributeEnd"
-                              : "TransformBegin and TransformEnd";
+    const char* message =
+        (stack_manipulation_reasons_.top() == PushPopReason::ATTRIBUTE)
+            ? "AttributeBegin and AttributeEnd"
+            : "TransformBegin and TransformEnd";
     std::cerr << "ERROR: Mismatched " << message << " directives" << std::endl;
     exit(EXIT_FAILURE);
   }
