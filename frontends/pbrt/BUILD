@@ -120,6 +120,17 @@ cc_test(
 )
 
 cc_library(
+    name = "parser",
+    srcs = ["parser.cc"],
+    hdrs = ["parser.h"],
+    deps = [
+        ":quoted_string",
+        ":renderable",
+        ":tokenizer",
+    ],
+)
+
+cc_library(
     name = "renderable",
     srcs = ["renderable.cc"],
     hdrs = ["renderable.h"],
