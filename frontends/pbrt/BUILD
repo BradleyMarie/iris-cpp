@@ -120,6 +120,40 @@ cc_test(
 )
 
 cc_library(
+    name = "renderable",
+    srcs = ["renderable.cc"],
+    hdrs = ["renderable.h"],
+    deps = [
+        "//iris:camera",
+        "//iris:color_matcher",
+        "//iris:framebuffer",
+        "//iris:image_sampler",
+        "//iris:integrator",
+        "//iris:light_scene",
+        "//iris:random",
+        "//iris:renderer",
+        "//iris:scene",
+        "//iris:scene_objects",
+    ],
+)
+
+cc_test(
+    name = "renderable_test",
+    srcs = ["renderable_test.cc"],
+    deps = [
+        ":renderable",
+        "//iris/cameras:mock_camera",
+        "//iris/color_matchers:mock_color_matcher",
+        "//iris/image_samplers:mock_image_sampler",
+        "//iris/integrators:mock_integrator",
+        "//iris/light_scenes:all_light_scene",
+        "//iris/random:mock_random",
+        "//iris/scenes:list_scene",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "spectrum_manager",
     hdrs = ["spectrum_manager.h"],
     deps = [
