@@ -22,8 +22,14 @@ void Parser::Include() {
   }
 
   std::filesystem::path file_path(*unquoted);
-  if (file_path.is_relative()) {
-    file_path = *tokenizers_.top().second / file_path;
+  file_path = std::filesystem::weakly_canonical(file_path);
+
+  for (const auto& entry : tokenizers_) {
+    if (entry.file_path && file_path == *entry.file_path) {
+      std::cerr << "ERROR: Detected cyclic Include of file: " << *unquoted
+                << std::endl;
+      exit(EXIT_FAILURE);
+    }
   }
 
   std::filesystem::path search_path = file_path;
@@ -31,40 +37,45 @@ void Parser::Include() {
 
   auto file = std::make_unique<std::ifstream>(file_path);
   if (file->fail()) {
-    std::cerr << "ERROR: Failed to open file:" << file_path << std::endl;
+    std::cerr << "ERROR: Failed to open file:" << *unquoted << std::endl;
     exit(EXIT_FAILURE);
   }
 
-  owned_tokenizers_.emplace(Tokenizer(*file), std::move(search_path),
-                            std::move(file));
+  auto tokenizer = std::make_unique<Tokenizer>(*file);
 
-  tokenizers_.emplace(&std::get<0>(owned_tokenizers_.top()),
-                      &std::get<1>(owned_tokenizers_.top()));
+  tokenizers_.emplace_back(tokenizer.get(), std::move(tokenizer),
+                           std::filesystem::weakly_canonical(search_path),
+                           file_path, std::move(file));
 }
 
 std::optional<std::string_view> Parser::NextToken() {
   while (!tokenizers_.empty()) {
-    if (tokenizers_.top().first->Peek()) {
-      return tokenizers_.top().first->Next();
+    if (tokenizers_.back().tokenizer->Peek()) {
+      return tokenizers_.back().tokenizer->Next();
     }
 
-    tokenizers_.pop();
-    if (!owned_tokenizers_.empty()) {
-      owned_tokenizers_.pop();
-    }
+    tokenizers_.pop_back();
   }
 
   return std::nullopt;
 }
 
 std::optional<Renderable> Parser::ParseFrom(
-    const std::filesystem::path& path_root, Tokenizer& tokenizer) {
+    const std::filesystem::path& search_root, Tokenizer& tokenizer,
+    std::optional<std::filesystem::path> file_path) {
   static const std::unordered_map<std::string_view, void (Parser::*)()>
       callbacks = {
           {"Include", &Parser::Include},
       };
 
-  tokenizers_.emplace(&tokenizer, &path_root);
+  if (file_path) {
+    *file_path = std::filesystem::weakly_canonical(*file_path);
+  }
+
+  tokenizers_.emplace_back(&tokenizer, nullptr,
+                           std::filesystem::weakly_canonical(search_root),
+                           file_path, nullptr);
+
   for (;;) {
     auto token = NextToken();
 
