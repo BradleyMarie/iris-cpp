@@ -130,6 +130,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "parser_test",
+    srcs = ["parser_test.cc"],
+    deps = [
+        ":parser",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "renderable",
     srcs = ["renderable.cc"],
