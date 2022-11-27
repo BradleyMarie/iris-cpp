@@ -22,6 +22,10 @@ void Parser::Include() {
   }
 
   std::filesystem::path file_path(*unquoted);
+  if (file_path.is_relative()) {
+    file_path = tokenizers_.back().search_path / file_path;
+  }
+
   file_path = std::filesystem::weakly_canonical(file_path);
 
   for (const auto& entry : tokenizers_) {
@@ -37,7 +41,7 @@ void Parser::Include() {
 
   auto file = std::make_unique<std::ifstream>(file_path);
   if (file->fail()) {
-    std::cerr << "ERROR: Failed to open file:" << *unquoted << std::endl;
+    std::cerr << "ERROR: Failed to open file: " << *unquoted << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -76,8 +80,17 @@ std::optional<Renderable> Parser::ParseFrom(
                            std::filesystem::weakly_canonical(search_root),
                            file_path, nullptr);
 
+  bool tokens_parsed = false;
   for (;;) {
     auto token = NextToken();
+    if (!token.has_value()) {
+      if (tokens_parsed) {
+        std::cerr << "ERROR: Final directive should be WorldEnd" << std::endl;
+        exit(EXIT_FAILURE);
+      }
+
+      return std::nullopt;
+    }
 
     auto iter = callbacks.find(*token);
     if (iter == callbacks.end()) {
@@ -86,6 +99,8 @@ std::optional<Renderable> Parser::ParseFrom(
     }
 
     (this->*iter->second)();
+
+    tokens_parsed = true;
   }
 }
 

@@ -133,6 +133,13 @@ cc_library(
 cc_test(
     name = "parser_test",
     srcs = ["parser_test.cc"],
+    data = [
+        "test_data/include_circular_first.pbrt",
+        "test_data/include_circular_second.pbrt",
+        "test_data/include_circular_self.pbrt",
+        "test_data/include_circular_third.pbrt",
+        "test_data/include_empty.pbrt",
+    ],
     deps = [
         ":parser",
         "@com_google_googletest//:gtest_main",
