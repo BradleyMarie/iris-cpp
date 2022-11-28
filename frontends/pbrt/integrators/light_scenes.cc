@@ -3,12 +3,17 @@
 #include <unordered_map>
 
 #include "iris/light_scenes/all_light_scene.h"
+#include "iris/light_scenes/one_light_scene.h"
 
 namespace iris::pbrt_frontend::integrators {
 namespace {
 
 std::unique_ptr<LightScene::Builder> MakeAllLightSampler() {
   return std::make_unique<iris::light_scenes::AllLightScene::Builder>();
+}
+
+std::unique_ptr<LightScene::Builder> MakeUniformLightSampler() {
+  return std::make_unique<iris::light_scenes::OneLightScene::Builder>();
 }
 
 }  // namespace
@@ -18,6 +23,7 @@ std::unique_ptr<LightScene::Builder> ParseLightScene(std::string_view type) {
                                   std::unique_ptr<LightScene::Builder> (*)()>
       g_light_scenes = {
           {"all", MakeAllLightSampler},
+          {"uniform", MakeUniformLightSampler},
       };
 
   auto iter = g_light_scenes.find(type);

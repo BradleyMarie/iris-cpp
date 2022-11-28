@@ -1,5 +1,5 @@
-#ifndef _IRIS_LIGHT_SCENES_ALL_LIGHT_SCENE_
-#define _IRIS_LIGHT_SCENES_ALL_LIGHT_SCENE_
+#ifndef _IRIS_LIGHT_SCENES_ONE_LIGHT_SCENE_
+#define _IRIS_LIGHT_SCENES_ONE_LIGHT_SCENE_
 
 #include <memory>
 
@@ -13,7 +13,7 @@
 namespace iris {
 namespace light_scenes {
 
-class AllLightScene final : public LightScene {
+class OneLightScene final : public LightScene {
  public:
   class Builder final : public LightScene::Builder {
    public:
@@ -22,17 +22,20 @@ class AllLightScene final : public LightScene {
         const SceneObjects& scene_objects) const override;
   };
 
-  AllLightScene(const SceneObjects& scene_objects) noexcept
-      : scene_objects_(scene_objects) {}
+  OneLightScene(const SceneObjects& scene_objects) noexcept
+      : scene_objects_(scene_objects),
+        pdf_(static_cast<intermediate_t>(1.0) /
+             static_cast<intermediate_t>(scene_objects.NumLights())) {}
 
   LightSample* Sample(const Point& hit_point, Random& rng,
                       LightSampleAllocator& allocator) const override;
 
  private:
   const SceneObjects& scene_objects_;
+  visual_t pdf_;
 };
 
 }  // namespace light_scenes
 }  // namespace iris
 
-#endif  // _IRIS_LIGHT_SCENES_ALL_LIGHT_SCENE_
+#endif  // _IRIS_LIGHT_SCENES_ONE_LIGHT_SCENE_

@@ -10,6 +10,7 @@ cc_library(
     deps = [
         "//iris:light_scene",
         "//iris/light_scenes:all_light_scene",
+        "//iris/light_scenes:one_light_scene",
     ],
 )
 
