@@ -35,6 +35,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "parse_test",
+    srcs = ["parse_test.cc"],
+    deps = [
+        ":parse",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "path",
     srcs = ["path.cc"],

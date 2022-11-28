@@ -30,8 +30,8 @@ const ObjectBuilder<Result>& Parse(Tokenizer& tokenizer) {
 
   auto iter = g_integrators.find(*unquoted);
   if (iter == g_integrators.end()) {
-    std::cerr << "ERROR: Unsupported type for directive Integrator: " << *type
-              << std::endl;
+    std::cerr << "ERROR: Unsupported type for directive Integrator: "
+              << *unquoted << std::endl;
     exit(EXIT_FAILURE);
   }
 
