@@ -58,6 +58,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "path_test",
+    srcs = ["path_test.cc"],
+    deps = [
+        ":path",
+        "//frontends/pbrt:build_objects",
+        "//iris/reflectors:mock_reflector",
+        "//iris/spectra:mock_spectrum",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "pixel_bounds",
     srcs = ["pixel_bounds.cc"],

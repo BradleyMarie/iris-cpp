@@ -14,7 +14,6 @@ static const std::unordered_map<std::string_view, Parameter::Type>
         {"lightsamplestrategy", Parameter::STRING},
         {"maxdepth", Parameter::INTEGER},
         {"pixelbounds", Parameter::INTEGER},
-        {"rrminprobability", Parameter::FLOAT},
         {"rrthreshold", Parameter::FLOAT},
 };
 
@@ -49,7 +48,7 @@ Result PathObjectBuilder::Build(
 
   auto rrthreshold = parameters.find("rrthreshold");
   if (rrthreshold != parameters.end()) {
-    auto value = maxdepth->second.GetFloatValues(1).front();
+    auto value = rrthreshold->second.GetFloatValues(1).front();
     if (value < 0.0 || value > 1.0) {
       std::cerr << "ERROR: Out of range value for parameter: rrthreshold"
                 << std::endl;
