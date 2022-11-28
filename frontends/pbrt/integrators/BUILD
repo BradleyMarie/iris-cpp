@@ -14,6 +14,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "light_scenes_test",
+    srcs = ["light_scenes_test.cc"],
+    deps = [
+        ":light_scenes",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "parse",
     srcs = ["parse.cc"],
