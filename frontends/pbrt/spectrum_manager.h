@@ -21,6 +21,8 @@ class SpectrumManager {
 
   virtual ReferenceCounted<Reflector> AllocateReflector(
       const std::map<visual, visual>& wavelengths) = 0;
+
+  virtual void Clear() = 0;
 };
 
 }  // namespace iris::pbrt_frontend

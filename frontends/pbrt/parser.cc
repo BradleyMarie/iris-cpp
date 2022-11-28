@@ -4,11 +4,13 @@
 #include <iostream>
 #include <unordered_map>
 
+#include "frontends/pbrt/build_objects.h"
+#include "frontends/pbrt/integrators/parse.h"
 #include "frontends/pbrt/quoted_string.h"
 
 namespace iris::pbrt_frontend {
 
-void Parser::Include() {
+bool Parser::Include() {
   auto next = NextToken();
   if (!next) {
     std::cerr << "ERROR: Too few parameters to directive Include" << std::endl;
@@ -50,6 +52,52 @@ void Parser::Include() {
   tokenizers_.emplace_back(tokenizer.get(), std::move(tokenizer),
                            std::filesystem::weakly_canonical(search_path),
                            file_path, std::move(file));
+
+  return true;
+}
+
+bool Parser::Integrator() {
+  if (world_begin_encountered_) {
+    std::cerr << "ERROR: Directive cannot be specified between WorldBegin and "
+                 "WorldEnd: Integrator"
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  if (integrator_encountered_) {
+    std::cerr << "ERROR: Directive specified twice for a render: Integrator"
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  const auto& builder = integrators::Parse(*tokenizers_.back().tokenizer);
+  auto object = BuildObject(builder, *tokenizers_.back().tokenizer,
+                            *spectrum_manager_, *texture_manager_);
+  integrator_ = std::move(object.integrator);
+  light_scene_builder_ = std::move(object.light_scene_builder);
+
+  integrator_encountered_ = true;
+
+  return true;
+}
+
+bool Parser::WorldBegin() {
+  if (world_begin_encountered_) {
+    std::cerr << "ERROR: Invalid WorldBegin directive" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  world_begin_encountered_ = true;
+  return true;
+}
+
+bool Parser::WorldEnd() {
+  if (!world_begin_encountered_) {
+    std::cerr << "ERROR: Invalid WorldEnd directive" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  return false;
 }
 
 std::optional<std::string_view> Parser::NextToken() {
@@ -67,9 +115,18 @@ std::optional<std::string_view> Parser::NextToken() {
 std::optional<Renderable> Parser::ParseFrom(
     const std::filesystem::path& search_root, Tokenizer& tokenizer,
     std::optional<std::filesystem::path> file_path) {
-  static const std::unordered_map<std::string_view, void (Parser::*)()>
+  TextureManager texture_manager;
+  texture_manager_ = &texture_manager;
+
+  integrator_encountered_ = false;
+  world_begin_encountered_ = false;
+
+  static const std::unordered_map<std::string_view, bool (Parser::*)()>
       callbacks = {
           {"Include", &Parser::Include},
+          {"Integrator", &Parser::Integrator},
+          {"WorldBegin", &Parser::WorldBegin},
+          {"WorldEnd", &Parser::WorldEnd},
       };
 
   if (file_path) {
@@ -98,10 +155,15 @@ std::optional<Renderable> Parser::ParseFrom(
       exit(EXIT_FAILURE);
     }
 
-    (this->*iter->second)();
+    if (!(this->*iter->second)()) {
+      break;
+    }
 
     tokens_parsed = true;
   }
+
+  spectrum_manager_->Clear();
+  return std::nullopt;
 }
 
 }  // namespace iris::pbrt_frontend

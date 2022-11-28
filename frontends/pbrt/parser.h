@@ -9,12 +9,21 @@
 #include <vector>
 
 #include "frontends/pbrt/renderable.h"
+#include "frontends/pbrt/spectrum_manager.h"
+#include "frontends/pbrt/texture_manager.h"
 #include "frontends/pbrt/tokenizer.h"
+#include "iris/integrator.h"
+#include "iris/light_scene.h"
 
 namespace iris::pbrt_frontend {
 
 class Parser {
  public:
+  Parser(std::unique_ptr<SpectrumManager> spectrum_manager)
+      : spectrum_manager_(std::move(spectrum_manager)) {
+    spectrum_manager_->Clear();
+  }
+
   std::optional<Renderable> ParseFrom(
       const std::filesystem::path& search_root, Tokenizer& tokenizer,
       std::optional<std::filesystem::path> file_path = std::nullopt);
@@ -22,7 +31,10 @@ class Parser {
  private:
   std::optional<std::string_view> NextToken();
 
-  void Include();
+  bool Include();
+  bool Integrator();
+  bool WorldBegin();
+  bool WorldEnd();
 
   struct TokenizerEntry {
     Tokenizer* tokenizer;
@@ -33,6 +45,14 @@ class Parser {
   };
 
   std::vector<TokenizerEntry> tokenizers_;
+  std::unique_ptr<SpectrumManager> spectrum_manager_;
+  TextureManager* texture_manager_ = nullptr;
+
+  std::unique_ptr<iris::Integrator> integrator_;
+  std::unique_ptr<iris::LightScene::Builder> light_scene_builder_;
+
+  bool integrator_encountered_ = false;
+  bool world_begin_encountered_ = false;
 };
 
 }  // namespace iris::pbrt_frontend

@@ -124,9 +124,15 @@ cc_library(
     srcs = ["parser.cc"],
     hdrs = ["parser.h"],
     deps = [
+        ":build_objects",
         ":quoted_string",
         ":renderable",
+        ":spectrum_manager",
+        ":texture_manager",
         ":tokenizer",
+        "//frontends/pbrt/integrators:parse",
+        "//iris:integrator",
+        "//iris:light_scene",
     ],
 )
 
@@ -142,6 +148,8 @@ cc_test(
     ],
     deps = [
         ":parser",
+        "//iris/reflectors:mock_reflector",
+        "//iris/spectra:mock_spectrum",
         "@com_google_googletest//:gtest_main",
     ],
 )

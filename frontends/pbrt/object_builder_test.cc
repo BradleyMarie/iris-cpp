@@ -37,6 +37,8 @@ class TestSpectrumManager final : public iris::pbrt_frontend::SpectrumManager {
       const iris::pbrt_frontend::Color& color) override {
     return iris::ReferenceCounted<iris::Reflector>();
   }
+
+  void Clear() override {}
 };
 
 TEST(ObjectBuilder, SpecifiedTwice) {
