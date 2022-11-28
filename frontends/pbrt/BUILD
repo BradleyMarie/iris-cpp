@@ -125,6 +125,7 @@ cc_library(
     hdrs = ["parser.h"],
     deps = [
         ":build_objects",
+        ":matrix_manager",
         ":quoted_string",
         ":renderable",
         ":spectrum_manager",

@@ -31,6 +31,24 @@ class TestSpectrumManager final : public iris::pbrt_frontend::SpectrumManager {
   void Clear() override {}
 };
 
+TEST(Parser, Empty) {
+  std::stringstream input("");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(std::make_unique<TestSpectrumManager>());
+  EXPECT_FALSE(parser.ParseFrom(".", tokenizer));
+}
+
+TEST(Parser, NoEnd) {
+  std::stringstream input("WorldBegin");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(std::make_unique<TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Final directive should be WorldEnd");
+}
+
 TEST(Parser, InvalidDirective) {
   std::stringstream input("NotADirective");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
@@ -103,6 +121,26 @@ TEST(Integrator, AfterWorldBegin) {
               testing::ExitedWithCode(EXIT_FAILURE),
               "ERROR: Directive cannot be specified between WorldBegin and "
               "WorldEnd: Integrator");
+}
+
+TEST(Integrator, Duplicate) {
+  std::stringstream input("Integrator \"path\" Integrator \"path\"");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(std::make_unique<TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "Directive specified twice for a render: Integrator");
+}
+
+TEST(Matrix, Parses) {
+  std::stringstream input("Identity");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(std::make_unique<TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Final directive should be WorldEnd");
 }
 
 TEST(WorldBegin, Duplicate) {

@@ -11,7 +11,7 @@
 namespace iris::pbrt_frontend {
 
 bool Parser::Include() {
-  auto next = NextToken();
+  auto next = tokenizers_.back().tokenizer->Next();
   if (!next) {
     std::cerr << "ERROR: Too few parameters to directive Include" << std::endl;
     exit(EXIT_FAILURE);
@@ -87,6 +87,8 @@ bool Parser::WorldBegin() {
     exit(EXIT_FAILURE);
   }
 
+  matrix_manager_ = std::make_unique<MatrixManager>();
+
   world_begin_encountered_ = true;
   return true;
 }
@@ -100,10 +102,10 @@ bool Parser::WorldEnd() {
   return false;
 }
 
-std::optional<std::string_view> Parser::NextToken() {
+std::optional<std::string_view> Parser::PeekToken() {
   while (!tokenizers_.empty()) {
     if (tokenizers_.back().tokenizer->Peek()) {
-      return tokenizers_.back().tokenizer->Next();
+      return tokenizers_.back().tokenizer->Peek();
     }
 
     tokenizers_.pop_back();
@@ -112,11 +114,15 @@ std::optional<std::string_view> Parser::NextToken() {
   return std::nullopt;
 }
 
+std::string_view Parser::NextToken() {
+  return tokenizers_.back().tokenizer->Next().value();
+}
+
 std::optional<Renderable> Parser::ParseFrom(
     const std::filesystem::path& search_root, Tokenizer& tokenizer,
     std::optional<std::filesystem::path> file_path) {
-  TextureManager texture_manager;
-  texture_manager_ = &texture_manager;
+  matrix_manager_ = std::make_unique<MatrixManager>();
+  texture_manager_ = std::make_unique<TextureManager>();
 
   integrator_encountered_ = false;
   world_begin_encountered_ = false;
@@ -139,8 +145,8 @@ std::optional<Renderable> Parser::ParseFrom(
 
   bool tokens_parsed = false;
   for (;;) {
-    auto token = NextToken();
-    if (!token.has_value()) {
+    auto peeked_token = PeekToken();
+    if (!peeked_token.has_value()) {
       if (tokens_parsed) {
         std::cerr << "ERROR: Final directive should be WorldEnd" << std::endl;
         exit(EXIT_FAILURE);
@@ -149,20 +155,29 @@ std::optional<Renderable> Parser::ParseFrom(
       return std::nullopt;
     }
 
-    auto iter = callbacks.find(*token);
+    tokens_parsed = true;
+
+    if (matrix_manager_->TryParse(*tokenizers_.back().tokenizer)) {
+      continue;
+    }
+
+    auto token = NextToken();
+
+    auto iter = callbacks.find(token);
     if (iter == callbacks.end()) {
-      std::cerr << "ERROR: Invalid directive: " << *token << std::endl;
+      std::cerr << "ERROR: Invalid directive: " << token << std::endl;
       exit(EXIT_FAILURE);
     }
 
     if (!(this->*iter->second)()) {
       break;
     }
-
-    tokens_parsed = true;
   }
 
   spectrum_manager_->Clear();
+  matrix_manager_.reset();
+  texture_manager_.reset();
+
   return std::nullopt;
 }
 

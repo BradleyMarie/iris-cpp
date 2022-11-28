@@ -8,6 +8,7 @@
 #include <string_view>
 #include <vector>
 
+#include "frontends/pbrt/matrix_manager.h"
 #include "frontends/pbrt/renderable.h"
 #include "frontends/pbrt/spectrum_manager.h"
 #include "frontends/pbrt/texture_manager.h"
@@ -29,7 +30,8 @@ class Parser {
       std::optional<std::filesystem::path> file_path = std::nullopt);
 
  private:
-  std::optional<std::string_view> NextToken();
+  std::optional<std::string_view> PeekToken();
+  std::string_view NextToken();
 
   bool Include();
   bool Integrator();
@@ -46,7 +48,8 @@ class Parser {
 
   std::vector<TokenizerEntry> tokenizers_;
   std::unique_ptr<SpectrumManager> spectrum_manager_;
-  TextureManager* texture_manager_ = nullptr;
+  std::unique_ptr<MatrixManager> matrix_manager_;
+  std::unique_ptr<TextureManager> texture_manager_;
 
   std::unique_ptr<iris::Integrator> integrator_;
   std::unique_ptr<iris::LightScene::Builder> light_scene_builder_;
