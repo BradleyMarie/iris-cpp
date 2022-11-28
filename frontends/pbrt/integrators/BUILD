@@ -58,6 +58,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "pixel_bounds_test",
+    srcs = ["pixel_bounds_test.cc"],
+    deps = [
+        ":pixel_bounds",
+        "//iris/reflectors:mock_reflector",
+        "//iris/spectra:mock_spectrum",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "result",
     hdrs = ["result.h"],
