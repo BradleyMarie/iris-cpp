@@ -6,7 +6,7 @@ cc_library(
     name = "light_scenes",
     srcs = ["light_scenes.cc"],
     hdrs = ["light_scenes.h"],
-    visibility = ["//visibility:public"],
+    visibility = ["//visibility:private"],
     deps = [
         "//iris:light_scene",
         "//iris/light_scenes:all_light_scene",
@@ -74,6 +74,7 @@ cc_library(
     name = "pixel_bounds",
     srcs = ["pixel_bounds.cc"],
     hdrs = ["pixel_bounds.h"],
+    visibility = ["//visibility:private"],
     deps = [
         "//frontends/pbrt:parameter",
     ],
