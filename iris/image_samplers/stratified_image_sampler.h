@@ -15,14 +15,8 @@ namespace image_samplers {
 
 class StratifiedImageSampler final : public ImageSampler {
  public:
-  StratifiedImageSampler(uint16_t x_samples, uint16_t y_samples, bool jittered)
-      : x_samples_(x_samples),
-        y_samples_(y_samples),
-        subpixel_size_x_(static_cast<geometric_t>(1.0) /
-                         static_cast<geometric_t>(x_samples)),
-        subpixel_size_y_(static_cast<geometric_t>(1.0) /
-                         static_cast<geometric_t>(y_samples)),
-        jittered_(jittered) {}
+  StratifiedImageSampler(uint16_t x_samples, uint16_t y_samples,
+                         bool jittered) noexcept;
 
   Sample SamplePixel(std::pair<size_t, size_t> image_dimensions,
                      std::pair<size_t, size_t> pixel, uint32_t sample_index,

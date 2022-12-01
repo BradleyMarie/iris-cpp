@@ -16,6 +16,21 @@ geometric_t ToImageCoordinates(size_t pixel_index, size_t image_size,
 
 }  // namespace
 
+StratifiedImageSampler::StratifiedImageSampler(uint16_t x_samples,
+                                               uint16_t y_samples,
+                                               bool jittered) noexcept
+    : x_samples_(x_samples),
+      y_samples_(y_samples),
+      subpixel_size_x_((x_samples != 0)
+                           ? static_cast<geometric_t>(1.0) /
+                                 static_cast<geometric_t>(x_samples)
+                           : 0.0),
+      subpixel_size_y_((y_samples != 0)
+                           ? static_cast<geometric_t>(1.0) /
+                                 static_cast<geometric_t>(y_samples)
+                           : 0.0),
+      jittered_(jittered) {}
+
 ImageSampler::Sample StratifiedImageSampler::SamplePixel(
     std::pair<size_t, size_t> image_dimensions, std::pair<size_t, size_t> pixel,
     uint32_t sample_index, bool sample_lens, Random& rng) {

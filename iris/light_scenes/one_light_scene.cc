@@ -12,17 +12,25 @@ std::unique_ptr<LightScene> OneLightScene::Builder::Build(
   return std::make_unique<OneLightScene>(scene_objects);
 }
 
+OneLightScene::OneLightScene(const SceneObjects& scene_objects) noexcept
+    : scene_objects_(scene_objects),
+      pdf_((scene_objects.NumLights() > 1)
+               ? std::optional<visual_t>(
+                     static_cast<intermediate_t>(1.0) /
+                     static_cast<intermediate_t>(scene_objects.NumLights()))
+               : std::nullopt) {}
+
 LightSample* OneLightScene::Sample(const Point& hit_point, Random& rng,
                                    LightSampleAllocator& allocator) const {
   if (scene_objects_.NumLights() == 0) {
     return nullptr;
   }
 
-  if (scene_objects_.NumLights() == 1) {
-    return &allocator.Allocate(scene_objects_.GetLight(0), std::nullopt);
+  size_t index = 0;
+  if (scene_objects_.NumLights() != 1) {
+    index = rng.NextIndex(scene_objects_.NumLights());
   }
 
-  auto index = rng.NextIndex(scene_objects_.NumLights());
   return &allocator.Allocate(scene_objects_.GetLight(index), pdf_);
 }
 

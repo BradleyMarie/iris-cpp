@@ -2,6 +2,7 @@
 #define _IRIS_LIGHT_SCENES_ONE_LIGHT_SCENE_
 
 #include <memory>
+#include <optional>
 
 #include "iris/light_sample.h"
 #include "iris/light_sample_allocator.h"
@@ -22,17 +23,14 @@ class OneLightScene final : public LightScene {
         const SceneObjects& scene_objects) const override;
   };
 
-  OneLightScene(const SceneObjects& scene_objects) noexcept
-      : scene_objects_(scene_objects),
-        pdf_(static_cast<intermediate_t>(1.0) /
-             static_cast<intermediate_t>(scene_objects.NumLights())) {}
+  OneLightScene(const SceneObjects& scene_objects) noexcept;
 
   LightSample* Sample(const Point& hit_point, Random& rng,
                       LightSampleAllocator& allocator) const override;
 
  private:
   const SceneObjects& scene_objects_;
-  visual_t pdf_;
+  const std::optional<visual_t> pdf_;
 };
 
 }  // namespace light_scenes

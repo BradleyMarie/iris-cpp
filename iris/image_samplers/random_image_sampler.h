@@ -15,7 +15,7 @@ namespace image_samplers {
 
 class RandomImageSampler final : public ImageSampler {
  public:
-  RandomImageSampler(uint32_t samples_per_pixel)
+  RandomImageSampler(uint32_t samples_per_pixel) noexcept
       : samples_per_pixel_(samples_per_pixel) {}
 
   Sample SamplePixel(std::pair<size_t, size_t> image_dimensions,
