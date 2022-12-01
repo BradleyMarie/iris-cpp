@@ -34,3 +34,24 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "stratified_image_sampler",
+    srcs = ["stratified_image_sampler.cc"],
+    hdrs = ["stratified_image_sampler.h"],
+    deps = [
+        "//iris:float",
+        "//iris:image_sampler",
+        "//iris:random",
+    ],
+)
+
+cc_test(
+    name = "stratified_image_sampler_test",
+    srcs = ["stratified_image_sampler_test.cc"],
+    deps = [
+        ":stratified_image_sampler",
+        "//iris/random:mock_random",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
