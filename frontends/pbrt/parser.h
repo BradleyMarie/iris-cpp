@@ -35,6 +35,7 @@ class Parser {
 
   bool Include();
   bool Integrator();
+  bool PixelFilter();
   bool WorldBegin();
   bool WorldEnd();
 
@@ -55,6 +56,7 @@ class Parser {
   std::unique_ptr<iris::LightScene::Builder> light_scene_builder_;
 
   bool integrator_encountered_ = false;
+  bool pixel_filter_encountered_ = false;
   bool world_begin_encountered_ = false;
 };
 

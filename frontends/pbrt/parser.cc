@@ -81,6 +81,45 @@ bool Parser::Integrator() {
   return true;
 }
 
+bool Parser::PixelFilter() {
+  if (world_begin_encountered_) {
+    std::cerr << "ERROR: Directive cannot be specified between WorldBegin and "
+                 "WorldEnd: PixelFilter"
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  if (pixel_filter_encountered_) {
+    std::cerr << "ERROR: Directive specified twice for a render: PixelFilter"
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  auto next = tokenizers_.back().tokenizer->Next();
+  if (!next) {
+    std::cerr << "ERROR: Too few parameters to directive PixelFilter"
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  auto unquoted = Unquote(*next);
+  if (!unquoted) {
+    std::cerr << "ERROR: Parameter to PixelFilter must be a string"
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  if (*unquoted != "box") {
+    std::cerr << "ERROR: Unsupported type for directive PixelFilter: "
+              << *unquoted << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  pixel_filter_encountered_ = true;
+
+  return true;
+}
+
 bool Parser::WorldBegin() {
   if (world_begin_encountered_) {
     std::cerr << "ERROR: Invalid WorldBegin directive" << std::endl;
@@ -125,12 +164,14 @@ std::optional<Renderable> Parser::ParseFrom(
   texture_manager_ = std::make_unique<TextureManager>();
 
   integrator_encountered_ = false;
+  pixel_filter_encountered_ = false;
   world_begin_encountered_ = false;
 
   static const std::unordered_map<std::string_view, bool (Parser::*)()>
       callbacks = {
           {"Include", &Parser::Include},
           {"Integrator", &Parser::Integrator},
+          {"PixelFilter", &Parser::PixelFilter},
           {"WorldBegin", &Parser::WorldBegin},
           {"WorldEnd", &Parser::WorldEnd},
       };

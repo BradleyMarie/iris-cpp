@@ -143,6 +143,47 @@ TEST(Matrix, Parses) {
               "ERROR: Final directive should be WorldEnd");
 }
 
+TEST(PixelFilter, AfterWorldBegin) {
+  std::stringstream input("WorldBegin PixelFilter");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(std::make_unique<TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Directive cannot be specified between WorldBegin and "
+              "WorldEnd: PixelFilter");
+}
+
+TEST(PixelFilter, MissingToken) {
+  std::stringstream input("PixelFilter");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(std::make_unique<TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Too few parameters to directive PixelFilter");
+}
+
+TEST(PixelFilter, NotQuoted) {
+  std::stringstream input("PixelFilter 2.0");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(std::make_unique<TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Parameter to PixelFilter must be a string");
+}
+
+TEST(PixelFilter, Duplicate) {
+  std::stringstream input("PixelFilter \"box\" PixelFilter \"box\"");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(std::make_unique<TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "Directive specified twice for a render: PixelFilter");
+}
+
 TEST(WorldBegin, Duplicate) {
   std::stringstream input("WorldBegin WorldBegin");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
