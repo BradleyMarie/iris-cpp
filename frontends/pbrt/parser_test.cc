@@ -184,6 +184,27 @@ TEST(PixelFilter, Duplicate) {
               "Directive specified twice for a render: PixelFilter");
 }
 
+TEST(Sampler, AfterWorldBegin) {
+  std::stringstream input("WorldBegin Sampler");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(std::make_unique<TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Directive cannot be specified between WorldBegin and "
+              "WorldEnd: Sampler");
+}
+
+TEST(Sampler, Duplicate) {
+  std::stringstream input("Sampler \"random\" Sampler \"random\"");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(std::make_unique<TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "Directive specified twice for a render: Sampler");
+}
+
 TEST(WorldBegin, Duplicate) {
   std::stringstream input("WorldBegin WorldBegin");
   iris::pbrt_frontend::Tokenizer tokenizer(input);

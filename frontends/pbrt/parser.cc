@@ -7,6 +7,7 @@
 #include "frontends/pbrt/build_objects.h"
 #include "frontends/pbrt/integrators/parse.h"
 #include "frontends/pbrt/quoted_string.h"
+#include "frontends/pbrt/samplers/parse.h"
 
 namespace iris::pbrt_frontend {
 
@@ -120,6 +121,29 @@ bool Parser::PixelFilter() {
   return true;
 }
 
+bool Parser::Sampler() {
+  if (world_begin_encountered_) {
+    std::cerr << "ERROR: Directive cannot be specified between WorldBegin and "
+                 "WorldEnd: Sampler"
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  if (image_sampler_) {
+    std::cerr << "ERROR: Directive specified twice for a render: Sampler"
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  const auto& builder = samplers::Parse(*tokenizers_.back().tokenizer);
+  image_sampler_ = BuildObject(builder, *tokenizers_.back().tokenizer,
+                               *spectrum_manager_, *texture_manager_);
+
+  sampler_encountered_ = true;
+
+  return true;
+}
+
 bool Parser::WorldBegin() {
   if (world_begin_encountered_) {
     std::cerr << "ERROR: Invalid WorldBegin directive" << std::endl;
@@ -165,6 +189,7 @@ std::optional<Renderable> Parser::ParseFrom(
 
   integrator_encountered_ = false;
   pixel_filter_encountered_ = false;
+  sampler_encountered_ = false;
   world_begin_encountered_ = false;
 
   static const std::unordered_map<std::string_view, bool (Parser::*)()>
@@ -172,6 +197,7 @@ std::optional<Renderable> Parser::ParseFrom(
           {"Include", &Parser::Include},
           {"Integrator", &Parser::Integrator},
           {"PixelFilter", &Parser::PixelFilter},
+          {"Sampler", &Parser::Sampler},
           {"WorldBegin", &Parser::WorldBegin},
           {"WorldEnd", &Parser::WorldEnd},
       };

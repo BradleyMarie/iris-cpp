@@ -132,6 +132,8 @@ cc_library(
         ":texture_manager",
         ":tokenizer",
         "//frontends/pbrt/integrators:parse",
+        "//frontends/pbrt/samplers:parse",
+        "//iris:image_sampler",
         "//iris:integrator",
         "//iris:light_scene",
     ],
