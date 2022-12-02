@@ -477,7 +477,7 @@ bool ParameterList::ParseFrom(Tokenizer& tokenizer) {
   tokenizer.Next();
 
   type_name_ = iter->first;
-  type_ = (this->*(iter->second))(tokenizer, type_and_name->first);
+  type_ = (this->*(iter->second))(tokenizer, iter->first);
 
   return true;
 }
