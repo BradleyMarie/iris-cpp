@@ -10,14 +10,14 @@ TEST(StraifiedImageSamplerTest, SamplesPerPixel) {
   EXPECT_EQ(15u, sampler.SamplesPerPixel());
 }
 
-TEST(RandomImageSamplerTest, Duplicate) {
+TEST(StraifiedImageSamplerTest, Duplicate) {
   iris::image_samplers::StratifiedImageSampler sampler(5, 3, false);
   EXPECT_EQ(15u, sampler.SamplesPerPixel());
   auto duplicate = sampler.Duplicate();
   EXPECT_EQ(15u, duplicate->SamplesPerPixel());
 }
 
-TEST(RandomImageSamplerTest, SampleNoLensNoJitter) {
+TEST(StraifiedImageSamplerTest, SampleNoLensNoJitter) {
   iris::image_samplers::StratifiedImageSampler sampler(2, 2, false);
   EXPECT_EQ(4u, sampler.SamplesPerPixel());
 
@@ -30,7 +30,7 @@ TEST(RandomImageSamplerTest, SampleNoLensNoJitter) {
   EXPECT_EQ(&rng, &sample.rng);
 }
 
-TEST(RandomImageSamplerTest, SampleWithLensNoJitter) {
+TEST(StraifiedImageSamplerTest, SampleWithLensNoJitter) {
   iris::image_samplers::StratifiedImageSampler sampler(2, 2, false);
   EXPECT_EQ(4u, sampler.SamplesPerPixel());
 
@@ -51,7 +51,7 @@ TEST(RandomImageSamplerTest, SampleWithLensNoJitter) {
   EXPECT_EQ(&rng, &sample.rng);
 }
 
-TEST(RandomImageSamplerTest, SampleNoLensWithJitter) {
+TEST(StraifiedImageSamplerTest, SampleNoLensWithJitter) {
   iris::image_samplers::StratifiedImageSampler sampler(2, 2, true);
   EXPECT_EQ(4u, sampler.SamplesPerPixel());
 
@@ -70,7 +70,7 @@ TEST(RandomImageSamplerTest, SampleNoLensWithJitter) {
   EXPECT_EQ(&rng, &sample.rng);
 }
 
-TEST(RandomImageSamplerTest, SampleWithLensWithJitter) {
+TEST(StraifiedImageSamplerTest, SampleWithLensWithJitter) {
   iris::image_samplers::StratifiedImageSampler sampler(2, 2, true);
   EXPECT_EQ(4u, sampler.SamplesPerPixel());
 
