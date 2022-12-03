@@ -19,6 +19,7 @@ cc_test(
     srcs = ["build_objects_test.cc"],
     deps = [
         ":build_objects",
+        "//frontends/pbrt/spectrum_managers:test_spectrum_manager",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -65,6 +66,7 @@ cc_test(
     srcs = ["object_builder_test.cc"],
     deps = [
         ":object_builder",
+        "//frontends/pbrt/spectrum_managers:test_spectrum_manager",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -113,8 +115,7 @@ cc_test(
     srcs = ["parameter_test.cc"],
     deps = [
         ":parameter",
-        "//iris/reflectors:mock_reflector",
-        "//iris/spectra:mock_spectrum",
+        "//frontends/pbrt/spectrum_managers:test_spectrum_manager",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -151,8 +152,7 @@ cc_test(
     ],
     deps = [
         ":parser",
-        "//iris/reflectors:mock_reflector",
-        "//iris/spectra:mock_spectrum",
+        "//frontends/pbrt/spectrum_managers:test_spectrum_manager",
         "@com_google_googletest//:gtest_main",
     ],
 )

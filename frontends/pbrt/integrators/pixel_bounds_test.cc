@@ -1,32 +1,7 @@
 #include "frontends/pbrt/integrators/pixel_bounds.h"
 
+#include "frontends/pbrt/spectrum_managers/test_spectrum_manager.h"
 #include "googletest/include/gtest/gtest.h"
-#include "iris/reflectors/mock_reflector.h"
-#include "iris/spectra/mock_spectrum.h"
-
-class TestSpectrumManager final : public iris::pbrt_frontend::SpectrumManager {
- public:
-  iris::ReferenceCounted<iris::Spectrum> AllocateSpectrum(
-      const std::map<iris::visual, iris::visual>& wavelengths) override {
-    return iris::MakeReferenceCounted<iris::spectra::MockSpectrum>();
-  }
-  iris::ReferenceCounted<iris::Spectrum> AllocateSpectrum(
-      const iris::pbrt_frontend::Color& color) override {
-    return iris::MakeReferenceCounted<iris::spectra::MockSpectrum>();
-  }
-
-  iris::ReferenceCounted<iris::Reflector> AllocateReflector(
-      const std::map<iris::visual, iris::visual>& wavelengths) override {
-    return iris::MakeReferenceCounted<iris::reflectors::MockReflector>();
-  }
-
-  iris::ReferenceCounted<iris::Reflector> AllocateReflector(
-      const iris::pbrt_frontend::Color& color) override {
-    return iris::MakeReferenceCounted<iris::reflectors::MockReflector>();
-  }
-
-  void Clear() override {}
-};
 
 TEST(ParseLightScene, NegativeXBegin) {
   std::stringstream input("\"integer pixelbounds\" [-1 2 3 4]");
@@ -34,7 +9,7 @@ TEST(ParseLightScene, NegativeXBegin) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::INTEGER,
@@ -51,7 +26,7 @@ TEST(ParseLightScene, NegativeXEnd) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::INTEGER,
@@ -68,7 +43,7 @@ TEST(ParseLightScene, NegativeYBegin) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::INTEGER,
@@ -85,7 +60,7 @@ TEST(ParseLightScene, NegativeYEnd) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::INTEGER,
@@ -102,7 +77,7 @@ TEST(ParseLightScene, BadOrderX) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::INTEGER,
@@ -119,7 +94,7 @@ TEST(ParseLightScene, BadOrderY) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::INTEGER,
@@ -136,7 +111,7 @@ TEST(ParseLightScene, Succeeds) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::INTEGER,

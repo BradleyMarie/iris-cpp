@@ -42,8 +42,7 @@ cc_test(
     deps = [
         ":random",
         "//frontends/pbrt:build_objects",
-        "//iris/reflectors:mock_reflector",
-        "//iris/spectra:mock_spectrum",
+        "//frontends/pbrt/spectrum_managers:test_spectrum_manager",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -65,8 +64,7 @@ cc_test(
     deps = [
         ":stratified",
         "//frontends/pbrt:build_objects",
-        "//iris/reflectors:mock_reflector",
-        "//iris/spectra:mock_spectrum",
+        "//frontends/pbrt/spectrum_managers:test_spectrum_manager",
         "@com_google_googletest//:gtest_main",
     ],
 )

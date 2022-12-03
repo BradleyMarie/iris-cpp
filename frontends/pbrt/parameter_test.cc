@@ -1,32 +1,7 @@
 #include "frontends/pbrt/parameter.h"
 
+#include "frontends/pbrt/spectrum_managers/test_spectrum_manager.h"
 #include "googletest/include/gtest/gtest.h"
-#include "iris/reflectors/mock_reflector.h"
-#include "iris/spectra/mock_spectrum.h"
-
-class TestSpectrumManager final : public iris::pbrt_frontend::SpectrumManager {
- public:
-  iris::ReferenceCounted<iris::Spectrum> AllocateSpectrum(
-      const std::map<iris::visual, iris::visual>& wavelengths) override {
-    return iris::MakeReferenceCounted<iris::spectra::MockSpectrum>();
-  }
-  iris::ReferenceCounted<iris::Spectrum> AllocateSpectrum(
-      const iris::pbrt_frontend::Color& color) override {
-    return iris::MakeReferenceCounted<iris::spectra::MockSpectrum>();
-  }
-
-  iris::ReferenceCounted<iris::Reflector> AllocateReflector(
-      const std::map<iris::visual, iris::visual>& wavelengths) override {
-    return iris::MakeReferenceCounted<iris::reflectors::MockReflector>();
-  }
-
-  iris::ReferenceCounted<iris::Reflector> AllocateReflector(
-      const iris::pbrt_frontend::Color& color) override {
-    return iris::MakeReferenceCounted<iris::reflectors::MockReflector>();
-  }
-
-  void Clear() override {}
-};
 
 TEST(Parameter, BoolWrongType) {
   std::stringstream input("\"integer name\" [1]");
@@ -34,7 +9,7 @@ TEST(Parameter, BoolWrongType) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   EXPECT_EXIT(
@@ -50,7 +25,7 @@ TEST(Parameter, BoolTooFew) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::BOOL,
@@ -67,7 +42,7 @@ TEST(Parameter, BoolTooMany) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::BOOL,
@@ -84,7 +59,7 @@ TEST(Parameter, Bool) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::BOOL,
@@ -100,7 +75,7 @@ TEST(Parameter, FloatWrongType) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   EXPECT_EXIT(
@@ -116,7 +91,7 @@ TEST(Parameter, FloatTooFew) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::FLOAT,
@@ -133,7 +108,7 @@ TEST(Parameter, FloatTooMany) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::FLOAT,
@@ -150,7 +125,7 @@ TEST(Parameter, Float) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::FLOAT,
@@ -166,7 +141,7 @@ TEST(Parameter, FloatTextureWrongType) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   EXPECT_EXIT(parameter.LoadFrom(parameter_list,
@@ -182,7 +157,7 @@ TEST(Parameter, FloatTextureOutOfRange) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   EXPECT_EXIT(parameter.LoadFrom(parameter_list,
@@ -198,7 +173,7 @@ TEST(Parameter, FloatTextureTooFew) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list,
@@ -216,7 +191,7 @@ TEST(Parameter, FloatTextureFloat) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list,
@@ -234,7 +209,7 @@ TEST(Parameter, FloatTextureTexture) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list,
@@ -256,7 +231,7 @@ TEST(Parameter, FloatTextureTooMany) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list,
@@ -274,7 +249,7 @@ TEST(Parameter, IntegerWrongType) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   EXPECT_EXIT(parameter.LoadFrom(parameter_list,
@@ -290,7 +265,7 @@ TEST(Parameter, IntegerTooFew) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::INTEGER,
@@ -307,7 +282,7 @@ TEST(Parameter, IntegerTooMany) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::INTEGER,
@@ -324,7 +299,7 @@ TEST(Parameter, Integer) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::INTEGER,
@@ -340,7 +315,7 @@ TEST(Parameter, NormalWrongType) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   EXPECT_EXIT(
@@ -356,7 +331,7 @@ TEST(Parameter, NormalTooFew) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::NORMAL,
@@ -373,7 +348,7 @@ TEST(Parameter, NormalTooMany) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::NORMAL,
@@ -390,7 +365,7 @@ TEST(Parameter, Normal) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::NORMAL,
@@ -407,7 +382,7 @@ TEST(Parameter, Point3WrongType) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   EXPECT_EXIT(
@@ -423,7 +398,7 @@ TEST(Parameter, Point3TooFew) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::POINT3,
@@ -440,7 +415,7 @@ TEST(Parameter, Point3TooMany) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::POINT3,
@@ -457,7 +432,7 @@ TEST(Parameter, Point3) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::POINT3,
@@ -474,7 +449,7 @@ TEST(Parameter, ReflectorTextureWrongType) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   EXPECT_EXIT(
@@ -491,7 +466,7 @@ TEST(Parameter, ReflectorTextureOutOfRange) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   EXPECT_EXIT(
@@ -508,7 +483,7 @@ TEST(Parameter, ReflectorTextureOutOfRangeX) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   EXPECT_EXIT(
@@ -525,7 +500,7 @@ TEST(Parameter, ReflectorTextureOutOfRangeY) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   EXPECT_EXIT(
@@ -542,7 +517,7 @@ TEST(Parameter, ReflectorTextureOutOfRangeZ) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   EXPECT_EXIT(
@@ -560,7 +535,7 @@ TEST(Parameter, ReflectorTextureTooFew) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list,
@@ -589,7 +564,7 @@ TEST(Parameter, ReflectorTextureTooMany) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list,
@@ -617,7 +592,7 @@ TEST(Parameter, ReflectorColorTexture) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list,
@@ -635,7 +610,7 @@ TEST(Parameter, ReflectorTexture) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list,
@@ -662,7 +637,7 @@ TEST(Parameter, SpectrumWrongType) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   EXPECT_EXIT(parameter.LoadFrom(parameter_list,
@@ -678,7 +653,7 @@ TEST(Parameter, SpectrumTooFew) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::SPECTRUM,
@@ -695,7 +670,7 @@ TEST(Parameter, SpectrumTooMany) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::SPECTRUM,
@@ -712,7 +687,7 @@ TEST(Parameter, SpectrumTooManyColor) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::SPECTRUM,
@@ -728,7 +703,7 @@ TEST(Parameter, SpectrumTooManySampled) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::SPECTRUM,
@@ -744,7 +719,7 @@ TEST(Parameter, StringWrongType) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   EXPECT_EXIT(
@@ -760,7 +735,7 @@ TEST(Parameter, StringTooFew) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::STRING,
@@ -777,7 +752,7 @@ TEST(Parameter, StringTooMany) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::STRING,
@@ -794,7 +769,7 @@ TEST(Parameter, String) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::STRING,
@@ -810,7 +785,7 @@ TEST(Parameter, Vector3WrongType) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   EXPECT_EXIT(parameter.LoadFrom(parameter_list,
@@ -826,7 +801,7 @@ TEST(Parameter, Vector3TooFew) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::VECTOR3,
@@ -843,7 +818,7 @@ TEST(Parameter, Vector3TooMany) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::VECTOR3,
@@ -860,7 +835,7 @@ TEST(Parameter, Vector3) {
   iris::pbrt_frontend::ParameterList parameter_list;
   ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   iris::pbrt_frontend::Parameter parameter;
   parameter.LoadFrom(parameter_list, iris::pbrt_frontend::Parameter::VECTOR3,

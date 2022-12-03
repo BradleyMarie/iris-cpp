@@ -1,5 +1,6 @@
 #include "frontends/pbrt/build_objects.h"
 
+#include "frontends/pbrt/spectrum_managers/test_spectrum_manager.h"
 #include "googletest/include/gtest/gtest.h"
 
 class TestObjectBuilder : public iris::pbrt_frontend::ObjectBuilder<int> {
@@ -20,31 +21,6 @@ class TestObjectBuilder : public iris::pbrt_frontend::ObjectBuilder<int> {
   }
 };
 
-class TestSpectrumManager final : public iris::pbrt_frontend::SpectrumManager {
- public:
-  iris::ReferenceCounted<iris::Spectrum> AllocateSpectrum(
-      const std::map<iris::visual, iris::visual>& wavelengths) override {
-    return iris::ReferenceCounted<iris::Spectrum>();
-  }
-
-  iris::ReferenceCounted<iris::Spectrum> AllocateSpectrum(
-      const iris::pbrt_frontend::Color& color) override {
-    return iris::ReferenceCounted<iris::Spectrum>();
-  }
-
-  iris::ReferenceCounted<iris::Reflector> AllocateReflector(
-      const std::map<iris::visual, iris::visual>& wavelengths) override {
-    return iris::ReferenceCounted<iris::Reflector>();
-  }
-
-  iris::ReferenceCounted<iris::Reflector> AllocateReflector(
-      const iris::pbrt_frontend::Color& color) override {
-    return iris::ReferenceCounted<iris::Reflector>();
-  }
-
-  void Clear() override {}
-};
-
 TEST(ObjectBuilder, Success) {
   std::stringstream input("\"integer name\" [123] \"integer name2\" [456]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
@@ -54,7 +30,7 @@ TEST(ObjectBuilder, Success) {
                     {"name2", iris::pbrt_frontend::Parameter::INTEGER}};
   TestObjectBuilder object_builder(parameters);
 
-  TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
   EXPECT_EQ(1337,
             iris::pbrt_frontend::BuildObject(

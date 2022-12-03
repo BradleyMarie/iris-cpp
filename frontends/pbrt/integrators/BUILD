@@ -64,8 +64,7 @@ cc_test(
     deps = [
         ":path",
         "//frontends/pbrt:build_objects",
-        "//iris/reflectors:mock_reflector",
-        "//iris/spectra:mock_spectrum",
+        "//frontends/pbrt/spectrum_managers:test_spectrum_manager",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -84,8 +83,7 @@ cc_test(
     srcs = ["pixel_bounds_test.cc"],
     deps = [
         ":pixel_bounds",
-        "//iris/reflectors:mock_reflector",
-        "//iris/spectra:mock_spectrum",
+        "//frontends/pbrt/spectrum_managers:test_spectrum_manager",
         "@com_google_googletest//:gtest_main",
     ],
 )
