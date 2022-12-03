@@ -2,7 +2,6 @@
 #define _FRONTENDS_PBRT_SAMPLERS_PARSE_
 
 #include <memory>
-#include <string_view>
 
 #include "frontends/pbrt/object_builder.h"
 #include "iris/image_sampler.h"

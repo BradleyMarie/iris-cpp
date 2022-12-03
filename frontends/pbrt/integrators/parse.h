@@ -2,7 +2,6 @@
 #define _FRONTENDS_PBRT_INTEGRATORS_PARSE_
 
 #include <memory>
-#include <string_view>
 
 #include "frontends/pbrt/integrators/result.h"
 #include "frontends/pbrt/object_builder.h"
