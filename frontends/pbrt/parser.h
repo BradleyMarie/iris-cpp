@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string_view>
@@ -13,6 +14,7 @@
 #include "frontends/pbrt/spectrum_manager.h"
 #include "frontends/pbrt/texture_manager.h"
 #include "frontends/pbrt/tokenizer.h"
+#include "iris/camera.h"
 #include "iris/image_sampler.h"
 #include "iris/integrator.h"
 #include "iris/light_scene.h"
@@ -34,6 +36,7 @@ class Parser {
   std::optional<std::string_view> PeekToken();
   std::string_view NextToken();
 
+  bool Camera();
   bool Include();
   bool Integrator();
   bool PixelFilter();
@@ -54,10 +57,13 @@ class Parser {
   std::unique_ptr<MatrixManager> matrix_manager_;
   std::unique_ptr<TextureManager> texture_manager_;
 
+  std::function<std::unique_ptr<iris::Camera>(const std::pair<size_t, size_t>&)>
+      camera_;
   std::unique_ptr<iris::ImageSampler> image_sampler_;
   std::unique_ptr<iris::Integrator> integrator_;
   std::unique_ptr<iris::LightScene::Builder> light_scene_builder_;
 
+  bool camera_encountered_ = false;
   bool sampler_encountered_ = false;
   bool integrator_encountered_ = false;
   bool pixel_filter_encountered_ = false;

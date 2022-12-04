@@ -132,6 +132,7 @@ cc_library(
         ":spectrum_manager",
         ":texture_manager",
         ":tokenizer",
+        "//frontends/pbrt/cameras:parse",
         "//frontends/pbrt/integrators:parse",
         "//frontends/pbrt/samplers:parse",
         "//iris:image_sampler",

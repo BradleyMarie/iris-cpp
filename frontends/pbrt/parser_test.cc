@@ -39,6 +39,31 @@ TEST(Parser, InvalidDirective) {
               "ERROR: Invalid directive: NotADirective");
 }
 
+TEST(Camera, AfterWorldBegin) {
+  std::stringstream input("WorldBegin Camera");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(
+      std::make_unique<
+          iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Directive cannot be specified between WorldBegin and "
+              "WorldEnd: Camera");
+}
+
+TEST(Camera, Duplicate) {
+  std::stringstream input("Camera \"perspective\" Camera \"perspective\"");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(
+      std::make_unique<
+          iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "Directive specified twice for a render: Camera");
+}
+
 TEST(Include, MissingToken) {
   std::stringstream input("Include");
   iris::pbrt_frontend::Tokenizer tokenizer(input);

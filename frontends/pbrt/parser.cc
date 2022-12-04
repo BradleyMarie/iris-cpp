@@ -5,11 +5,36 @@
 #include <unordered_map>
 
 #include "frontends/pbrt/build_objects.h"
+#include "frontends/pbrt/cameras/parse.h"
 #include "frontends/pbrt/integrators/parse.h"
 #include "frontends/pbrt/quoted_string.h"
 #include "frontends/pbrt/samplers/parse.h"
 
 namespace iris::pbrt_frontend {
+
+bool Parser::Camera() {
+  if (world_begin_encountered_) {
+    std::cerr << "ERROR: Directive cannot be specified between WorldBegin and "
+                 "WorldEnd: Camera"
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  if (camera_encountered_) {
+    std::cerr << "ERROR: Directive specified twice for a render: Camera"
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  const auto& builder = cameras::Parse(*tokenizers_.back().tokenizer);
+  camera_ =
+      BuildObject(builder, *tokenizers_.back().tokenizer, *spectrum_manager_,
+                  *texture_manager_, matrix_manager_->Get());
+
+  camera_encountered_ = true;
+
+  return true;
+}
 
 bool Parser::Include() {
   auto next = tokenizers_.back().tokenizer->Next();
@@ -129,7 +154,7 @@ bool Parser::Sampler() {
     exit(EXIT_FAILURE);
   }
 
-  if (image_sampler_) {
+  if (sampler_encountered_) {
     std::cerr << "ERROR: Directive specified twice for a render: Sampler"
               << std::endl;
     exit(EXIT_FAILURE);
@@ -187,6 +212,7 @@ std::optional<Renderable> Parser::ParseFrom(
   matrix_manager_ = std::make_unique<MatrixManager>();
   texture_manager_ = std::make_unique<TextureManager>();
 
+  camera_encountered_ = false;
   integrator_encountered_ = false;
   pixel_filter_encountered_ = false;
   sampler_encountered_ = false;
@@ -194,6 +220,7 @@ std::optional<Renderable> Parser::ParseFrom(
 
   static const std::unordered_map<std::string_view, bool (Parser::*)()>
       callbacks = {
+          {"Camera", &Parser::Camera},
           {"Include", &Parser::Include},
           {"Integrator", &Parser::Integrator},
           {"PixelFilter", &Parser::PixelFilter},
@@ -241,6 +268,7 @@ std::optional<Renderable> Parser::ParseFrom(
     }
   }
 
+  camera_ = nullptr;
   spectrum_manager_->Clear();
   matrix_manager_.reset();
   texture_manager_.reset();

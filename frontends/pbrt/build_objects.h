@@ -16,7 +16,7 @@ namespace iris::pbrt_frontend {
 template <typename T, typename... BuildArgs>
 T BuildObject(const ObjectBuilder<T, BuildArgs...>& builder,
               Tokenizer& tokenizer, SpectrumManager& spectrum_manager,
-              TextureManager& texture_manager, BuildArgs... build_args) {
+              TextureManager& texture_manager, BuildArgs&&... build_args) {
   std::unordered_set<std::string_view> parameters_parsed;
   std::unordered_map<std::string_view, Parameter> parameters;
 
