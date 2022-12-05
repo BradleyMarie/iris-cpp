@@ -13,9 +13,8 @@ namespace cameras {
 
 class OrthographicCamera final : public Camera {
  public:
-  // fov is specified in degrees
-  OrthographicCamera(const Matrix& camera_to_world) noexcept
-      : camera_to_world_(camera_to_world) {}
+  OrthographicCamera(const Matrix& camera_to_world,
+                     const std::array<geometric_t, 4>& frame_bounds) noexcept;
 
   Ray Compute(const std::array<geometric_t, 2>& image_uv,
               const std::array<geometric_t, 2>* lens_uv) const override;
@@ -23,6 +22,8 @@ class OrthographicCamera final : public Camera {
 
  private:
   const Matrix camera_to_world_;
+  const std::array<geometric_t, 2> frame_start_;
+  const std::array<geometric_t, 2> frame_size_;
 };
 
 }  // namespace cameras
