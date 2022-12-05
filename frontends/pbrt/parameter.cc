@@ -293,8 +293,7 @@ void Parameter::LoadFrom(const ParameterList& parameter_list, Type type,
           {VECTOR3, &Parameter::ParseVector3},
       };
 
-  name_storage_ = parameter_list.GetName();
-  name_ = name_storage_;
+  name_ = parameter_list.GetName();
   type_ = type;
 
   auto callback = callbacks.at(type);

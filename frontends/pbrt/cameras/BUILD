@@ -14,6 +14,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "orthographic_test",
+    srcs = ["orthographic_test.cc"],
+    deps = [
+        ":orthographic",
+        ":parse",
+        "//frontends/pbrt:build_objects",
+        "//frontends/pbrt/spectrum_managers:test_spectrum_manager",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "parse",
     srcs = ["parse.cc"],

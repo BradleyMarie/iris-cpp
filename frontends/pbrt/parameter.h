@@ -102,8 +102,7 @@ class Parameter {
                     SpectrumManager& spectrum_manager,
                     TextureManager& texture_manager);
 
-  std::optional<std::string_view> name_;
-  std::string name_storage_;
+  std::optional<std::string> name_;
   std::optional<Type> type_;
 
   std::vector<bool> bools_;
