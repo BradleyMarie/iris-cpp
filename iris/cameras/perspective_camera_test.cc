@@ -3,12 +3,16 @@
 #include "googletest/include/gtest/gtest.h"
 
 TEST(PerspectiveCameraTest, HasLens) {
-  iris::cameras::PerspectiveCamera camera(iris::Matrix::Identity(), 1.0, 90.0);
+  iris::cameras::PerspectiveCamera camera(
+      iris::Matrix::Identity(),
+      std::array<iris::geometric_t, 4>({-1.0, -1.0, 1.0, 1.0}), 90.0);
   EXPECT_FALSE(camera.HasLens());
 }
 
 TEST(PerspectiveCameraTest, FourCorners) {
-  iris::cameras::PerspectiveCamera camera(iris::Matrix::Identity(), 1.0, 90.0);
+  iris::cameras::PerspectiveCamera camera(
+      iris::Matrix::Identity(),
+      std::array<iris::geometric_t, 4>({-1.0, -1.0, 1.0, 1.0}), 90.0);
 
   auto top_left = camera.Compute({0.0, 0.0}, nullptr);
   EXPECT_EQ(iris::Point(0.0, 0.0, 0.0), top_left.origin);
@@ -36,7 +40,9 @@ TEST(PerspectiveCameraTest, FourCorners) {
 }
 
 TEST(PerspectiveCameraTest, Center) {
-  iris::cameras::PerspectiveCamera camera(iris::Matrix::Identity(), 1.0, 90.0);
+  iris::cameras::PerspectiveCamera camera(
+      iris::Matrix::Identity(),
+      std::array<iris::geometric_t, 4>({-1.0, -1.0, 1.0, 1.0}), 90.0);
   auto ray = camera.Compute({0.5, 0.5}, nullptr);
   EXPECT_EQ(iris::Point(0.0, 0.0, 0.0), ray.origin);
   EXPECT_NEAR(0.0, ray.direction.x, 0.001);
@@ -46,7 +52,8 @@ TEST(PerspectiveCameraTest, Center) {
 
 TEST(PerspectiveCameraTest, ScaledCenter) {
   iris::cameras::PerspectiveCamera camera(
-      iris::Matrix::Scalar(2.0, 1.0, 2.0).value(), 1.0, 90.0);
+      iris::Matrix::Scalar(2.0, 1.0, 2.0).value(),
+      std::array<iris::geometric_t, 4>({-1.0, -1.0, 1.0, 1.0}), 90.0);
   auto ray = camera.Compute({0.5, 0.5}, nullptr);
   EXPECT_EQ(iris::Point(0.0, 0.0, 0.0), ray.origin);
   EXPECT_NEAR(0.0, ray.direction.x, 0.001);
@@ -56,26 +63,11 @@ TEST(PerspectiveCameraTest, ScaledCenter) {
 
 TEST(PerspectiveCameraTest, TranslatedCenter) {
   iris::cameras::PerspectiveCamera camera(
-      iris::Matrix::Translation(1.0, 2.0, 3.0).value(), 1.0, 90.0);
+      iris::Matrix::Translation(1.0, 2.0, 3.0).value(),
+      std::array<iris::geometric_t, 4>({-1.0, -1.0, 1.0, 1.0}), 90.0);
   auto ray = camera.Compute({0.5, 0.5}, nullptr);
   EXPECT_EQ(iris::Point(1.0, 2.0, 3.0), ray.origin);
   EXPECT_NEAR(0.0, ray.direction.x, 0.001);
   EXPECT_NEAR(0.0, ray.direction.y, 0.001);
   EXPECT_NEAR(1.0, ray.direction.z, 0.001);
-}
-
-TEST(PerspectiveCameraTest, FovX) {
-  iris::cameras::PerspectiveCamera camera(iris::Matrix::Identity(), 0.5, 90.0);
-  auto ray = camera.Compute({0.0, 0.5}, nullptr);
-  EXPECT_NEAR(0.707106,
-              iris::DotProduct(iris::Vector(0.0, 0.0, 1.0), ray.direction),
-              0.001);
-}
-
-TEST(PerspectiveCameraTest, FovY) {
-  iris::cameras::PerspectiveCamera camera(iris::Matrix::Identity(), 2.0, 90.0);
-  auto ray = camera.Compute({0.5, 0.0}, nullptr);
-  EXPECT_NEAR(0.707106,
-              iris::DotProduct(iris::Vector(0.0, 0.0, 1.0), ray.direction),
-              0.001);
 }

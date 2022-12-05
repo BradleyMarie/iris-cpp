@@ -8,37 +8,29 @@ namespace iris {
 namespace cameras {
 namespace {
 
-std::tuple<Vector, Vector, Vector> ComputeImagePlane(geometric_t aspect_ratio,
-                                                     geometric_t fov) {
-  geometric_t half_fov_radians = fov * static_cast<geometric>(M_PI / 360.0);
-  geometric_t image_dimension =
-      static_cast<geometric>(2.0) * std::tan(half_fov_radians);
-
-  geometric_t x_dim, y_dim;
-  if (aspect_ratio < 1.0) {
-    x_dim = image_dimension;
-    y_dim = image_dimension / aspect_ratio;
-  } else {
-    x_dim = image_dimension * aspect_ratio;
-    y_dim = image_dimension;
-  }
-
-  Vector image_plane_u(x_dim, 0.0, 0.0);
-  Vector image_plane_v(0.0, -y_dim, 0.0);
-  Vector to_image_plane =
-      Vector(0.0, 0.0, 1.0) - image_plane_u * 0.5 - image_plane_v * 0.5;
-
-  return std::make_tuple(to_image_plane, image_plane_u, image_plane_v);
+Point ComputeFrameStart(const std::array<geometric_t, 4>& frame_bounds,
+                        geometric_t fov) {
+  intermediate_t half_fov_radians =
+      fov * static_cast<intermediate_t>(M_PI / 360.0);
+  geometric_t image_plane_distance = 1.0 / std::tan(half_fov_radians);
+  return Point(frame_bounds[0], frame_bounds[3], image_plane_distance);
 }
 
 }  // namespace
 
-PerspectiveCamera::PerspectiveCamera(const Matrix& camera_to_world,
-                                     geometric_t aspect_ratio,
-                                     geometric_t fov) noexcept
+PerspectiveCamera::PerspectiveCamera(
+    const Matrix& camera_to_world,
+    const std::array<geometric_t, 4>& frame_bounds, geometric_t fov) noexcept
     : camera_to_world_(camera_to_world),
-      image_plane_(ComputeImagePlane(aspect_ratio, fov)) {
-  assert(std::isfinite(aspect_ratio) && aspect_ratio > 0.0);
+      frame_start_(ComputeFrameStart(frame_bounds, fov)),
+      frame_size_({frame_bounds[2] - frame_bounds[0],
+                   frame_bounds[1] - frame_bounds[3]}) {
+  assert(std::isfinite(frame_bounds[0]));
+  assert(std::isfinite(frame_bounds[1]));
+  assert(std::isfinite(frame_bounds[2]));
+  assert(std::isfinite(frame_bounds[3]));
+  assert(frame_bounds[0] < frame_bounds[2]);
+  assert(frame_bounds[1] < frame_bounds[3]);
   assert(0.0 < fov && fov < 180.0);
 }
 
@@ -46,10 +38,10 @@ Ray PerspectiveCamera::Compute(
     const std::array<geometric_t, 2>& image_uv,
     const std::array<geometric_t, 2>* lens_uv) const {
   Point camera_origin(0.0, 0.0, 0.0);
-  Vector camera_direction = std::get<0>(image_plane_) +
-                            std::get<1>(image_plane_) * image_uv[0] +
-                            std::get<2>(image_plane_) * image_uv[1];
-  Ray camera_ray(camera_origin, camera_direction);
+  Point image_plane(frame_start_.x + frame_size_[0] * image_uv[0],
+                    frame_start_.y + frame_size_[1] * image_uv[1],
+                    frame_start_.z);
+  Ray camera_ray(camera_origin, image_plane - camera_origin);
   return Normalize(camera_to_world_.Multiply(camera_ray));
 }
 
