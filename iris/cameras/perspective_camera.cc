@@ -37,11 +37,10 @@ PerspectiveCamera::PerspectiveCamera(
 Ray PerspectiveCamera::Compute(
     const std::array<geometric_t, 2>& image_uv,
     const std::array<geometric_t, 2>* lens_uv) const {
-  Point camera_origin(0.0, 0.0, 0.0);
-  Point image_plane(frame_start_.x + frame_size_[0] * image_uv[0],
-                    frame_start_.y + frame_size_[1] * image_uv[1],
-                    frame_start_.z);
-  Ray camera_ray(camera_origin, image_plane - camera_origin);
+  Point origin(frame_start_.x + frame_size_[0] * image_uv[0],
+               frame_start_.y + frame_size_[1] * image_uv[1], 0.0);
+  Vector direction(origin.x, origin.y, frame_start_.z);
+  Ray camera_ray(origin, direction);
   return Normalize(camera_to_world_.Multiply(camera_ray));
 }
 

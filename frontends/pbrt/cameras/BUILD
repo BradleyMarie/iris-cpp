@@ -61,3 +61,15 @@ cc_library(
         "//iris/cameras:perspective_camera",
     ],
 )
+
+cc_test(
+    name = "perspective_test",
+    srcs = ["perspective_test.cc"],
+    deps = [
+        ":parse",
+        ":perspective",
+        "//frontends/pbrt:build_objects",
+        "//frontends/pbrt/spectrum_managers:test_spectrum_manager",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

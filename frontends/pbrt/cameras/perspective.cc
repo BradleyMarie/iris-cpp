@@ -70,7 +70,7 @@ PerspectiveObjectBuilder::Build(
       exit(EXIT_FAILURE);
     }
 
-    fov = value;
+    half_fov = value;
   }
 
   auto screenwindow = parameters.find("screenwindow");
@@ -103,7 +103,7 @@ PerspectiveObjectBuilder::Build(
   }
 
   if (half_fov) {
-    fov = *half_fov * 0.5;
+    fov = half_fov.value() * 0.5;
   }
 
   if (!fov) {

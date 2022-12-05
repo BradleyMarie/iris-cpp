@@ -15,25 +15,25 @@ TEST(PerspectiveCameraTest, FourCorners) {
       std::array<iris::geometric_t, 4>({-1.0, -1.0, 1.0, 1.0}), 90.0);
 
   auto top_left = camera.Compute({0.0, 0.0}, nullptr);
-  EXPECT_EQ(iris::Point(0.0, 0.0, 0.0), top_left.origin);
+  EXPECT_EQ(iris::Point(-1.0, 1.0, 0.0), top_left.origin);
   EXPECT_NEAR(-0.57735025882720947, top_left.direction.x, 0.001);
   EXPECT_NEAR(0.57735025882720947, top_left.direction.y, 0.001);
   EXPECT_NEAR(0.57735025882720947, top_left.direction.z, 0.001);
 
   auto top_right = camera.Compute({1.0, 0.0}, nullptr);
-  EXPECT_EQ(iris::Point(0.0, 0.0, 0.0), top_right.origin);
+  EXPECT_EQ(iris::Point(1.0, 1.0, 0.0), top_right.origin);
   EXPECT_NEAR(0.57735025882720947, top_right.direction.x, 0.001);
   EXPECT_NEAR(0.57735025882720947, top_right.direction.y, 0.001);
   EXPECT_NEAR(0.57735025882720947, top_right.direction.z, 0.001);
 
   auto bottom_left = camera.Compute({0.0, 1.0}, nullptr);
-  EXPECT_EQ(iris::Point(0.0, 0.0, 0.0), bottom_left.origin);
+  EXPECT_EQ(iris::Point(-1.0, -1.0, 0.0), bottom_left.origin);
   EXPECT_NEAR(-0.57735025882720947, bottom_left.direction.x, 0.001);
   EXPECT_NEAR(-0.57735025882720947, bottom_left.direction.y, 0.001);
   EXPECT_NEAR(0.57735025882720947, bottom_left.direction.z, 0.001);
 
   auto bottom_right = camera.Compute({1.0, 1.0}, nullptr);
-  EXPECT_EQ(iris::Point(0.0, 0.0, 0.0), bottom_right.origin);
+  EXPECT_EQ(iris::Point(1.0, -1.0, 0.0), bottom_right.origin);
   EXPECT_NEAR(0.57735025882720947, bottom_right.direction.x, 0.001);
   EXPECT_NEAR(-0.57735025882720947, bottom_right.direction.y, 0.001);
   EXPECT_NEAR(0.57735025882720947, bottom_right.direction.z, 0.001);
