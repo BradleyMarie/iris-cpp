@@ -33,6 +33,26 @@ cc_library(
 )
 
 cc_library(
+    name = "material_manager",
+    srcs = ["material_manager.cc"],
+    hdrs = ["material_manager.h"],
+    deps = [
+        "//iris:material",
+        "//iris:reference_counted",
+    ],
+)
+
+cc_test(
+    name = "material_manager_test",
+    srcs = ["material_manager_test.cc"],
+    deps = [
+        ":material_manager",
+        "//iris/materials:mock_material",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "matrix_manager",
     srcs = ["matrix_manager.cc"],
     hdrs = ["matrix_manager.h"],
