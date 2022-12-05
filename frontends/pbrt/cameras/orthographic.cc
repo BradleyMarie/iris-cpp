@@ -71,7 +71,7 @@ OrthographicObjectBuilder::Build(
     return [screen_window,
             transformation](const std::pair<size_t, size_t>& image_dimensions) {
       return std::make_unique<iris::cameras::OrthographicCamera>(
-          transformation.start, *screen_window);
+          transformation.start, screen_window.value());
     };
   }
 
