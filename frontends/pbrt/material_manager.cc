@@ -5,7 +5,8 @@
 
 namespace iris::pbrt_frontend {
 
-ReferenceCounted<Material> MaterialManager::Get(std::string_view name) const {
+std::shared_ptr<ObjectBuilder<iris::ReferenceCounted<Material>>>
+MaterialManager::Get(std::string_view name) const {
   temp_key_ = name;
 
   auto iter = materials_.find(temp_key_);
@@ -17,8 +18,9 @@ ReferenceCounted<Material> MaterialManager::Get(std::string_view name) const {
   return iter->second;
 }
 
-void MaterialManager::Put(std::string_view name,
-                          ReferenceCounted<Material> texture) {
+void MaterialManager::Put(
+    std::string_view name,
+    std::shared_ptr<ObjectBuilder<iris::ReferenceCounted<Material>>> texture) {
   temp_key_ = name;
   materials_[temp_key_] = texture;
 }

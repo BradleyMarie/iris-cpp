@@ -37,6 +37,7 @@ cc_library(
     srcs = ["material_manager.cc"],
     hdrs = ["material_manager.h"],
     deps = [
+        ":object_builder",
         "//iris:material",
         "//iris:reference_counted",
     ],

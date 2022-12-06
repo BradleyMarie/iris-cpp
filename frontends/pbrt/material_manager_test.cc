@@ -3,6 +3,19 @@
 #include "googletest/include/gtest/gtest.h"
 #include "iris/materials/mock_material.h"
 
+class TestObjectBuilder : public iris::pbrt_frontend::ObjectBuilder<
+                              iris::ReferenceCounted<iris::Material>> {
+ public:
+  TestObjectBuilder() : ObjectBuilder({}) {}
+
+  iris::ReferenceCounted<iris::Material> Build(
+      const std::unordered_map<std::string_view,
+                               iris::pbrt_frontend::Parameter>& parameters)
+      const override {
+    return iris::ReferenceCounted<iris::Material>();
+  }
+};
+
 TEST(MaterialManager, GetMissing) {
   iris::pbrt_frontend::MaterialManager material_manager;
   EXPECT_EXIT(material_manager.Get("test"),
@@ -11,14 +24,14 @@ TEST(MaterialManager, GetMissing) {
 }
 
 TEST(MaterialManager, Get) {
-  auto material = iris::MakeReferenceCounted<iris::materials::MockMaterial>();
+  auto material = std::make_shared<TestObjectBuilder>();
   iris::pbrt_frontend::MaterialManager material_manager;
   material_manager.Put("test", material);
-  EXPECT_EQ(material.Get(), material_manager.Get("test").Get());
+  EXPECT_EQ(material.get(), material_manager.Get("test").get());
 }
 
 TEST(MaterialManager, Clear) {
-  auto material = iris::MakeReferenceCounted<iris::materials::MockMaterial>();
+  auto material = std::make_shared<TestObjectBuilder>();
   iris::pbrt_frontend::MaterialManager material_manager;
   material_manager.Clear();
   EXPECT_EXIT(material_manager.Get("test"),
