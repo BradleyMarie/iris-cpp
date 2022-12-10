@@ -460,6 +460,40 @@ TEST(Parameter, ReflectorTextureWrongType) {
       "ERROR: Wrong type for parameter list: name");
 }
 
+TEST(Parameter, ReflectorFloatTextureOutOfRangeNegative) {
+  std::stringstream input("\"float name\" [-2]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
+
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  EXPECT_EXIT(
+      parameter.LoadFrom(parameter_list,
+                         iris::pbrt_frontend::Parameter::REFLECTOR_TEXTURE,
+                         spectrum_manager, texture_manager),
+      testing::ExitedWithCode(EXIT_FAILURE),
+      "ERROR: Out of range value in parameter list: name");
+}
+
+TEST(Parameter, ReflectorFloatTextureOutOfRangePositive) {
+  std::stringstream input("\"float name\" [2]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
+
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  EXPECT_EXIT(
+      parameter.LoadFrom(parameter_list,
+                         iris::pbrt_frontend::Parameter::REFLECTOR_TEXTURE,
+                         spectrum_manager, texture_manager),
+      testing::ExitedWithCode(EXIT_FAILURE),
+      "ERROR: Out of range value in parameter list: name");
+}
+
 TEST(Parameter, ReflectorTextureOutOfRange) {
   std::stringstream input("\"spectrum name\" [1 2]");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
@@ -584,6 +618,23 @@ TEST(Parameter, ReflectorTextureTooMany) {
   EXPECT_EXIT(parameter.GetReflectorTextures(1u, 1u),
               testing::ExitedWithCode(EXIT_FAILURE),
               "ERROR: Too many values in parameter list: name");
+}
+
+TEST(Parameter, ReflectorFloatTexture) {
+  std::stringstream input("\"float name\" [1]");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+  iris::pbrt_frontend::ParameterList parameter_list;
+  ASSERT_TRUE(parameter_list.ParseFrom(tokenizer));
+
+  iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
+  iris::pbrt_frontend::TextureManager texture_manager;
+  iris::pbrt_frontend::Parameter parameter;
+  parameter.LoadFrom(parameter_list,
+                     iris::pbrt_frontend::Parameter::REFLECTOR_TEXTURE,
+                     spectrum_manager, texture_manager);
+
+  EXPECT_EQ(1u, parameter.GetReflectorTextures(1u, 1u).size());
+  EXPECT_NE(nullptr, parameter.GetReflectorTextures(1u, 1u).at(0).Get());
 }
 
 TEST(Parameter, ReflectorColorTexture) {

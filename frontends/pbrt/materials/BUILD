@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 
 package(default_visibility = ["//visibility:private"])
 
@@ -12,6 +12,17 @@ cc_library(
         "//iris:material",
         "//iris:reference_counted",
         "//iris/materials:matte_material",
+    ],
+)
+
+cc_test(
+    name = "matte_test",
+    srcs = ["matte_test.cc"],
+    deps = [
+        ":matte",
+        "//frontends/pbrt:build_objects",
+        "//frontends/pbrt/spectrum_managers:test_spectrum_manager",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
