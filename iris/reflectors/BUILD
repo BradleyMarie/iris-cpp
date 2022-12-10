@@ -31,3 +31,22 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "uniform_reflector",
+    srcs = ["uniform_reflector.cc"],
+    hdrs = ["uniform_reflector.h"],
+    deps = [
+        "//iris:float",
+        "//iris:reflector",
+    ],
+)
+
+cc_test(
+    name = "uniform_reflector_test",
+    srcs = ["uniform_reflector_test.cc"],
+    deps = [
+        ":uniform_reflector",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
