@@ -38,6 +38,7 @@ cc_library(
     hdrs = ["material_manager.h"],
     deps = [
         ":object_builder",
+        ":texture_manager",
         "//iris:material",
         "//iris:reference_counted",
     ],
@@ -232,6 +233,7 @@ cc_library(
         "//iris:reference_counted",
         "//iris:reflector",
         "//iris:spectral_allocator",
+        "//iris/reflectors:uniform_reflector",
         "//iris/textures:constant_texture",
         "//iris/textures:texture2d",
     ],

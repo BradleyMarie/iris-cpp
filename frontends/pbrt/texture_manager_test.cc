@@ -10,6 +10,16 @@ TEST(TextureManager, AllocateUniformFloatTexture) {
   EXPECT_EQ(texture0.Get(), texture1.Get());
 }
 
+TEST(TextureManager, AllocateUniformFloatReflectorTexture) {
+  auto reflector =
+      iris::MakeReferenceCounted<iris::reflectors::MockReflector>();
+
+  iris::pbrt_frontend::TextureManager texture_manager;
+  auto texture0 = texture_manager.AllocateUniformReflectorTexture(1.0);
+  auto texture1 = texture_manager.AllocateUniformReflectorTexture(1.0);
+  EXPECT_EQ(texture0.Get(), texture1.Get());
+}
+
 TEST(TextureManager, AllocateUniformReflectorTexture) {
   auto reflector =
       iris::MakeReferenceCounted<iris::reflectors::MockReflector>();

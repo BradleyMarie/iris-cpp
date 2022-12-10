@@ -4,14 +4,15 @@
 #include "iris/materials/mock_material.h"
 
 class TestObjectBuilder : public iris::pbrt_frontend::ObjectBuilder<
-                              iris::ReferenceCounted<iris::Material>> {
+                              iris::ReferenceCounted<iris::Material>,
+                              iris::pbrt_frontend::TextureManager&> {
  public:
   TestObjectBuilder() : ObjectBuilder({}) {}
 
   iris::ReferenceCounted<iris::Material> Build(
       const std::unordered_map<std::string_view,
-                               iris::pbrt_frontend::Parameter>& parameters)
-      const override {
+                               iris::pbrt_frontend::Parameter>& parameters,
+      iris::pbrt_frontend::TextureManager& texture_manager) const override {
     return iris::ReferenceCounted<iris::Material>();
   }
 };

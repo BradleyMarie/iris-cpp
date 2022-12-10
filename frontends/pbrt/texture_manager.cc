@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "iris/reflectors/uniform_reflector.h"
 #include "iris/textures/constant_texture.h"
 
 namespace iris::pbrt_frontend {
@@ -35,6 +36,25 @@ TextureManager::AllocateUniformReflectorTexture(
       iris::textures::ConstantPointerTexture2D<Reflector, SpectralAllocator>>(
       std::move(reflector));
   uniform_reflector_textures_[key] = texture;
+
+  return texture;
+}
+
+ReferenceCounted<textures::PointerTexture2D<Reflector, SpectralAllocator>>
+TextureManager::AllocateUniformReflectorTexture(visual reflectance) {
+  auto iter = uniform_value_reflector_textures_.find(reflectance);
+  if (iter != uniform_value_reflector_textures_.end()) {
+    return iter->second;
+  }
+
+  auto reflector =
+      iris::MakeReferenceCounted<iris::reflectors::UniformReflector>(
+          reflectance);
+
+  auto texture = iris::MakeReferenceCounted<
+      iris::textures::ConstantPointerTexture2D<Reflector, SpectralAllocator>>(
+      std::move(reflector));
+  uniform_value_reflector_textures_[reflectance] = texture;
 
   return texture;
 }
