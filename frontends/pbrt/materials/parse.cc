@@ -119,4 +119,10 @@ ParseNamed(Tokenizer& tokenizer, MaterialManager& material_manager,
   return result;
 }
 
+std::shared_ptr<
+    ObjectBuilder<iris::ReferenceCounted<Material>, TextureManager&>>
+Default() {
+  return g_default;
+}
+
 }  // namespace iris::pbrt_frontend::materials

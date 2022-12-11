@@ -139,3 +139,8 @@ TEST(ParseNamed, Matte) {
 
   EXPECT_EQ(result, material_manager.Get("name"));
 }
+
+TEST(Default, Default) {
+  auto default_builder = iris::pbrt_frontend::materials::Default();
+  EXPECT_NE(nullptr, default_builder.get());
+}

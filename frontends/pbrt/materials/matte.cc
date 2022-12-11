@@ -1,9 +1,14 @@
 #include "frontends/pbrt/materials/matte.h"
 
 #include "iris/materials/matte_material.h"
+#include "iris/reflectors/uniform_reflector.h"
+#include "iris/textures/constant_texture.h"
 
 namespace iris::pbrt_frontend::materials {
 namespace {
+
+static const iris::visual kDefaultReflectance = 0.5;
+static const iris::visual kDefaultSigma = 0.0;
 
 static const std::unordered_map<std::string_view, Parameter::Type>
     g_parameters = {
@@ -57,8 +62,10 @@ std::shared_ptr<
 MatteObjectBuilder::Build(
     const std::unordered_map<std::string_view, Parameter>& parameters,
     TextureManager& texture_manager) const {
-  auto diffuse_texture = texture_manager.AllocateUniformReflectorTexture(0.5);
-  auto sigma_texture = texture_manager.AllocateUniformFloatTexture(0.5);
+  auto diffuse_texture =
+      texture_manager.AllocateUniformReflectorTexture(kDefaultReflectance);
+  auto sigma_texture =
+      texture_manager.AllocateUniformFloatTexture(kDefaultSigma);
 
   auto kd = parameters.find("Kd");
   if (kd != parameters.end()) {
@@ -98,6 +105,24 @@ iris::ReferenceCounted<Material> NestedMatteObjectBuilder::Build(
       std::move(diffuse_texture), std::move(sigma_texture));
 }
 
+std::shared_ptr<
+    ObjectBuilder<iris::ReferenceCounted<Material>, TextureManager&>>
+InitializeDefault() {
+  auto reflectance =
+      iris::MakeReferenceCounted<iris::reflectors::UniformReflector>(
+          kDefaultReflectance);
+
+  auto diffuse = iris::MakeReferenceCounted<
+      iris::textures::ConstantPointerTexture2D<Reflector, SpectralAllocator>>(
+      std::move(reflectance));
+
+  auto sigma = iris::MakeReferenceCounted<
+      iris::textures::ConstantValueTexture2D<visual>>(kDefaultSigma);
+
+  return std::make_shared<NestedMatteObjectBuilder>(std::move(diffuse),
+                                                    std::move(sigma));
+}
+
 }  // namespace
 
 const std::unique_ptr<
@@ -105,5 +130,9 @@ const std::unique_ptr<
                             iris::ReferenceCounted<Material>, TextureManager&>>,
                         TextureManager&>>
     g_matte_builder = std::make_unique<MatteObjectBuilder>();
+
+const std::shared_ptr<
+    ObjectBuilder<iris::ReferenceCounted<Material>, TextureManager&>>
+    g_default = InitializeDefault();
 
 }  // namespace iris::pbrt_frontend::materials

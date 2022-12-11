@@ -12,6 +12,8 @@ cc_library(
         "//iris:material",
         "//iris:reference_counted",
         "//iris/materials:matte_material",
+        "//iris/reflectors:uniform_reflector",
+        "//iris/textures:constant_texture",
     ],
 )
 
