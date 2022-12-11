@@ -97,7 +97,7 @@ ParseNamed(Tokenizer& tokenizer, MaterialManager& material_manager,
       g_materials.find(type_parameter.GetStringValues(1).front());
   if (material_builder == g_materials.end()) {
     std::cerr << "ERROR: Unsupported type for directive MakeNamedMaterial: "
-              << *unquoted << std::endl;
+              << type_parameter.GetStringValues(1).front() << std::endl;
     exit(EXIT_FAILURE);
   }
 
