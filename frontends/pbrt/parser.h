@@ -37,6 +37,8 @@ class Parser {
   std::optional<std::string_view> PeekToken();
   std::string_view NextToken();
 
+  bool AttributeBegin();
+  bool AttributeEnd();
   bool Camera();
   bool Include();
   bool Integrator();

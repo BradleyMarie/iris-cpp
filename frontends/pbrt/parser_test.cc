@@ -39,6 +39,54 @@ TEST(Parser, InvalidDirective) {
               "ERROR: Invalid directive: NotADirective");
 }
 
+TEST(AttributeBegin, BeforeWorldBegin) {
+  std::stringstream input("AttributeBegin");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(
+      std::make_unique<
+          iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
+  EXPECT_EXIT(
+      parser.ParseFrom(".", tokenizer), testing::ExitedWithCode(EXIT_FAILURE),
+      "ERROR: Directive cannot be specified before WorldBegin: AttributeBegin");
+}
+
+TEST(AttributeBegin, Mismatched) {
+  std::stringstream input("WorldBegin AttributeBegin TransformEnd");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(
+      std::make_unique<
+          iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Mismatched AttributeBegin and AttributeEnd directives");
+}
+
+TEST(AttributeEnd, BeforeWorldBegin) {
+  std::stringstream input("AttributeEnd");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(
+      std::make_unique<
+          iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
+  EXPECT_EXIT(
+      parser.ParseFrom(".", tokenizer), testing::ExitedWithCode(EXIT_FAILURE),
+      "ERROR: Directive cannot be specified before WorldBegin: AttributeEnd");
+}
+
+TEST(AttributeEnd, Mismatched) {
+  std::stringstream input("WorldBegin AttributeEnd");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(
+      std::make_unique<
+          iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Missing AttributeBegin directive");
+}
+
 TEST(Camera, AfterWorldBegin) {
   std::stringstream input("WorldBegin Camera");
   iris::pbrt_frontend::Tokenizer tokenizer(input);

@@ -13,6 +13,34 @@
 
 namespace iris::pbrt_frontend {
 
+bool Parser::AttributeBegin() {
+  if (!world_begin_encountered_) {
+    std::cerr << "ERROR: Directive cannot be specified before WorldBegin: "
+                 "AttributeBegin"
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  attributes_.push_back(attributes_.back());
+  matrix_manager_->Push();
+
+  return true;
+}
+
+bool Parser::AttributeEnd() {
+  if (!world_begin_encountered_) {
+    std::cerr << "ERROR: Directive cannot be specified before WorldBegin: "
+                 "AttributeEnd"
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  attributes_.pop_back();
+  matrix_manager_->Pop();
+
+  return true;
+}
+
 bool Parser::Camera() {
   if (world_begin_encountered_) {
     std::cerr << "ERROR: Directive cannot be specified between WorldBegin and "
@@ -245,6 +273,8 @@ std::optional<Renderable> Parser::ParseFrom(
 
   static const std::unordered_map<std::string_view, bool (Parser::*)()>
       callbacks = {
+          {"AttributeBegin", &Parser::AttributeBegin},
+          {"AttributeEnd", &Parser::AttributeEnd},
           {"Camera", &Parser::Camera},
           {"Include", &Parser::Include},
           {"Integrator", &Parser::Integrator},
