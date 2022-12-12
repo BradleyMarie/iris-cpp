@@ -8,7 +8,7 @@ TEST(Parse, TooFewParameters) {
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   EXPECT_EXIT(iris::pbrt_frontend::materials::Parse(tokenizer),
               testing::ExitedWithCode(EXIT_FAILURE),
-              "ERROR: Too few parameters to directive Material");
+              "ERROR: Too few parameters to directive: Material");
 }
 
 TEST(Parse, NotAString) {
@@ -45,7 +45,7 @@ TEST(ParseNamed, TooFewParameters) {
       iris::pbrt_frontend::materials::ParseNamed(
           tokenizer, material_manager, spectrum_manager, texture_manager),
       testing::ExitedWithCode(EXIT_FAILURE),
-      "ERROR: Too few parameters to directive MakeNamedMaterial");
+      "ERROR: Too few parameters to directive: MakeNamedMaterial");
 }
 
 TEST(ParseNamed, NotAString) {
@@ -118,11 +118,9 @@ TEST(ParseNamed, WithArgs) {
   iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
 
-  auto result = iris::pbrt_frontend::materials::ParseNamed(
-      tokenizer, material_manager, spectrum_manager, texture_manager);
-  EXPECT_TRUE(result);
-
-  EXPECT_EQ(result, material_manager.Get("name"));
+  iris::pbrt_frontend::materials::ParseNamed(tokenizer, material_manager,
+                                             spectrum_manager, texture_manager);
+  EXPECT_NE(nullptr, material_manager.Get("name"));
 }
 
 TEST(ParseNamed, Matte) {
@@ -133,11 +131,9 @@ TEST(ParseNamed, Matte) {
   iris::pbrt_frontend::spectrum_managers::TestSpectrumManager spectrum_manager;
   iris::pbrt_frontend::TextureManager texture_manager;
 
-  auto result = iris::pbrt_frontend::materials::ParseNamed(
-      tokenizer, material_manager, spectrum_manager, texture_manager);
-  EXPECT_TRUE(result);
-
-  EXPECT_EQ(result, material_manager.Get("name"));
+  iris::pbrt_frontend::materials::ParseNamed(tokenizer, material_manager,
+                                             spectrum_manager, texture_manager);
+  EXPECT_NE(nullptr, material_manager.Get("name"));
 }
 
 TEST(Default, Default) {

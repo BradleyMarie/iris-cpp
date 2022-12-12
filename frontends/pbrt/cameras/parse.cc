@@ -26,7 +26,7 @@ const ObjectBuilder<
 Parse(Tokenizer& tokenizer) {
   auto type = tokenizer.Next();
   if (!type) {
-    std::cerr << "ERROR: Too few parameters to directive Camera" << std::endl;
+    std::cerr << "ERROR: Too few parameters to directive: Camera" << std::endl;
     exit(EXIT_FAILURE);
   }
 

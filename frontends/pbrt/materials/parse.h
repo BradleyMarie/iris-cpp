@@ -16,10 +16,9 @@ const ObjectBuilder<std::shared_ptr<ObjectBuilder<
                     TextureManager&>&
 Parse(Tokenizer& tokenizer);
 
-std::shared_ptr<
-    ObjectBuilder<iris::ReferenceCounted<Material>, TextureManager&>>
-ParseNamed(Tokenizer& tokenizer, MaterialManager& material_manager,
-           SpectrumManager& spectrum_manager, TextureManager& texture_manager);
+void ParseNamed(Tokenizer& tokenizer, MaterialManager& material_manager,
+                SpectrumManager& spectrum_manager,
+                TextureManager& texture_manager);
 
 std::shared_ptr<
     ObjectBuilder<iris::ReferenceCounted<Material>, TextureManager&>>

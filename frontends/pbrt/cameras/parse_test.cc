@@ -7,7 +7,7 @@ TEST(Parse, TooFewParameters) {
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   EXPECT_EXIT(iris::pbrt_frontend::cameras::Parse(tokenizer),
               testing::ExitedWithCode(EXIT_FAILURE),
-              "ERROR: Too few parameters to directive Camera");
+              "ERROR: Too few parameters to directive: Camera");
 }
 
 TEST(Parse, NotAString) {

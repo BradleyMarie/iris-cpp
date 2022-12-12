@@ -17,7 +17,7 @@ static const std::unordered_map<std::string_view, const ObjectBuilder<Result>*>
 const ObjectBuilder<Result>& Parse(Tokenizer& tokenizer) {
   auto type = tokenizer.Next();
   if (!type) {
-    std::cerr << "ERROR: Too few parameters to directive Integrator"
+    std::cerr << "ERROR: Too few parameters to directive: Integrator"
               << std::endl;
     exit(EXIT_FAILURE);
   }

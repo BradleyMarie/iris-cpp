@@ -25,7 +25,8 @@ const ObjectBuilder<std::shared_ptr<ObjectBuilder<
 Parse(Tokenizer& tokenizer) {
   auto type = tokenizer.Next();
   if (!type) {
-    std::cerr << "ERROR: Too few parameters to directive Material" << std::endl;
+    std::cerr << "ERROR: Too few parameters to directive: Material"
+              << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -45,13 +46,12 @@ Parse(Tokenizer& tokenizer) {
   return *iter->second;
 }
 
-std::shared_ptr<
-    ObjectBuilder<iris::ReferenceCounted<Material>, TextureManager&>>
-ParseNamed(Tokenizer& tokenizer, MaterialManager& material_manager,
-           SpectrumManager& spectrum_manager, TextureManager& texture_manager) {
+void ParseNamed(Tokenizer& tokenizer, MaterialManager& material_manager,
+                SpectrumManager& spectrum_manager,
+                TextureManager& texture_manager) {
   auto type = tokenizer.Next();
   if (!type) {
-    std::cerr << "ERROR: Too few parameters to directive MakeNamedMaterial"
+    std::cerr << "ERROR: Too few parameters to directive: MakeNamedMaterial"
               << std::endl;
     exit(EXIT_FAILURE);
   }
@@ -115,8 +115,6 @@ ParseNamed(Tokenizer& tokenizer, MaterialManager& material_manager,
 
   auto result = material_builder->second->Build(parameters, texture_manager);
   material_manager.Put(name, result);
-
-  return result;
 }
 
 std::shared_ptr<

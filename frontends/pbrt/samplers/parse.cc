@@ -21,7 +21,7 @@ const ObjectBuilder<std::unique_ptr<ImageSampler>>& Parse(
     Tokenizer& tokenizer) {
   auto type = tokenizer.Next();
   if (!type) {
-    std::cerr << "ERROR: Too few parameters to directive Sampler" << std::endl;
+    std::cerr << "ERROR: Too few parameters to directive: Sampler" << std::endl;
     exit(EXIT_FAILURE);
   }
 

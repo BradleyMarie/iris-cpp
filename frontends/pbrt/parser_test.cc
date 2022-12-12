@@ -64,6 +64,18 @@ TEST(Camera, Duplicate) {
               "Directive specified twice for a render: Camera");
 }
 
+TEST(Camera, TooFewArguments) {
+  std::stringstream input("Camera");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(
+      std::make_unique<
+          iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Too few parameters to directive: Camera");
+}
+
 TEST(Include, MissingToken) {
   std::stringstream input("Include");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
@@ -73,7 +85,7 @@ TEST(Include, MissingToken) {
           iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
   EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
               testing::ExitedWithCode(EXIT_FAILURE),
-              "ERROR: Too few parameters to directive Include");
+              "ERROR: Too few parameters to directive: Include");
 }
 
 TEST(Include, NotQuoted) {
@@ -152,6 +164,54 @@ TEST(Integrator, Duplicate) {
               "Directive specified twice for a render: Integrator");
 }
 
+TEST(Integrator, TooFewArguments) {
+  std::stringstream input("Integrator");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(
+      std::make_unique<
+          iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Too few parameters to directive: Integrator");
+}
+
+TEST(MakeNamedMaterial, TooFewArguments) {
+  std::stringstream input("MakeNamedMaterial");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(
+      std::make_unique<
+          iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Too few parameters to directive: MakeNamedMaterial");
+}
+
+TEST(Material, BeforeWorldEnd) {
+  std::stringstream input("Material \"matte\"");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(
+      std::make_unique<
+          iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
+  EXPECT_EXIT(
+      parser.ParseFrom(".", tokenizer), testing::ExitedWithCode(EXIT_FAILURE),
+      "ERROR: Directive cannot be specified before WorldBegin: Material");
+}
+
+TEST(Material, TooFewArguments) {
+  std::stringstream input("WorldBegin Material");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(
+      std::make_unique<
+          iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Too few parameters to directive: Material");
+}
+
 TEST(Matrix, Parses) {
   std::stringstream input("Identity");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
@@ -186,7 +246,7 @@ TEST(PixelFilter, MissingToken) {
           iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
   EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
               testing::ExitedWithCode(EXIT_FAILURE),
-              "ERROR: Too few parameters to directive PixelFilter");
+              "ERROR: Too few parameters to directive: PixelFilter");
 }
 
 TEST(PixelFilter, NotQuoted) {
@@ -236,6 +296,18 @@ TEST(Sampler, Duplicate) {
   EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
               testing::ExitedWithCode(EXIT_FAILURE),
               "Directive specified twice for a render: Sampler");
+}
+
+TEST(Sampler, TooFewArguments) {
+  std::stringstream input("Sampler");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(
+      std::make_unique<
+          iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Too few parameters to directive: Sampler");
 }
 
 TEST(WorldBegin, Duplicate) {

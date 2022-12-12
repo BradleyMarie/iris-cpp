@@ -7,7 +7,7 @@ TEST(Parse, TooFewParameters) {
   iris::pbrt_frontend::Tokenizer tokenizer(input);
   EXPECT_EXIT(iris::pbrt_frontend::integrators::Parse(tokenizer),
               testing::ExitedWithCode(EXIT_FAILURE),
-              "ERROR: Too few parameters to directive Integrator");
+              "ERROR: Too few parameters to directive: Integrator");
 }
 
 TEST(Parse, NotAString) {

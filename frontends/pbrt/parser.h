@@ -9,6 +9,7 @@
 #include <string_view>
 #include <vector>
 
+#include "frontends/pbrt/material_manager.h"
 #include "frontends/pbrt/matrix_manager.h"
 #include "frontends/pbrt/renderable.h"
 #include "frontends/pbrt/spectrum_manager.h"
@@ -39,6 +40,8 @@ class Parser {
   bool Camera();
   bool Include();
   bool Integrator();
+  bool MakeNamedMaterial();
+  bool Material();
   bool PixelFilter();
   bool Sampler();
   bool WorldBegin();
@@ -53,7 +56,16 @@ class Parser {
   };
 
   std::vector<TokenizerEntry> tokenizers_;
+
+  struct AttributeEntry {
+    std::shared_ptr<
+        ObjectBuilder<iris::ReferenceCounted<iris::Material>, TextureManager&>>
+        material;
+  };
+
+  std::vector<AttributeEntry> attributes_;
   std::unique_ptr<SpectrumManager> spectrum_manager_;
+  std::unique_ptr<MaterialManager> material_manager_;
   std::unique_ptr<MatrixManager> matrix_manager_;
   std::unique_ptr<TextureManager> texture_manager_;
 

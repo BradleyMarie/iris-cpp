@@ -7,6 +7,7 @@
 #include "frontends/pbrt/build_objects.h"
 #include "frontends/pbrt/cameras/parse.h"
 #include "frontends/pbrt/integrators/parse.h"
+#include "frontends/pbrt/materials/parse.h"
 #include "frontends/pbrt/quoted_string.h"
 #include "frontends/pbrt/samplers/parse.h"
 
@@ -39,7 +40,7 @@ bool Parser::Camera() {
 bool Parser::Include() {
   auto next = tokenizers_.back().tokenizer->Next();
   if (!next) {
-    std::cerr << "ERROR: Too few parameters to directive Include" << std::endl;
+    std::cerr << "ERROR: Too few parameters to directive: Include" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -107,6 +108,28 @@ bool Parser::Integrator() {
   return true;
 }
 
+bool Parser::MakeNamedMaterial() {
+  materials::ParseNamed(*tokenizers_.back().tokenizer, *material_manager_,
+                        *spectrum_manager_, *texture_manager_);
+  return true;
+}
+
+bool Parser::Material() {
+  if (!world_begin_encountered_) {
+    std::cerr
+        << "ERROR: Directive cannot be specified before WorldBegin: Material"
+        << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  const auto& builder = materials::Parse(*tokenizers_.back().tokenizer);
+  attributes_.back().material =
+      BuildObject(builder, *tokenizers_.back().tokenizer, *spectrum_manager_,
+                  *texture_manager_, *texture_manager_);
+
+  return true;
+}
+
 bool Parser::PixelFilter() {
   if (world_begin_encountered_) {
     std::cerr << "ERROR: Directive cannot be specified between WorldBegin and "
@@ -123,7 +146,7 @@ bool Parser::PixelFilter() {
 
   auto next = tokenizers_.back().tokenizer->Next();
   if (!next) {
-    std::cerr << "ERROR: Too few parameters to directive PixelFilter"
+    std::cerr << "ERROR: Too few parameters to directive: PixelFilter"
               << std::endl;
     exit(EXIT_FAILURE);
   }
@@ -209,6 +232,8 @@ std::string_view Parser::NextToken() {
 std::optional<Renderable> Parser::ParseFrom(
     const std::filesystem::path& search_root, Tokenizer& tokenizer,
     std::optional<std::filesystem::path> file_path) {
+  attributes_.emplace_back(materials::Default());
+  material_manager_ = std::make_unique<MaterialManager>();
   matrix_manager_ = std::make_unique<MatrixManager>();
   texture_manager_ = std::make_unique<TextureManager>();
 
@@ -223,6 +248,8 @@ std::optional<Renderable> Parser::ParseFrom(
           {"Camera", &Parser::Camera},
           {"Include", &Parser::Include},
           {"Integrator", &Parser::Integrator},
+          {"MakeNamedMaterial", &Parser::MakeNamedMaterial},
+          {"Material", &Parser::Material},
           {"PixelFilter", &Parser::PixelFilter},
           {"Sampler", &Parser::Sampler},
           {"WorldBegin", &Parser::WorldBegin},
@@ -269,7 +296,9 @@ std::optional<Renderable> Parser::ParseFrom(
   }
 
   camera_ = nullptr;
+  attributes_.clear();
   spectrum_manager_->Clear();
+  material_manager_.reset();
   matrix_manager_.reset();
   texture_manager_.reset();
 
