@@ -40,6 +40,7 @@ class Parser {
   bool AttributeBegin();
   bool AttributeEnd();
   bool Camera();
+  bool Film();
   bool Include();
   bool Integrator();
   bool MakeNamedMaterial();
@@ -73,11 +74,14 @@ class Parser {
 
   std::function<std::unique_ptr<iris::Camera>(const std::pair<size_t, size_t>&)>
       camera_;
+  std::pair<size_t, size_t> image_dimensions_;
   std::unique_ptr<iris::ImageSampler> image_sampler_;
   std::unique_ptr<iris::Integrator> integrator_;
   std::unique_ptr<iris::LightScene::Builder> light_scene_builder_;
+  std::function<void(Framebuffer&, std::ofstream&)> write_function_;
 
   bool camera_encountered_ = false;
+  bool film_encountered_ = false;
   bool sampler_encountered_ = false;
   bool integrator_encountered_ = false;
   bool pixel_filter_encountered_ = false;

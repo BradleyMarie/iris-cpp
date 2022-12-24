@@ -6,6 +6,7 @@
 
 #include "frontends/pbrt/build_objects.h"
 #include "frontends/pbrt/cameras/parse.h"
+#include "frontends/pbrt/film/parse.h"
 #include "frontends/pbrt/integrators/parse.h"
 #include "frontends/pbrt/materials/parse.h"
 #include "frontends/pbrt/quoted_string.h"
@@ -61,6 +62,32 @@ bool Parser::Camera() {
                   *texture_manager_, matrix_manager_->Get());
 
   camera_encountered_ = true;
+
+  return true;
+}
+
+bool Parser::Film() {
+  if (world_begin_encountered_) {
+    std::cerr << "ERROR: Directive cannot be specified between WorldBegin and "
+                 "WorldEnd: Film"
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  if (film_encountered_) {
+    std::cerr << "ERROR: Directive specified twice for a render: Film"
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  const auto& builder = film::Parse(*tokenizers_.back().tokenizer);
+  auto result = BuildObject(builder, *tokenizers_.back().tokenizer,
+                            *spectrum_manager_, *texture_manager_);
+
+  image_dimensions_ = result.resolution;
+  write_function_ = result.write_function;
+
+  film_encountered_ = true;
 
   return true;
 }
@@ -266,6 +293,7 @@ std::optional<Renderable> Parser::ParseFrom(
   texture_manager_ = std::make_unique<TextureManager>();
 
   camera_encountered_ = false;
+  film_encountered_ = false;
   integrator_encountered_ = false;
   pixel_filter_encountered_ = false;
   sampler_encountered_ = false;
@@ -276,6 +304,7 @@ std::optional<Renderable> Parser::ParseFrom(
           {"AttributeBegin", &Parser::AttributeBegin},
           {"AttributeEnd", &Parser::AttributeEnd},
           {"Camera", &Parser::Camera},
+          {"Film", &Parser::Film},
           {"Include", &Parser::Include},
           {"Integrator", &Parser::Integrator},
           {"MakeNamedMaterial", &Parser::MakeNamedMaterial},

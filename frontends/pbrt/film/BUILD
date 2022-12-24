@@ -28,6 +28,7 @@ cc_library(
     name = "parse",
     srcs = ["parse.cc"],
     hdrs = ["parse.h"],
+    visibility = ["//frontends/pbrt:__subpackages__"],
     deps = [
         ":image",
         ":result",
@@ -47,6 +48,7 @@ cc_test(
 cc_library(
     name = "result",
     hdrs = ["result.h"],
+    visibility = ["//frontends/pbrt:__subpackages__"],
     deps = [
         "//iris:framebuffer",
     ],

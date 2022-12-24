@@ -124,6 +124,43 @@ TEST(Camera, TooFewArguments) {
               "ERROR: Too few parameters to directive: Camera");
 }
 
+TEST(Film, AfterWorldBegin) {
+  std::stringstream input("WorldBegin Film");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(
+      std::make_unique<
+          iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Directive cannot be specified between WorldBegin and "
+              "WorldEnd: Film");
+}
+
+TEST(Film, Duplicate) {
+  std::stringstream input("Film \"image\" Film \"image\"");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(
+      std::make_unique<
+          iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "Directive specified twice for a render: Film");
+}
+
+TEST(Film, TooFewArguments) {
+  std::stringstream input("Film");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(
+      std::make_unique<
+          iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Too few parameters to directive: Film");
+}
+
 TEST(Include, MissingToken) {
   std::stringstream input("Include");
   iris::pbrt_frontend::Tokenizer tokenizer(input);
