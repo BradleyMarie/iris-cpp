@@ -7,7 +7,7 @@
 #include "frontends/pbrt/area_lights/diffuse.h"
 #include "frontends/pbrt/quoted_string.h"
 
-namespace iris::pbrt_frontend::integrators {
+namespace iris::pbrt_frontend::area_lights {
 namespace {
 
 static const std::unordered_map<
@@ -47,4 +47,4 @@ Parse(Tokenizer& tokenizer) {
   return *iter->second;
 }
 
-}  // namespace iris::pbrt_frontend::integrators
+}  // namespace iris::pbrt_frontend::area_lights

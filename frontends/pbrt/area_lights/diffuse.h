@@ -8,7 +8,7 @@
 #include "iris/emissive_material.h"
 #include "iris/reference_counted.h"
 
-namespace iris::pbrt_frontend::integrators {
+namespace iris::pbrt_frontend::area_lights {
 
 extern const std::unique_ptr<
     const ObjectBuilder<std::pair<iris::ReferenceCounted<EmissiveMaterial>,
@@ -16,6 +16,6 @@ extern const std::unique_ptr<
                         SpectrumManager&>>
     g_diffuse_builder;
 
-}  // namespace iris::pbrt_frontend::integrators
+}  // namespace iris::pbrt_frontend::area_lights
 
 #endif  // _FRONTENDS_PBRT_AREA_LIGHTS_DIFFUSE_

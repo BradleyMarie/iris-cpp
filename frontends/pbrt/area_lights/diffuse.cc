@@ -4,7 +4,7 @@
 
 #include "iris/emissive_materials/constant_emissive_material.h"
 
-namespace iris::pbrt_frontend::integrators {
+namespace iris::pbrt_frontend::area_lights {
 namespace {
 
 static const Color kDefaultEmissions({1.0, 1.0, 1.0}, Color::RGB);
@@ -48,7 +48,7 @@ DiffuseObjectBuilder::Build(
   auto samples = parameters.find("samples");
   if (samples != parameters.end()) {
     auto value = samples->second.GetIntegerValues(1).front();
-    if (value < 0 || value > std::numeric_limits<uint8_t>::max()) {
+    if (value <= 0 || value > std::numeric_limits<uint8_t>::max()) {
       std::cerr << "ERROR: Out of range value for parameter: samples"
                 << std::endl;
       exit(EXIT_FAILURE);
@@ -80,4 +80,4 @@ const std::unique_ptr<
                         SpectrumManager&>>
     g_diffuse_builder = std::make_unique<DiffuseObjectBuilder>();
 
-}  // namespace iris::pbrt_frontend::integrators
+}  // namespace iris::pbrt_frontend::area_lights
