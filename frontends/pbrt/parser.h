@@ -37,6 +37,7 @@ class Parser {
   std::optional<std::string_view> PeekToken();
   std::string_view NextToken();
 
+  bool AreaLightSource();
   bool AttributeBegin();
   bool AttributeEnd();
   bool Camera();
@@ -64,6 +65,9 @@ class Parser {
     std::shared_ptr<
         ObjectBuilder<iris::ReferenceCounted<iris::Material>, TextureManager&>>
         material;
+    std::pair<iris::ReferenceCounted<iris::EmissiveMaterial>,
+              iris::ReferenceCounted<iris::EmissiveMaterial>>
+        emissive_material;
   };
 
   std::vector<AttributeEntry> attributes_;

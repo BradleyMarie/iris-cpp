@@ -39,6 +39,31 @@ TEST(Parser, InvalidDirective) {
               "ERROR: Invalid directive: NotADirective");
 }
 
+TEST(AreaLightSource, BeforeWorldEnd) {
+  std::stringstream input("AreaLightSource \"diffuse\"");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(
+      std::make_unique<
+          iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Directive cannot be specified before WorldBegin: "
+              "AreaLightSource");
+}
+
+TEST(AreaLightSource, TooFewArguments) {
+  std::stringstream input("WorldBegin AreaLightSource");
+  iris::pbrt_frontend::Tokenizer tokenizer(input);
+
+  iris::pbrt_frontend::Parser parser(
+      std::make_unique<
+          iris::pbrt_frontend::spectrum_managers::TestSpectrumManager>());
+  EXPECT_EXIT(parser.ParseFrom(".", tokenizer),
+              testing::ExitedWithCode(EXIT_FAILURE),
+              "ERROR: Too few parameters to directive: AreaLightSource");
+}
+
 TEST(AttributeBegin, BeforeWorldBegin) {
   std::stringstream input("AttributeBegin");
   iris::pbrt_frontend::Tokenizer tokenizer(input);

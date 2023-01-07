@@ -154,6 +154,7 @@ cc_library(
         ":spectrum_manager",
         ":texture_manager",
         ":tokenizer",
+        "//frontends/pbrt/area_lights:parse",
         "//frontends/pbrt/cameras:parse",
         "//frontends/pbrt/film:parse",
         "//frontends/pbrt/integrators:parse",

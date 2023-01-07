@@ -4,6 +4,7 @@
 #include <iostream>
 #include <unordered_map>
 
+#include "frontends/pbrt/area_lights/parse.h"
 #include "frontends/pbrt/build_objects.h"
 #include "frontends/pbrt/cameras/parse.h"
 #include "frontends/pbrt/film/parse.h"
@@ -13,6 +14,22 @@
 #include "frontends/pbrt/samplers/parse.h"
 
 namespace iris::pbrt_frontend {
+
+bool Parser::AreaLightSource() {
+  if (!world_begin_encountered_) {
+    std::cerr << "ERROR: Directive cannot be specified before WorldBegin: "
+                 "AreaLightSource"
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  const auto& builder = area_lights::Parse(*tokenizers_.back().tokenizer);
+  attributes_.back().emissive_material =
+      BuildObject(builder, *tokenizers_.back().tokenizer, *spectrum_manager_,
+                  *texture_manager_, *spectrum_manager_);
+
+  return true;
+}
 
 bool Parser::AttributeBegin() {
   if (!world_begin_encountered_) {
@@ -301,6 +318,7 @@ std::optional<Renderable> Parser::ParseFrom(
 
   static const std::unordered_map<std::string_view, bool (Parser::*)()>
       callbacks = {
+          {"AreaLightSource", &Parser::AreaLightSource},
           {"AttributeBegin", &Parser::AttributeBegin},
           {"AttributeEnd", &Parser::AttributeEnd},
           {"Camera", &Parser::Camera},
