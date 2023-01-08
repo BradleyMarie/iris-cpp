@@ -143,9 +143,9 @@ std::optional<Point> Triangle::SampleFace(face_t face, Sampler& sampler) const {
   geometric_t u = sampler.Next();
   geometric_t v = sampler.Next();
 
-  if (u + v > 1.0) {
-    u = 1.0 - u;
-    v = 1.0 - v;
+  if (u + v > (geometric_t)1.0) {
+    u = (geometric_t)1.0 - u;
+    v = (geometric_t)1.0 - v;
   }
 
   Vector v0_to_v1 =
