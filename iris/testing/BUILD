@@ -16,6 +16,17 @@ cc_library(
 )
 
 cc_library(
+    name = "hit_allocator",
+    testonly = True,
+    srcs = ["hit_allocator.cc"],
+    hdrs = ["hit_allocator.h"],
+    deps = [
+        "//iris:hit_allocator",
+        "//iris/internal:arena",
+    ],
+)
+
+cc_library(
     name = "light_sample_allocator",
     testonly = True,
     srcs = ["light_sample_allocator.cc"],

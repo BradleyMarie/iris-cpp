@@ -86,7 +86,13 @@ Vector Triangle::ComputeSurfaceNormal() const {
 Vector Triangle::ComputeSurfaceNormal(const Point& hit_point, face_t face,
                                       const void* additional_data) const {
   Vector surface_normal = ComputeSurfaceNormal();
-  return Normalize(surface_normal);
+  Vector normalized = Normalize(surface_normal);
+
+  if (face == FRONT_FACE) {
+    return normalized;
+  }
+
+  return -normalized;
 }
 
 std::optional<TextureCoordinates> Triangle::ComputeTextureCoordinates(
@@ -121,8 +127,13 @@ std::variant<Vector, const NormalMap*> Triangle::ComputeShadingNormal(
   Vector shading_normal = shared_->normals[vertices_[0]] * (*barycentric)[0] +
                           shared_->normals[vertices_[1]] * (*barycentric)[1] +
                           shared_->normals[vertices_[2]] * (*barycentric)[2];
+  Vector normalized = Normalize(shading_normal);
 
-  return Normalize(shading_normal);
+  if (face == FRONT_FACE) {
+    return normalized;
+  }
+
+  return -normalized;
 }
 
 const Material* Triangle::GetMaterial(face_t face,
@@ -261,8 +272,8 @@ Hit* Triangle::Trace(const Ray& ray, HitAllocator& hit_allocator) const {
     front_face = FRONT_FACE;
     back_face = BACK_FACE;
   } else {
-    front_face = FRONT_FACE;
-    back_face = BACK_FACE;
+    front_face = BACK_FACE;
+    back_face = FRONT_FACE;
   }
 
   return &hit_allocator.Allocate(nullptr, distance, front_face, back_face,
