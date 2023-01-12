@@ -20,6 +20,7 @@ cc_test(
         "//iris/emissive_materials:mock_emissive_material",
         "//iris/materials:mock_material",
         "//iris/normal_maps:mock_normal_map",
+        "//iris/random:mock_random",
         "//iris/testing:hit_allocator",
         "@com_google_googletest//:gtest_main",
     ],
